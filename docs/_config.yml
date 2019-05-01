@@ -1,1 +1,11 @@
 remote_theme: pmarsceill/just-the-docs
+title: Iota9
+description: The Iota9 Programming Language
+baseurl: "/iota9/"
+url: "https://salifm.github.io"
+search_enabled: true
+aux_links:
+  "Iota9 on GitHub":
+    - "//github.com/salifm/iota9"
+plugins:
+  - jekyll-seo-tag
