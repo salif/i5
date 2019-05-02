@@ -1,5 +1,7 @@
 # The Iota9 Programming Language
 
+The **iota9** is a script programming language with a interpreter.
+
 ![](docs/res/images/iota9_1536_768.png)
 
 ---
