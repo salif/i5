@@ -9,7 +9,7 @@
 ### Golang
 
 ```sh
-go get github.com/salifm/
+go get github.com/salifm/iota9
 ```
 
 ### Download
