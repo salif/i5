@@ -30,4 +30,4 @@ STATEMENT
 
 # ELSE :
   'else' IF
-  | else 
+  | 'else' '{' STATEMENTS '}'
