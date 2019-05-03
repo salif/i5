@@ -14,15 +14,20 @@ SYNTAX RULES
 
 # STATEMENTS :
 STATEMENT
-| STATEMENTS STATEMENT
+  | STATEMENTS STATEMENT
 
 # STATEMENT :
-IF
-| WHILE
-| SWITCH
-| FOR
-| FUNCTION
-|
+  IF
+  | WHILE
+  | SWITCH
+  | FOR
+  | FUNCTION
+  |
 
 # IF :
-if  '(' CONDITATION ')' '{' STATEMENTS '}'
+  'if'  '(' CONDITATION ')' '{' STATEMENTS '}'
+  | 'if'  '(' CONDITATION ')' '{' STATEMENTS '}' ELSE
+
+# ELSE :
+  'else' IF
+  | else 
