@@ -27,6 +27,9 @@ STATEMENT
 # WHILE :
   'while' '(' CONDITATION ')' '{' STATEMENTS '}'
 
+# FOR :
+  'for' '(' EXPRESSIONS ';' CONDITATION ';' EXPRESSIONS ')' '{' STATEMENTS '}'
+
 # IF :
   'if'  '(' CONDITATION ')' '{' STATEMENTS '}'
   | 'if'  '(' CONDITATION ')' '{' STATEMENTS '}' ELSE
