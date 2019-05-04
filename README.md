@@ -26,7 +26,7 @@ iota5 file.i5
 
 ## Community
 
-* [Gitter](https://gitter.im/iota5/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
+* [Gitter](https://gitter.im/iota5-lang/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 * [Discord](https://discord.gg/nFhr9mx)
 
 ## License
