@@ -24,6 +24,9 @@ STATEMENT
   | FUNCTION
   |
 
+# WHILE :
+  'while' '(' CONDITATION ')' '{' STATEMENTS '}'
+
 # IF :
   'if'  '(' CONDITATION ')' '{' STATEMENTS '}'
   | 'if'  '(' CONDITATION ')' '{' STATEMENTS '}' ELSE
