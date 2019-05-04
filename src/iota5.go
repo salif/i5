@@ -1,11 +1,11 @@
 package src
 
 import (
-	"github.com/salifm/iota9/src/file"
-	"github.com/salifm/iota9/src/help"
-	"github.com/salifm/iota9/src/lexer"
-	"github.com/salifm/iota9/src/parser"
-	"github.com/salifm/iota9/src/interpreter"
+	"github.com/salifm/iota5/src/file"
+	"github.com/salifm/iota5/src/help"
+	"github.com/salifm/iota5/src/lexer"
+	"github.com/salifm/iota5/src/parser"
+	"github.com/salifm/iota5/src/interpreter"
 )
 
 func Run(args []string) int {

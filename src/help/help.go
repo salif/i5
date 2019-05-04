@@ -8,7 +8,7 @@ func Print() int {
 	fmt.Println(`
 	Usage:
 
-		iota9 [options] [file]
+		iota5 [options] [file]
 
 	options:
 
