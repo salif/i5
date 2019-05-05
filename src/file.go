@@ -1,4 +1,4 @@
-package file
+package src
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 )
 
-func Read(name string) string {
+func ReadFile(name string) string {
 	file, err := ioutil.ReadFile(name)
 	if err != nil {
 		fmt.Println("error: " + name + ": No such file or directory")
