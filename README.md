@@ -11,7 +11,7 @@ The **iota5** is a script programming language with a interpreter.
 ### Golang
 
 ```sh
-go get github.com/salifm/iota5
+$ go get github.com/salifm/iota5
 ```
 
 ### Download
@@ -21,7 +21,7 @@ go get github.com/salifm/iota5
 ## Usage
 
 ```sh
-iota5 file.i5
+ $ iota5 file.i5
 ```
 
 ## Community
