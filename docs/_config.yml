@@ -1,11 +1,11 @@
 remote_theme: pmarsceill/just-the-docs
 title: iota5
 description: The iota5 Programming Language
-baseurl: "/iota5/"
-url: "https://salifm.github.io"
+baseurl: "/"
+url: "https://iota5-lang.github.io"
 search_enabled: true
 aux_links:
   "iota5 on GitHub":
-    - "//github.com/salifm/iota5"
+    - "//github.com/iota5-lang/iota5"
 plugins:
   - jekyll-seo-tag

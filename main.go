@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/salifm/iota5/src"
+	"github.com/iota5-lang/iota5/src"
 	"os"
 )
 

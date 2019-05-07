@@ -11,12 +11,12 @@ The **iota5** is a script programming language with a interpreter.
 ### Golang
 
 ```sh
-$ go get github.com/salifm/iota5
+$ go get github.com/iota5-lang/iota5
 ```
 
 ### Download
 
-* [https://github.com/salifm/iota5/releases](https://github.com/salifm/iota5/releases)
+* [https://github.com/iota5-lang/iota5/releases](https://github.com/iota5-lang/iota5/releases)
 
 ## Usage
 
