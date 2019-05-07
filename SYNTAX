@@ -24,6 +24,9 @@ STATEMENT
   | FUNCTION
   |
 
+# FUNCTION
+  'function' IDENTIFIER '(' ')' '{' '}'
+
 # WHILE :
   'while' '(' CONDITATION ')' '{' STATEMENTS '}'
 
