@@ -26,7 +26,14 @@ STATEMENT
   |
 
 # FUNCTION
-  'function' IDENTIFIER '(' ')' '{' '}'
+  'function' IDENTIFIER '(' ARGUMENTS ')' '{' '}'
+
+# ARGUMENTS
+  ARGUMENTS ',' ARGUMENT 
+  | ARGUMENTS ARGUMENT ','
+
+# ARGUMENT
+  VALUE
 
 # WHILE :
   'while' '(' CONDITATION ')' '{' STATEMENTS '}'
@@ -41,3 +48,10 @@ STATEMENT
 # ELSE :
   'else' IF
   | 'else' '{' STATEMENTS '}'
+
+# VALUE
+  [a-zA-Z_][a-zA-Z0-9_]+
+  (-|+|)[0-9]+
+  'true'
+  'false'
+  'null'
