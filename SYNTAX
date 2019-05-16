@@ -19,6 +19,7 @@ SYNTAX RULES
 
 # STATEMENT :
   IF
+  | DOWHILE
   | WHILE
   | SWITCH
   | FOR
@@ -33,8 +34,11 @@ SYNTAX RULES
   | ARGUMENTS ARGUMENT ','
   | 
 
-# ARGUMENT
+# ARGUMENT :
   VALUE
+
+# DOWHILE :
+  'do' '{' STATEMENTS '}' 'while' '(' CONDITATION ')' ';'
 
 # WHILE :
   'while' '(' CONDITATION ')' '{' STATEMENTS '}'
