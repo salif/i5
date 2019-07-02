@@ -17,7 +17,5 @@ func parseArgs(args []string) int {
 }
 
 func Execute(source string) int {
-	var tokens []token = Tokenizer(source)
-	var ast []token = Parser(tokens)
-	return Interpreter(ast)
+	return Interpreter(Parser(Tokenizer(source)))
 }

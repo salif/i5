@@ -1,8 +1,10 @@
-# The iota5 Programming Language
+# The iota5 programming language
 
 The **iota5** is a script programming language with a interpreter.
 
-![iota5](docs/res/images/iota5_lang.png)
+<div style="text-align: center;">
+    <img src="docs/res/images/i5.png" alt="iota5" />
+</div>
 
 ---
 
