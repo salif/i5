@@ -2,10 +2,6 @@
 
 The **iota5** is a script programming language with a interpreter.
 
-<div style="text-align: center;">
-    <img src="docs/res/images/i5.png" alt="iota5" />
-</div>
-
 ---
 
 ## Install
@@ -30,6 +26,10 @@ $ go get github.com/iota5-lang/iota5
 
 * [Gitter](https://gitter.im/iota5-lang/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 * [Discord](https://discord.gg/nFhr9mx)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more.
 
 ## License
 
