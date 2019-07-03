@@ -8,7 +8,7 @@ func PrintHelp() int {
 	fmt.Println(`
 Usage:
 
-	iota5 [options] [file]
+	i5 [options] [file]
 
 options:
 

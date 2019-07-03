@@ -1,25 +1,25 @@
-# The iota5 programming language
+# The i5 programming language
 
-The **iota5** is a script programming language with a interpreter.
+The **i5** is a script programming language with a interpreter.
 
 ---
 
 ## Install
 
-### Golang
+### Build from source
 
 ```sh
-$ go get github.com/iota5-lang/iota5
+$ go get github.com/i5-lang/i5
 ```
 
 ### Download
 
-* [https://github.com/iota5-lang/iota5/releases](https://github.com/iota5-lang/iota5/releases)
+* [https://github.com/i5-lang/i5/releases](https://github.com/i5-lang/i5/releases)
 
 ## Usage
 
 ```sh
- $ iota5 file.i5
+ $ i5 file.i5
 ```
 
 ## Community

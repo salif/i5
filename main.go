@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/iota5-lang/iota5/src"
+	"github.com/i5-lang/i5/src"
 	"os"
 )
 

@@ -1,11 +1,11 @@
 remote_theme: pmarsceill/just-the-docs
-title: iota5
-description: The iota5 Programming Language
+title: i5
+description: The i5 programming language
 baseurl: "/"
-url: "https://iota5-lang.github.io"
+url: "https://i5-lang.github.io"
 search_enabled: true
 aux_links:
   "iota5 on GitHub":
-    - "//github.com/iota5-lang/iota5"
+    - "//github.com/i5-lang/i5"
 plugins:
   - jekyll-seo-tag
