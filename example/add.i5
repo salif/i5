@@ -1,0 +1,7 @@
+fn add(a, b) {
+	ret a + b
+}
+
+fn main(args) {
+	$print( add(5, 3) )
+}
