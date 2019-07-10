@@ -1,0 +1,11 @@
+#!/usr/bin/env i5
+
+fn main() {
+    a := 1
+    b := 2
+    $print(sum(a, b))
+}
+
+fn sum(a, b) {
+    return a + b
+}
