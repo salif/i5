@@ -33,4 +33,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more.
 
 ## License
 
-This project is licensed under the [GPLv3 License](LICENSE).
+This project is licensed under the [GPL v3 License](LICENSE).

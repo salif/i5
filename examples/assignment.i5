@@ -1,0 +1,6 @@
+fn main() {
+	variable := 1
+	variable = 2
+	$print(variable)
+	# output: 2
+}

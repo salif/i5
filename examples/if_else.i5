@@ -1,0 +1,8 @@
+fn main() {
+	if(false) {
+		$print("false")
+	} else {
+		$print("true")
+	}
+	# output: "true"
+}
