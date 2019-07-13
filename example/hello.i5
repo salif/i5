@@ -1,3 +1,0 @@
-fn main(args) {
-	$print("Hello, World!")
-}

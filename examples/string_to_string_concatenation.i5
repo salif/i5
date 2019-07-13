@@ -1,0 +1,6 @@
+fn main() {
+	variable := "first"
+	variable += " "
+	$print(variable + "second")
+	# output: "first second"
+}
