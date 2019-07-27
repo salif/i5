@@ -9,7 +9,7 @@ The **i5** is a script programming language with a interpreter.
 ### Build from source
 
 ```sh
-$ go get github.com/i5-lang/i5
+$ go get -u github.com/i5-lang/i5
 ```
 
 ### Download
