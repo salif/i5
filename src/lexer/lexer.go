@@ -8,15 +8,22 @@ package lexer
 // eol eof
 
 import (
-	"github.com/i5-lang/i5/src/error"
-	"github.com/i5-lang/i5/src/types"
+	"github.com/i5/i5/src/errors"
+	"github.com/i5/i5/src/types"
+	"strings"
 )
 
 var (
-	keywords map[string]bool = map[string]bool{"if": true, "elif": true, "else": true, "for": true, "break": true,
-		"continue": true, "fn": true, "return": true, "true": true, "false": true, "and": true, "or": true, "null": true}
-	operators map[string]bool = map[string]bool{"+": true, "-": true, "*": true, "/": true, "=": true, "%": true, "!": true, "<": true, ">": true, ".": true, ":": true}
-	bbp       map[string]bool = map[string]bool{"{": true, "}": true, "(": true, ")": true}
+	keywords map[string]bool = map[string]bool{
+		"if": true, "elif": true, "else": true, "for": true, "break": true,
+		"continue": true, "fn": true, "return": true, "try": true, "catch": true, "import": true}
+	bools map[string]bool = map[string]bool{
+		"true": true, "false": true}
+	operators map[string]bool = map[string]bool{
+		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true, "|": true,
+		"%": true, "!": true, "<": true, ">": true, ".": true, ":": true, "@": true, "?": true}
+	bbp map[string]bool = map[string]bool{
+		"{": true, "}": true, "(": true, ")": true}
 )
 
 func Run(code []byte) (tokens types.TokenList) {
@@ -99,6 +106,11 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
+		// if char is string(A-Z)
+		if between(char, 65, 90) {
+			char = ([]byte(strings.ToLower(string(char))))[0]
+		}
+
 		// if char is "_" or "$" or string(a-z)
 		if equals(char, 95) || equals(char, 36) || between(char, 97, 122) {
 			var value string = ""
@@ -112,6 +124,8 @@ func Run(code []byte) (tokens types.TokenList) {
 
 			if contains(keywords, value) {
 				tokens.Add("keyword", value, scanner.line)
+			} else if contains(bools, value) {
+				tokens.Add("bool", value, scanner.line)
 			} else {
 				tokens.Add("identifier", value, scanner.line)
 			}
@@ -130,7 +144,7 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		error.FatalLexerError("error: line %v: %v: unexpected token\n", scanner.line, string(char), 1)
+		errors.FatalLexerError("error: line %v: %v: unexpected token\n", scanner.line, string(char), 1)
 	}
 	tokens.Add("eof", "eof", 0)
 	return tokens

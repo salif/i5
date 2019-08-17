@@ -3,7 +3,7 @@
 * Create a fork of the repository.
 * Clone the repo
 ```
-git clone https://github.com/i5-lang/i5.git
+git clone https://github.com/i5/i5.git
 ```
 * Switch to `dev` branch
 ```

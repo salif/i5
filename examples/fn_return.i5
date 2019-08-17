@@ -1,9 +1,0 @@
-fn main() {
-	variable := f()
-	$print(variable)
-	# output: "f()"
-}
-
-fn f() {
-	return "f()"
-}

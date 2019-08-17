@@ -15,3 +15,7 @@ func (ta *TokenList) Add(kind string, char string, line int) {
 func (ta TokenList) Get(index int) Token {
 	return ta.list[index]
 }
+
+func (ta TokenList) Size() int {
+	return len(ta.list)
+}

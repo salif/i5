@@ -1,6 +1,0 @@
-fn main() {
-	variable := 1
-	variable += "st"
-	$print(variable)
-	# output: "1st"
-}

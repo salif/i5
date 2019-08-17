@@ -1,6 +1,0 @@
-fn main() {
-	variable := "number: "
-	variable += 1
-	$print(variable + 2)
-	# output: "number: 12"
-}

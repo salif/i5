@@ -1,0 +1,15 @@
+fn main() {
+	f()
+	# output: "text"
+	text = get_text()
+	$print(text)
+	# output: "text2"
+}
+
+fn f() {
+	$print("text")
+}
+
+fn get_text() {
+	return "text2"
+}

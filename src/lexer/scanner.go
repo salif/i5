@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"github.com/i5-lang/i5/src/error"
+	"github.com/i5/i5/src/errors"
 )
 
 type Scanner struct {
@@ -30,7 +30,7 @@ func (sc *Scanner) Peek() byte {
 	if sc.HasNext() {
 		return sc.code[sc.position]
 	} else {
-		error.FatalLexerError("error: line %v: %v: index out of range\n", sc.line, "", 1)
+		errors.FatalLexerError("error: line %v: %v: index out of range\n", sc.line, "", 1)
 		return 0
 	}
 }

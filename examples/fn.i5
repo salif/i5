@@ -1,8 +1,0 @@
-fn main() {
-	f()
-	# output: "f()"
-}
-
-fn f() {
-	$print("f()")
-}

@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"github.com/i5-lang/i5/src/types"
+	"github.com/i5/i5/src/types"
 )
 
 var (
@@ -16,17 +16,17 @@ func Run(tkns types.TokenList) types.Node {
 		Dlm:  "eol",
 		Body: []types.Node{},
 	}
-	walk(&root.Body, "eof")
+	Walk(&root.Body, "eof")
 	root.Body = append(root.Body, types.Node{
 		Kind:  "eol",
 		Value: "eol",
 	})
 	var dn types.Node
-	group(root, &dn)
+	Group(root, &dn)
 	return dn
 }
 
-func walk(cnode *[]types.Node, until string) {
+func Walk(cnode *[]types.Node, until string) {
 	current++
 	tkn := tokens.Get(current)
 	if tkn.Kind == until {
@@ -38,7 +38,7 @@ func walk(cnode *[]types.Node, until string) {
 			Dlm:  "Dlm",
 			Body: []types.Node{},
 		}
-		walk(&n.Body, ")")
+		Walk(&n.Body, ")")
 
 		*cnode = append(*cnode, n)
 	} else if tkn.Kind == "{" {
@@ -47,7 +47,7 @@ func walk(cnode *[]types.Node, until string) {
 			Dlm:  "eol",
 			Body: []types.Node{},
 		}
-		walk(&n.Body, "}")
+		Walk(&n.Body, "}")
 		*cnode = append(*cnode, n)
 	} else {
 		*cnode = append(*cnode, types.Node{
@@ -57,11 +57,11 @@ func walk(cnode *[]types.Node, until string) {
 	}
 
 	if tkn.Kind != until {
-		walk(cnode, until)
+		Walk(cnode, until)
 	}
 }
 
-func group(nd types.Node, dn *types.Node) {
+func Group(nd types.Node, dn *types.Node) {
 	er := types.Node{
 		Kind: "statement",
 		Body: []types.Node{},
@@ -83,7 +83,7 @@ func group(nd types.Node, dn *types.Node) {
 				er.Body = append(er.Body, n)
 			} else {
 				var tdn types.Node
-				group(n, &tdn)
+				Group(n, &tdn)
 				er.Body = append(er.Body, tdn)
 			}
 			if i == len(nd.Body)-1 {

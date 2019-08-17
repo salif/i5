@@ -1,6 +1,6 @@
 # The i5 programming language
 
-The **i5** is a script programming language with a interpreter.
+**i5** is a lightweight, interpreted programming language
 
 ---
 
@@ -9,12 +9,12 @@ The **i5** is a script programming language with a interpreter.
 ### Build from source
 
 ```sh
-$ go get -u github.com/i5-lang/i5
+$ go get -u github.com/i5/i5
 ```
 
 ### Download
 
-* [https://github.com/i5-lang/i5/releases](https://github.com/i5-lang/i5/releases)
+* [https://github.com/i5/i5/releases](https://github.com/i5/i5/releases)
 
 ## Usage
 
