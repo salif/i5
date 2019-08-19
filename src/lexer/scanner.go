@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"github.com/i5/i5/src/errors"
+	_ "github.com/i5/i5/src/io/console"
 )
 
 type Scanner struct {
@@ -16,6 +17,14 @@ func (sc *Scanner) Init(code []byte) {
 	sc.lenght = len(code)
 	sc.position = 0
 	sc.line = 1
+}
+
+func (sc *Scanner) NextLine() {
+	sc.line++
+}
+
+func (sc *Scanner) Line() int {
+	return sc.line
 }
 
 func (sc *Scanner) HasNext() bool {
@@ -33,4 +42,16 @@ func (sc *Scanner) Peek() byte {
 		errors.FatalLexerError("error: line %v: %v: index out of range\n", sc.line, "", 1)
 		return 0
 	}
+}
+
+func (sc *Scanner) Until(char byte) bool {
+	return sc.Peek() != char
+}
+
+func (sc *Scanner) PeekEquals(char byte) bool {
+	return sc.Peek() == char
+}
+
+func (sc *Scanner) PeekBetween(first byte, second byte) bool {
+	return (sc.Peek() >= first && sc.Peek() <= second)
 }

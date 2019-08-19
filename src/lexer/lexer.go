@@ -3,25 +3,22 @@ package lexer
 // All tokens:
 // ( ) { }
 // number string
-// keyword identifier
+// keyword bool identifier
 // operator dlm
 // eol eof
 
 import (
 	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/types"
-	"strings"
 )
 
 var (
 	keywords map[string]bool = map[string]bool{
-		"if": true, "elif": true, "else": true, "for": true, "break": true,
-		"continue": true, "fn": true, "return": true, "try": true, "catch": true, "import": true}
+		"if": true, "elif": true, "else": true, "for": true, "break": true, "continue": true, "fn": true, "return": true, "try": true, "catch": true}
 	bools map[string]bool = map[string]bool{
-		"true": true, "false": true}
+		"true": true, "false:": true}
 	operators map[string]bool = map[string]bool{
-		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true, "|": true,
-		"%": true, "!": true, "<": true, ">": true, ".": true, ":": true, "@": true, "?": true}
+		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true, "|": true, "%": true, "!": true, "<": true, ">": true, ".": true, ":": true}
 	bbp map[string]bool = map[string]bool{
 		"{": true, "}": true, "(": true, ")": true}
 )
@@ -32,119 +29,113 @@ func Run(code []byte) (tokens types.TokenList) {
 	scanner.Init(code)
 
 	for scanner.HasNext() {
-		char := scanner.Peek()
 
-		if contains(bbp, string(char)) {
-			tokens.Add(string(char), string(char), scanner.line)
+		// if char is "{" or "}" or "(" or ")"
+		if contains(bbp, string(scanner.Peek())) {
+			tokens.Add(string(scanner.Peek()), string(scanner.Peek()), scanner.Line())
 			scanner.Next()
 			continue
 		}
 
 		// if char is "\n"
-		if equals(char, 10) {
-			tokens.Add("eol", "eol", scanner.line)
-			scanner.line++
+		if scanner.PeekEquals(10) {
+			tokens.Add("eol", "eol", scanner.Line())
+			scanner.NextLine()
 			scanner.Next()
 			continue
 		}
 
 		// if char is "\t" or " " or "\r"
-		if equals(char, 9) || equals(char, 32) || equals(char, 13) {
+		if scanner.PeekEquals(9) || scanner.PeekEquals(32) || scanner.PeekEquals(13) {
 			scanner.Next()
 			continue
 		}
 
 		// if char is ","
-		if equals(char, 44) {
-			tokens.Add("dlm", ",", scanner.line)
+		if scanner.PeekEquals(44) {
+			tokens.Add("dlm", ",", scanner.Line())
 			scanner.Next()
 			continue
 		}
 
 		// if char is number(0-9)
-		if between(char, 48, 57) {
+		if scanner.PeekBetween(48, 57) {
 			var value string = ""
 
 			// if char is number(0-9) or "."
-			for scanner.HasNext() && (between(char, 48, 57) || equals(char, 46)) {
-				value += string(char)
-				scanner.Next()
-				char = scanner.Peek()
+			for ; scanner.HasNext() && (scanner.PeekBetween(48, 57) || scanner.PeekEquals(46)); scanner.Next() {
+				value += string(scanner.Peek())
 			}
-			tokens.Add("number", value, scanner.line)
+			tokens.Add("number", value, scanner.Line())
 			continue
 		}
 
 		// if char is "#"
-		if equals(char, 35) {
-			for scanner.HasNext() && char != 10 {
-				scanner.Next()
-				char = scanner.Peek()
+		if scanner.PeekEquals(35) {
+			scanner.Next()
+			for ; scanner.HasNext() && scanner.Until(10); scanner.Next() {
 			}
+			continue
+		}
+
+		// if char is "`"
+		if scanner.PeekEquals(96) {
+			scanner.Next()
+			for ; scanner.HasNext() && scanner.Until(96); scanner.Next() {
+			}
+			scanner.Next()
 			continue
 		}
 
 		// if char is '"'
-		if equals(char, 34) {
-			var value string = ""
+		if scanner.PeekEquals(34) {
 			scanner.Next()
-			char = scanner.Peek()
+			var value string = ""
 
-			for scanner.HasNext() && char != 34 {
+			for ; scanner.HasNext() && scanner.Until(34); scanner.Next() {
 				// if char is "\n"
-				if equals(char, 10) {
-					scanner.line++
+				if scanner.PeekEquals(10) {
+					scanner.NextLine()
 				}
 				// if char is "\"
 				// TODO: if equals(char, 92) {}
-				value += string(char)
-				scanner.Next()
-				char = scanner.Peek()
+				value += string(scanner.Peek())
 			}
 			scanner.Next()
-			tokens.Add("string", value, scanner.line)
+			tokens.Add("string", value, scanner.Line())
 			continue
-		}
-
-		// if char is string(A-Z)
-		if between(char, 65, 90) {
-			char = ([]byte(strings.ToLower(string(char))))[0]
 		}
 
 		// if char is "_" or "$" or string(a-z)
-		if equals(char, 95) || equals(char, 36) || between(char, 97, 122) {
+		if scanner.PeekEquals(95) || scanner.PeekEquals(36) || scanner.PeekBetween(97, 122) {
 			var value string = ""
 
 			// if char is "_" or string(a-z) or number(0-9)
-			for scanner.HasNext() && (equals(char, 95) || equals(char, 36) || between(char, 97, 122) || between(char, 48, 57)) {
-				value += string(char)
-				scanner.Next()
-				char = scanner.Peek()
+			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekEquals(36) || scanner.PeekBetween(97, 122) || scanner.PeekBetween(48, 57)); scanner.Next() {
+				value += string(scanner.Peek())
 			}
 
 			if contains(keywords, value) {
-				tokens.Add("keyword", value, scanner.line)
+				tokens.Add("keyword", value, scanner.Line())
 			} else if contains(bools, value) {
-				tokens.Add("bool", value, scanner.line)
+				tokens.Add("bool", value, scanner.Line())
 			} else {
-				tokens.Add("identifier", value, scanner.line)
+				tokens.Add("identifier", value, scanner.Line())
 			}
 			continue
 		}
 
-		if contains(operators, string(char)) {
+		if contains(operators, string(scanner.Peek())) {
 			var value string = ""
 
-			for scanner.HasNext() && contains(operators, string(char)) {
-				value += string(char)
-				scanner.Next()
-				char = scanner.Peek()
+			for ; scanner.HasNext() && contains(operators, string(scanner.Peek())); scanner.Next() {
+				value += string(scanner.Peek())
 			}
-			tokens.Add("operator", value, scanner.line)
+			tokens.Add("operator", value, scanner.Line())
 			continue
 		}
 
-		errors.FatalLexerError("error: line %v: %v: unexpected token\n", scanner.line, string(char), 1)
+		errors.FatalLexerError("error: line %v: %v: unexpected token\n", scanner.Line(), string(scanner.Peek()), 1)
 	}
 	tokens.Add("eof", "eof", 0)
 	return tokens
@@ -153,12 +144,4 @@ func Run(code []byte) (tokens types.TokenList) {
 func contains(par map[string]bool, char string) bool {
 	_, dContains := par[char]
 	return dContains
-}
-
-func equals(first byte, second byte) bool {
-	return first == second
-}
-
-func between(char byte, first byte, second byte) bool {
-	return (char >= first && char <= second)
 }
