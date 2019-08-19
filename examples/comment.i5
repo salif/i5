@@ -1,3 +1,7 @@
 fn main() {
 	# comment
+	
+	`
+		comment
+	`
 }
