@@ -18,6 +18,12 @@ func parseArgs(args []string) {
 	switch args[1] {
 	case "--help":
 		PrintHelp()
+	case "--code":
+		PrintCode(lexer.Run(file.Read(args[2])))
+	case "--tokens":
+		PrintTokens(lexer.Run(file.Read(args[2])))
+	case "--ast":
+		PrintAst(parser.Run(lexer.Run(file.Read(args[2]))))
 	default:
 		Execute(args[1])
 	}

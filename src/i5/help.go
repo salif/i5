@@ -9,11 +9,14 @@ func PrintHelp() {
 	console.Println(`
 Usage:
 
-	i5 [options] [file]
+     i5 [options] [file]
 
 options:
 
-	--help      print help
-	`)
+     --help           print help
+     --code           print code
+     --tokens         print tokens
+     --ast            print ast
+     `)
 	errors.Exit(0)
 }
