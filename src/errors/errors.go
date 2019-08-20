@@ -6,14 +6,14 @@ import (
 	"os"
 )
 
-func FatalError(text interface{}, status int) types.Node {
-	console.Println(text)
+func NewFatalError(text interface{}, status int) types.Node {
+	console.Println(console.Color("error:", "red"), text)
 	Exit(status)
 	return types.Node{}
 }
 
-func FatalLexerError(text string, line int, char string, status int) {
-	console.Printf(text, line, char)
+func NewFatalLexerError(text string, line int, char string, status int) {
+	console.Printf(console.Color("error: ", "red")+text, line, char)
 	Exit(status)
 }
 

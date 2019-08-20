@@ -4,12 +4,12 @@ import "github.com/i5/i5/src/types"
 
 func Walk(cnode *[]types.Node, until string) {
 	current++
-	tkn := tokens.Get(current)
+	var tkn types.Token = tokens.Get(current)
 	if tkn.Kind == until {
 		return
 	}
 	if tkn.Kind == "(" {
-		n := types.Node{
+		var n types.Node = types.Node{
 			Kind: "call",
 			Dlm:  "Dlm",
 			Body: []types.Node{},
@@ -18,7 +18,7 @@ func Walk(cnode *[]types.Node, until string) {
 
 		*cnode = append(*cnode, n)
 	} else if tkn.Kind == "{" {
-		n := types.Node{
+		var n types.Node = types.Node{
 			Kind: "obj",
 			Dlm:  "eol",
 			Body: []types.Node{},

@@ -3,7 +3,7 @@ package parser
 import "github.com/i5/i5/src/types"
 
 func Group(nd types.Node, dn *types.Node) {
-	er := types.Node{
+	var er types.Node = types.Node{
 		Kind: "statement",
 		Body: []types.Node{},
 	}

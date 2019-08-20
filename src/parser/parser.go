@@ -9,7 +9,7 @@ var (
 
 func Run(tkns types.TokenList) types.Node {
 	tokens = tkns
-	root := types.Node{
+	var root types.Node = types.Node{
 		Kind: "program",
 		Dlm:  "eol",
 		Body: []types.Node{},

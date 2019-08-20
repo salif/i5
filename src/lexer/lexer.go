@@ -175,7 +175,7 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		errors.FatalLexerError("error: line %v: %v: unexpected token\n", scanner.Line(), string(scanner.Peek()), 1)
+		errors.NewFatalLexerError(errors.LEXER_UNEXPECTED_TOKEN, scanner.Line(), string(scanner.Peek()), 1)
 	}
 	tokens.Add("eof", "eof", scanner.Line())
 	return tokens

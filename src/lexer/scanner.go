@@ -36,7 +36,7 @@ func (sc *Scanner) Peek() byte {
 	if sc.HasNext() {
 		return sc.code[sc.position]
 	} else {
-		errors.FatalLexerError("error: line %v: %v: index out of range\n", sc.line, "", 1)
+		errors.NewFatalLexerError(errors.SCANNER_OUT_OF_RANGE, sc.line, "", 1)
 		return 0
 	}
 }

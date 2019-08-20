@@ -1,6 +1,10 @@
 package lexer
 
-import "testing"
+import (
+	"github.com/i5/i5/src/errors"
+	"github.com/i5/i5/src/types"
+	"testing"
+)
 
 var (
 	test_text1 string = `
@@ -13,8 +17,8 @@ var (
 )
 
 func TestRun(t *testing.T) {
-	res1 := Run(test1)
+	var res1 types.TokenList = Run(test1)
 	if res1.Size() != test_s1 {
-		t.Errorf("Error! got: %v, want: %v", res1, test_s1)
+		t.Errorf(errors.TEST_GOT_WANT, res1.Size(), test_s1)
 	}
 }
