@@ -1,9 +1,6 @@
 package lexer
 
-import (
-	"github.com/i5/i5/src/errors"
-	_ "github.com/i5/i5/src/io/console"
-)
+import "github.com/i5/i5/src/errors"
 
 type Scanner struct {
 	code     []byte

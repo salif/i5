@@ -1,8 +1,6 @@
 package lexer
 
-import (
-	"testing"
-)
+import "testing"
 
 var (
 	test_text1 string = `

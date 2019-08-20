@@ -3,8 +3,9 @@ package lexer
 // All tokens:
 // ( ) { }
 // number string
-// keyword bool identifier
-// operator dlm
+// builtin keyword
+// bool identifier
+// operator dlm dot
 // eol eof
 
 import (
@@ -16,9 +17,9 @@ var (
 	keywords map[string]bool = map[string]bool{
 		"if": true, "elif": true, "else": true, "for": true, "break": true, "continue": true, "fn": true, "return": true, "try": true, "catch": true}
 	bools map[string]bool = map[string]bool{
-		"true": true, "false:": true}
+		"true": true, "false": true}
 	operators map[string]bool = map[string]bool{
-		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true, "|": true, "%": true, "!": true, "<": true, ">": true, ".": true, ":": true}
+		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true, "|": true, "%": true, "!": true, "<": true, ">": true, ":": true}
 	bbp map[string]bool = map[string]bool{
 		"{": true, "}": true, "(": true, ")": true}
 )
@@ -54,6 +55,13 @@ func Run(code []byte) (tokens types.TokenList) {
 		// if char is ","
 		if scanner.PeekEquals(44) {
 			tokens.Add("dlm", ",", scanner.Line())
+			scanner.Next()
+			continue
+		}
+
+		// if char is "."
+		if scanner.PeekEquals(46) {
+			tokens.Add("dot", ".", scanner.Line())
 			scanner.Next()
 			continue
 		}
@@ -106,12 +114,44 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		// if char is "_" or "$" or string(a-z)
-		if scanner.PeekEquals(95) || scanner.PeekEquals(36) || scanner.PeekBetween(97, 122) {
+		// if char is "'"
+		if scanner.PeekEquals(39) {
+			scanner.Next()
+			var value string = ""
+
+			for ; scanner.HasNext() && scanner.Until(39); scanner.Next() {
+				// if char is "\n"
+				if scanner.PeekEquals(10) {
+					scanner.NextLine()
+				}
+				// if char is "\"
+				// TODO: if equals(char, 92) {}
+				value += string(scanner.Peek())
+			}
+			scanner.Next()
+			tokens.Add("string", value, scanner.Line())
+			continue
+		}
+
+		// if char is "$"
+		if scanner.PeekEquals(36) {
 			var value string = ""
 
 			// if char is "_" or string(a-z) or number(0-9)
 			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekEquals(36) || scanner.PeekBetween(97, 122) || scanner.PeekBetween(48, 57)); scanner.Next() {
+				value += string(scanner.Peek())
+			}
+
+			tokens.Add("builtin", value, scanner.Line())
+			continue
+		}
+
+		// if char is "_" or string(a-z) or string(A-Z)
+		if scanner.PeekEquals(95) || scanner.PeekBetween(97, 122) || scanner.PeekBetween(65, 90) {
+			var value string = ""
+
+			// if char is "_" or string(a-z) or string(A-Z) or number(0-9)
+			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekBetween(97, 122) || scanner.PeekBetween(65, 90) || scanner.PeekBetween(48, 57)); scanner.Next() {
 				value += string(scanner.Peek())
 			}
 
