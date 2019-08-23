@@ -15,6 +15,7 @@ func Run(args []string) {
 func PrintCode(tokens types.TokenList) {
 	const tab string = "    "
 	var tabs int = 0
+	console.Printf("%3d ", 1)
 	for i := 0; i < tokens.Size(); i++ {
 		var tkn types.Token = tokens.Get(i)
 		var tknk string = tkn.Kind
@@ -30,9 +31,11 @@ func PrintCode(tokens types.TokenList) {
 			console.Print(console.Color(tkn.Value, "cian"))
 		} else if tknk == "operator" {
 			console.Print(console.Color(" "+tkn.Value+" ", "red"))
-		} else if tknk == "eol" || tknk == "eof" {
+		} else if tknk == "eol" {
 			console.Println()
+			console.Printf("%3d ", tkn.Line+1)
 			console.Print(strings.Repeat(tab, tabs))
+		} else if tknk == "eof" {
 		} else if tknk == "{" {
 			console.Print("{")
 			tabs++
@@ -46,6 +49,7 @@ func PrintCode(tokens types.TokenList) {
 			console.Print(tkn.Value)
 		}
 	}
+	console.Println()
 }
 
 func PrintTokens(tokens types.TokenList) {

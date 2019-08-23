@@ -27,7 +27,9 @@ var (
 func Run(code []byte) (tokens types.TokenList) {
 	tokens.Init()
 	var scanner Scanner
-	scanner.Init(code)
+	scanner.Init(code, func(length int, position int, line int) {
+		errors.NewFatalLexerError(errors.SCANNER_OUT_OF_RANGE, line, "", 1)
+	})
 
 	for scanner.HasNext() {
 

@@ -1,19 +1,19 @@
 package lexer
 
-import "github.com/i5/i5/src/errors"
-
 type Scanner struct {
 	code     []byte
 	lenght   int
 	position int
 	line     int
+	err      func(int, int, int)
 }
 
-func (sc *Scanner) Init(code []byte) {
+func (sc *Scanner) Init(code []byte, err func(int, int, int)) {
 	sc.code = code
 	sc.lenght = len(code)
 	sc.position = 0
 	sc.line = 1
+	sc.err = err
 }
 
 func (sc *Scanner) NextLine() {
@@ -36,7 +36,7 @@ func (sc *Scanner) Peek() byte {
 	if sc.HasNext() {
 		return sc.code[sc.position]
 	} else {
-		errors.NewFatalLexerError(errors.SCANNER_OUT_OF_RANGE, sc.line, "", 1)
+		sc.err(sc.lenght, sc.position, sc.line)
 		return 0
 	}
 }
