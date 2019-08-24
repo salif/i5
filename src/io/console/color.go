@@ -11,7 +11,7 @@ func Color(text string, color string) string {
 		return "\x1b[94m" + text + "\x1b[0m"
 	} else if color == "magenta" {
 		return "\x1b[95m" + text + "\x1b[0m"
-	} else if color == "cian" {
+	} else if color == "cyan" {
 		return "\x1b[96m" + text + "\x1b[0m"
 	} else {
 		return text

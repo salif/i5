@@ -16,7 +16,7 @@ import (
 var (
 	keywords map[string]bool = map[string]bool{
 		"if": true, "elif": true, "else": true, "for": true, "break": true, "continue": true, "fn": true, "return": true, "try": true, "catch": true}
-	bools map[string]bool = map[string]bool{
+	booleans map[string]bool = map[string]bool{
 		"true": true, "false": true}
 	operators map[string]bool = map[string]bool{
 		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true, "|": true, "%": true, "!": true, "<": true, ">": true, ":": true}
@@ -159,7 +159,7 @@ func Run(code []byte) (tokens types.TokenList) {
 
 			if contains(keywords, value) {
 				tokens.Add("keyword", value, scanner.Line())
-			} else if contains(bools, value) {
+			} else if contains(booleans, value) {
 				tokens.Add("bool", value, scanner.Line())
 			} else {
 				tokens.Add("identifier", value, scanner.Line())

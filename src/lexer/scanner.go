@@ -2,7 +2,7 @@ package lexer
 
 type Scanner struct {
 	code     []byte
-	lenght   int
+	length   int
 	position int
 	line     int
 	err      func(int, int, int)
@@ -10,7 +10,7 @@ type Scanner struct {
 
 func (sc *Scanner) Init(code []byte, err func(int, int, int)) {
 	sc.code = code
-	sc.lenght = len(code)
+	sc.length = len(code)
 	sc.position = 0
 	sc.line = 1
 	sc.err = err
@@ -25,7 +25,7 @@ func (sc *Scanner) Line() int {
 }
 
 func (sc *Scanner) HasNext() bool {
-	return (sc.position < sc.lenght)
+	return (sc.position < sc.length)
 }
 
 func (sc *Scanner) Next() {
@@ -36,7 +36,7 @@ func (sc *Scanner) Peek() byte {
 	if sc.HasNext() {
 		return sc.code[sc.position]
 	} else {
-		sc.err(sc.lenght, sc.position, sc.line)
+		sc.err(sc.length, sc.position, sc.line)
 		return 0
 	}
 }
