@@ -4,7 +4,7 @@ import "github.com/i5/i5/src/types"
 
 func Group(nd types.Node, dn *types.Node) {
 	var er types.Node = types.Node{
-		Kind: "statement",
+		Kind: "expr",
 		Body: []types.Node{},
 	}
 	if len(nd.Body) == 0 {
@@ -16,7 +16,7 @@ func Group(nd types.Node, dn *types.Node) {
 			dn.Kind = nd.Kind
 			dn.Body = append(dn.Body, er)
 			er = types.Node{
-				Kind: "statement",
+				Kind: "expr",
 				Body: []types.Node{},
 			}
 		} else {
@@ -31,7 +31,7 @@ func Group(nd types.Node, dn *types.Node) {
 				dn.Kind = nd.Kind
 				dn.Body = append(dn.Body, er)
 				er = types.Node{
-					Kind: "statement",
+					Kind: "expr",
 					Body: []types.Node{},
 				}
 			}

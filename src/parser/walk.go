@@ -10,7 +10,7 @@ func Walk(cnode *[]types.Node, until string) {
 	}
 	if tkn.Kind == "(" {
 		var n types.Node = types.Node{
-			Kind: "call",
+			Kind: "args",
 			Dlm:  "Dlm",
 			Body: []types.Node{},
 		}
@@ -19,7 +19,7 @@ func Walk(cnode *[]types.Node, until string) {
 		*cnode = append(*cnode, n)
 	} else if tkn.Kind == "{" {
 		var n types.Node = types.Node{
-			Kind: "obj",
+			Kind: "body",
 			Dlm:  "eol",
 			Body: []types.Node{},
 		}

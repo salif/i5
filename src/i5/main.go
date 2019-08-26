@@ -50,7 +50,7 @@ func Run(names []string, areFiles bool) {
 				PrintTokens(tokenList)
 			}
 			if *_ast {
-				PrintAst(parser.Run(tokenList))
+				PrintAst(parser.Run(tokenList), 0, "red")
 			}
 		} else {
 			interpreter.Run(parser.Run(tokenList))

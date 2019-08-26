@@ -67,6 +67,28 @@ func PrintTokens(tokens types.TokenList) {
 	console.Println(output.String())
 }
 
-func PrintAst(ast types.Node) {
-	// TODO
+func PrintAst(ast types.Node, tabs int, _color string) {
+	const tab string = "    "
+	if ast.Value == "" {
+		console.Print(strings.Repeat(tab, tabs), console.Color(ast.Kind, "green"))
+		if len(ast.Body) == 0 {
+			console.Println(console.Color(" {}", _color))
+		} else {
+			console.Println(console.Color(" {", _color))
+			var _ncolor string
+			if _color == "red" {
+				_ncolor = "yellow"
+			} else {
+				_ncolor = "red"
+			}
+			for i := 0; i < len(ast.Body); i++ {
+				PrintAst(ast.Body[i], tabs+1, _ncolor)
+			}
+			console.Print(strings.Repeat(tab, tabs))
+			console.Println(console.Color("}", _color))
+		}
+	} else {
+		console.Print(strings.Repeat(tab, tabs))
+		console.Println(console.Color(ast.Kind, "cyan"), ast.Value)
+	}
 }
