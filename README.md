@@ -1,6 +1,6 @@
 # The i5 programming language
 
-**i5** is a lightweight, interpreted programming language
+**i5** is a lightweight, interpreted programming language.
 
 ---
 
