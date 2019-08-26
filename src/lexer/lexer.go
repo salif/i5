@@ -21,7 +21,7 @@ var (
 	operators map[string]bool = map[string]bool{
 		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true, "|": true, "%": true, "!": true, "<": true, ">": true, ":": true}
 	bbp map[string]bool = map[string]bool{
-		"{": true, "}": true, "(": true, ")": true}
+		"{": true, "}": true, "(": true, ")": true, "[": true, "]": true}
 )
 
 func Run(code []byte) (tokens types.TokenList) {

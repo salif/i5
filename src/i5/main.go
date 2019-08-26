@@ -2,82 +2,74 @@ package i5
 
 import (
 	"github.com/i5/i5/src/errors"
+	"github.com/i5/i5/src/interpreter"
 	"github.com/i5/i5/src/io/console"
+	"github.com/i5/i5/src/io/file"
+	"github.com/i5/i5/src/lexer"
+	"github.com/i5/i5/src/parser"
 	"github.com/i5/i5/src/types"
-	"strconv"
-	"strings"
+	"gopkg.in/alecthomas/kingpin.v2"
+	"os"
 )
 
-func Run(args []string) {
-	ParseArgs(args)
+var (
+	_code   = kingpin.Flag("code", "Print code").Short('c').Bool()
+	_tokens = kingpin.Flag("tokens", "Print tokens").Short('t').Bool()
+	_ast    = kingpin.Flag("ast", "Print AST").Short('s').Bool()
+	_files  = kingpin.Arg("file", "Run code").Strings()
+	_evals  = kingpin.Flag("eval", "Eval code").Short('e').Strings()
+)
+
+func ParseArgs() {
+	if len(os.Args) < 2 {
+		PrintHelp()
+		errors.Exit(0)
+	}
+
+	kingpin.Parse()
+	if len(*_files) > 0 {
+		Run(*_files, true)
+	} else if len(*_evals) > 0 {
+		Run(*_evals, false)
+	}
 }
 
-func PrintCode(tokens types.TokenList) {
-	const tab string = "    "
-	var tabs int = 0
-	console.Printf("%3d ", 1)
-	for i := 0; i < tokens.Size(); i++ {
-		var tkn types.Token = tokens.Get(i)
-		var tknk string = tkn.Kind
-		if tknk == "keyword" || tknk == "bool" {
-			console.Print(console.Color(tkn.Value, "red"), " ")
-		} else if tknk == "identifier" {
-			console.Print(console.Color(tkn.Value, "green"))
-		} else if tknk == "string" {
-			console.Print(console.Color("\""+tkn.Value+"\"", "yellow"))
-		} else if tknk == "number" {
-			console.Print(console.Color(tkn.Value, "magenta"))
-		} else if tknk == "builtin" {
-			console.Print(console.Color(tkn.Value, "cian"))
-		} else if tknk == "operator" {
-			console.Print(console.Color(" "+tkn.Value+" ", "red"))
-		} else if tknk == "eol" {
-			console.Println()
-			console.Printf("%3d ", tkn.Line+1)
-			console.Print(strings.Repeat(tab, tabs))
-		} else if tknk == "eof" {
-		} else if tknk == "{" {
-			console.Print("{")
-			tabs++
-		} else if tknk == "}" {
-			console.Print("\u0008\u0008\u0008\u0008")
-			console.Print("} ")
-			tabs--
-		} else if tknk == ")" {
-			console.Print(") ")
+func Run(names []string, areFiles bool) {
+	for _, name := range names {
+		var tokenList types.TokenList
+		if areFiles {
+			tokenList = lexer.Run(file.Read(name))
 		} else {
-			console.Print(tkn.Value)
+			tokenList = lexer.Run([]byte(name))
+		}
+		if *_code || *_tokens || *_ast {
+			if *_code {
+				PrintCode(tokenList)
+			}
+			if *_tokens {
+				PrintTokens(tokenList)
+			}
+			if *_ast {
+				PrintAst(parser.Run(tokenList))
+			}
+		} else {
+			interpreter.Run(parser.Run(tokenList))
 		}
 	}
-	console.Println()
-}
-
-func PrintTokens(tokens types.TokenList) {
-	console.Println(console.Color("Line", "cian"), console.Color("Type", "red"), console.Color("Value", "yellow"))
-	console.Println()
-	for i := 0; i < tokens.Size(); i++ {
-		var tkn types.Token = tokens.Get(i)
-		console.Println(
-			console.Color(strconv.Itoa(tkn.Line), "cian"), console.Color(tkn.Kind, "red"), console.Color(tkn.Value, "yellow"))
-	}
-}
-
-func PrintAst(ast types.Node) {
-	// TODO
 }
 
 func PrintHelp() {
 	console.Println(`
 Usage:
 
-     i5 [options] [file]
+    i5 [options] [file] [arguments]
 
 options:
 
-     --help           print help
-     --code           print code
-     --tokens         print tokens
-     --ast            print ast
-     `)
-	errors.Exit(0)
+    --help           print help
+    --code, -c       print code
+    --tokens, -t     print tokens
+    --ast, -s        print ast
+    --eval           eval code
+    `)
 }

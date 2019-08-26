@@ -1,6 +1,7 @@
 all:
-	go build && echo "run 'sudo make install' to install"
+	go build -ldflags "-s -w"
 install:
-	install -m 555 i5 /usr/bin/i5
+	go install
+	# go install -m 555 i5 /usr/bin/i5
 test:
 	go test ./...

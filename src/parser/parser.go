@@ -8,6 +8,7 @@ var (
 )
 
 func Run(tkns types.TokenList) types.Node {
+	current = -1
 	tokens = tkns
 	var root types.Node = types.Node{
 		Kind: "program",

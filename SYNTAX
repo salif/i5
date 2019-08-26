@@ -13,22 +13,19 @@
 SYNTAX RULES
 
 # STATEMENTS :
-  STATEMENT ';'
-  | STATEMENTS STATEMENT ';'
-  | ';'
+  STATEMENT '\n'
+  | STATEMENTS STATEMENT '\n'
+  | '\n'
   |
 
 # STATEMENT :
   IF
-  | DOWHILE
-  | WHILE
-  | SWITCH
   | FOR
   | FUNCTION
   |
 
 # FUNCTION
-  'function' IDENTIFIER '(' ARGUMENTS ')' '{' '}'
+  'fn' IDENTIFIER '(' ARGUMENTS ')' '{' '}'
 
 # ARGUMENTS
   ARGUMENTS ',' ARGUMENT 
@@ -38,22 +35,20 @@ SYNTAX RULES
 # ARGUMENT :
   VALUE
 
-# DOWHILE :
-  'do' '{' STATEMENTS '}' 'while' '(' CONDITATION ')' ';'
-
-# WHILE :
-  'while' '(' CONDITATION ')' '{' STATEMENTS '}'
-
 # FOR :
-  'for' '(' EXPRESSIONS ';' CONDITATION ';' EXPRESSIONS ')' '{' STATEMENTS '}'
+  'for' '(' EXPRESSIONS ',' CONDITATION ',' EXPRESSIONS ')' '{' STATEMENTS '}'
 
 # IF :
   'if'  '(' CONDITATION ')' '{' STATEMENTS '}'
+  | 'if'  '(' CONDITATION ')' '{' STATEMENTS '}' ELIF
   | 'if'  '(' CONDITATION ')' '{' STATEMENTS '}' ELSE
 
+# ELIF:
+  'elif'  '(' CONDITATION ')' '{' STATEMENTS '}' ELIF
+  | 'elif'  '(' CONDITATION ')' '{' STATEMENTS '}' ELSE
+
 # ELSE :
-  'else' IF
-  | 'else' '{' STATEMENTS '}'
+  'else' '{' STATEMENTS '}'
 
 # VALUE
   [a-zA-Z_][a-zA-Z0-9_]+
@@ -62,3 +57,4 @@ SYNTAX RULES
   'true'
   'false'
   'null'
+
