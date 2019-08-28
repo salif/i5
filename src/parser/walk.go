@@ -2,7 +2,7 @@ package parser
 
 import "github.com/i5/i5/src/types"
 
-func Walk(cnode *[]types.Node, until string) {
+func Walk(node *[]types.Node, until string) {
 	current++
 	var tkn types.Token = tokens.Get(current)
 	if tkn.Kind == until {
@@ -16,7 +16,7 @@ func Walk(cnode *[]types.Node, until string) {
 		}
 		Walk(&n.Body, ")")
 
-		*cnode = append(*cnode, n)
+		*node = append(*node, n)
 	} else if tkn.Kind == "{" {
 		var n types.Node = types.Node{
 			Kind: "body",
@@ -24,15 +24,15 @@ func Walk(cnode *[]types.Node, until string) {
 			Body: []types.Node{},
 		}
 		Walk(&n.Body, "}")
-		*cnode = append(*cnode, n)
+		*node = append(*node, n)
 	} else {
-		*cnode = append(*cnode, types.Node{
+		*node = append(*node, types.Node{
 			Kind:  tkn.Kind,
 			Value: tkn.Value,
 		})
 	}
 
 	if tkn.Kind != until {
-		Walk(cnode, until)
+		Walk(node, until)
 	}
 }

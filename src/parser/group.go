@@ -2,35 +2,35 @@ package parser
 
 import "github.com/i5/i5/src/types"
 
-func Group(nd types.Node, dn *types.Node) {
-	var er types.Node = types.Node{
+func Group(rootNode types.Node, newRootNode *types.Node) {
+	var expr types.Node = types.Node{
 		Kind: "expr",
 		Body: []types.Node{},
 	}
-	if len(nd.Body) == 0 {
-		dn.Kind = nd.Kind
-		dn.Body = append(dn.Body, er)
+	if len(rootNode.Body) == 0 {
+		newRootNode.Kind = rootNode.Kind
+		newRootNode.Body = append(newRootNode.Body, expr)
 	}
-	for i, n := range nd.Body {
-		if n.Kind == nd.Dlm {
-			dn.Kind = nd.Kind
-			dn.Body = append(dn.Body, er)
-			er = types.Node{
+	for i, nodeitem := range rootNode.Body {
+		if nodeitem.Kind == rootNode.Dlm {
+			newRootNode.Kind = rootNode.Kind
+			newRootNode.Body = append(newRootNode.Body, expr)
+			expr = types.Node{
 				Kind: "expr",
 				Body: []types.Node{},
 			}
 		} else {
-			if n.Dlm == "" {
-				er.Body = append(er.Body, n)
+			if nodeitem.Dlm == "" {
+				expr.Body = append(expr.Body, nodeitem)
 			} else {
 				var tdn types.Node
-				Group(n, &tdn)
-				er.Body = append(er.Body, tdn)
+				Group(nodeitem, &tdn)
+				expr.Body = append(expr.Body, tdn)
 			}
-			if i == len(nd.Body)-1 {
-				dn.Kind = nd.Kind
-				dn.Body = append(dn.Body, er)
-				er = types.Node{
+			if i == len(rootNode.Body)-1 {
+				newRootNode.Kind = rootNode.Kind
+				newRootNode.Body = append(newRootNode.Body, expr)
+				expr = types.Node{
 					Kind: "expr",
 					Body: []types.Node{},
 				}
