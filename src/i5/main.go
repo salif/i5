@@ -1,6 +1,9 @@
 package i5
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/interpreter"
 	"github.com/i5/i5/src/io/console"
@@ -9,7 +12,6 @@ import (
 	"github.com/i5/i5/src/parser"
 	"github.com/i5/i5/src/types"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"os"
 )
 
 var (
@@ -17,6 +19,7 @@ var (
 	_tokens = kingpin.Flag("tokens", "Print tokens").Short('t').Bool()
 	_ast    = kingpin.Flag("ast", "Print AST").Short('s').Bool()
 	_files  = kingpin.Arg("file", "Run code").Strings()
+	_color  = kingpin.Flag("color", "Color").String()
 	_evals  = kingpin.Flag("eval", "Eval code").Short('e').Strings()
 )
 
@@ -27,6 +30,19 @@ func ParseArgs() {
 	}
 
 	kingpin.Parse()
+
+	if len(*_color) > 0 {
+		switch *_color {
+		case "html":
+			console.SetColorizer(console.HTML)
+		case "no":
+			console.SetColorizer(console.NoColor)
+		case "color":
+			console.SetColorizer(console.Color)
+		default:
+			errors.NewFatalError(fmt.Sprintf(errors.ARGS_UNKNOWN_CLR, *_color), 1)
+		}
+	}
 	if len(*_files) > 0 {
 		Run(*_files, true)
 	} else if len(*_evals) > 0 {

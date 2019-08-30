@@ -19,9 +19,9 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Desktop (please complete the following information):**
+**Please complete the following information:**
  - OS: [e.g. Windows 10]
- - Version [e.g. 1.0.0]
+ - i5 version [e.g. 1.0.0]
 
 **Additional context**
 Add any other context about the problem here.
