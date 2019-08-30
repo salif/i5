@@ -2,17 +2,13 @@ package console
 
 import "html"
 
-var clr func(string, string) string = Colorize
+var clr func(string, string) string = defaultColor
 
 func Color(text string, color string) string {
 	return clr(text, color)
 }
 
-func SetColorizer(fn func(string, string) string) {
-	clr = fn
-}
-
-func Colorize(text string, color string) string {
+func defaultColor(text string, color string) string {
 	if color == "red" {
 		return "\x1b[91m" + text + "\x1b[0m"
 	} else if color == "green" {
@@ -30,10 +26,10 @@ func Colorize(text string, color string) string {
 	}
 }
 
-func HTML(text string, color string) string {
+func htmlColor(text string, color string) string {
 	return "<span style='color:" + color + ";'>" + html.EscapeString(text) + "</span>"
 }
 
-func NoColor(text string, color string) string {
+func noColor(text string, color string) string {
 	return text
 }

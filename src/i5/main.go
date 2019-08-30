@@ -2,7 +2,6 @@ package i5
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/interpreter"
@@ -11,66 +10,66 @@ import (
 	"github.com/i5/i5/src/lexer"
 	"github.com/i5/i5/src/parser"
 	"github.com/i5/i5/src/types"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
-	_code   = kingpin.Flag("code", "Print code").Short('c').Bool()
-	_tokens = kingpin.Flag("tokens", "Print tokens").Short('t').Bool()
-	_ast    = kingpin.Flag("ast", "Print AST").Short('s').Bool()
-	_files  = kingpin.Arg("file", "Run code").Strings()
-	_color  = kingpin.Flag("color", "Color").String()
-	_evals  = kingpin.Flag("eval", "Eval code").Short('e').Strings()
+	ap      ArgsParser = InitArgsParser()
+	_help              = ap.Bool("help")
+	_tokens            = ap.Bool("tokens")
+	_code              = ap.Bool("code")
+	_ast               = ap.Bool("ast")
+	_output            = ap.String("output")
+	_eval              = ap.String("eval")
+	_args              = ap.Default()
 )
 
 func ParseArgs() {
-	if len(os.Args) < 2 {
+
+	ap.Parse()
+
+	if ap.Empty() || *_help {
 		PrintHelp()
 		errors.Exit(0)
 	}
 
-	kingpin.Parse()
-
-	if len(*_color) > 0 {
-		switch *_color {
+	if len(*_output) > 0 {
+		switch *_output {
 		case "html":
-			console.SetColorizer(console.HTML)
-		case "no":
-			console.SetColorizer(console.NoColor)
-		case "color":
-			console.SetColorizer(console.Color)
+			console.SetOutput(console.HTML)
+		case "no-color":
+			console.SetOutput(console.NoColor)
+		case "default":
+			console.SetOutput(console.Default)
 		default:
-			errors.NewFatalError(fmt.Sprintf(errors.ARGS_UNKNOWN_CLR, *_color), 1)
+			errors.NewFatalError(fmt.Sprintf(errors.ARGS_UNKNOWN_CLR, *_output), 1)
 		}
 	}
-	if len(*_files) > 0 {
-		Run(*_files, true)
-	} else if len(*_evals) > 0 {
-		Run(*_evals, false)
+	if len(*_eval) > 0 {
+		Run(*_eval, *_args, false)
+	} else if len(*_args) > 0 {
+		Run((*_args)[0], *_args, true)
 	}
 }
 
-func Run(names []string, areFiles bool) {
-	for _, name := range names {
-		var tokenList types.TokenList
-		if areFiles {
-			tokenList = lexer.Run(file.Read(name))
-		} else {
-			tokenList = lexer.Run([]byte(name))
+func Run(name string, arguments []string, isFile bool) {
+	var tokenList types.TokenList
+	if isFile {
+		tokenList = lexer.Run(file.Read(name))
+	} else {
+		tokenList = lexer.Run([]byte(name))
+	}
+	if *_code || *_tokens || *_ast {
+		if *_code {
+			PrintCode(tokenList)
 		}
-		if *_code || *_tokens || *_ast {
-			if *_code {
-				PrintCode(tokenList)
-			}
-			if *_tokens {
-				PrintTokens(tokenList)
-			}
-			if *_ast {
-				PrintAst(parser.Run(tokenList), 0, "red")
-			}
-		} else {
-			interpreter.Run(parser.Run(tokenList))
+		if *_tokens {
+			PrintTokens(tokenList)
 		}
+		if *_ast {
+			PrintAst(parser.Run(tokenList), 0, "red")
+		}
+	} else {
+		interpreter.Run(parser.Run(tokenList))
 	}
 }
 
@@ -82,10 +81,12 @@ Usage:
 
 options:
 
-    --help           print help
-    --code, -c       print code
-    --tokens, -t     print tokens
-    --ast, -s        print ast
-    --eval           eval code
+    --help                      print help
+    --code                      print code
+    --tokens                    print tokens
+    --ast                       print ast
+    --output='string'           set output format
+                                ('html', 'no-color', 'default')
+    --eval='string'             eval code
     `)
 }
