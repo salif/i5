@@ -54,6 +54,13 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
+		// if char is "\"
+		if scanner.PeekEquals(92) {
+			scanner.Next()
+			scanner.Next()
+			continue
+		}
+
 		// if char is ","
 		if scanner.PeekEquals(44) {
 			tokens.Add("dlm", ",", scanner.Line())
