@@ -1,52 +1,29 @@
 package lexer
 
-// All tokens:
-// ( ) { }
-// number string
-// builtin keyword
-// bool identifier
-// operator dlm dot
-// eol eof
-
 import (
-	"fmt"
-
 	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/types"
-)
-
-var (
-	keywords map[string]bool = map[string]bool{
-		"if": true, "elif": true, "else": true, "for": true, "break": true,
-		"continue": true, "fn": true, "return": true, "try": true, "catch": true}
-	booleans map[string]bool = map[string]bool{
-		"true": true, "false": true}
-	operators map[string]bool = map[string]bool{
-		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true,
-		"|": true, "%": true, "!": true, "<": true, ">": true, ":": true}
-	bbp map[string]bool = map[string]bool{
-		"{": true, "}": true, "(": true, ")": true, "[": true, "]": true}
 )
 
 func Run(code []byte) (tokens types.TokenList) {
 	tokens.Init()
 	var scanner Scanner
 	scanner.Init(code, func(length int, position int, line int) {
-		errors.FatalError(fmt.Sprintf(errors.SCANNER_OUT_OF_RANGE, line, ""), 1)
+		errors.FatalError(errors.F(errors.SCANNER_OUT_OF_RANGE, line, ""), 1)
 	})
 
 	for scanner.HasNext() {
 
 		// if char is "{" or "}" or "(" or ")"
-		if contains(bbp, string(scanner.Peek())) {
-			tokens.Add(string(scanner.Peek()), string(scanner.Peek()), scanner.Line())
+		if IsBracket(string(scanner.Peek())) {
+			tokens.Add(types.BRACKET, string(scanner.Peek()), scanner.Line())
 			scanner.Next()
 			continue
 		}
 
 		// if char is "\n"
 		if scanner.PeekEquals(10) {
-			tokens.Add("eol", "eol", scanner.Line())
+			tokens.Add(types.EOL, types.EOL, scanner.Line())
 			scanner.NextLine()
 			scanner.Next()
 			continue
@@ -67,14 +44,14 @@ func Run(code []byte) (tokens types.TokenList) {
 
 		// if char is ","
 		if scanner.PeekEquals(44) {
-			tokens.Add("dlm", ",", scanner.Line())
+			tokens.Add(types.COMMA, types.COMMA, scanner.Line())
 			scanner.Next()
 			continue
 		}
 
 		// if char is "."
 		if scanner.PeekEquals(46) {
-			tokens.Add("dot", ".", scanner.Line())
+			tokens.Add(types.DOT, types.DOT, scanner.Line())
 			scanner.Next()
 			continue
 		}
@@ -87,7 +64,7 @@ func Run(code []byte) (tokens types.TokenList) {
 			for ; scanner.HasNext() && (scanner.PeekBetween(48, 57) || scanner.PeekEquals(46)); scanner.Next() {
 				value += string(scanner.Peek())
 			}
-			tokens.Add("number", value, scanner.Line())
+			tokens.Add(types.NUMBER, value, scanner.Line())
 			continue
 		}
 
@@ -123,7 +100,7 @@ func Run(code []byte) (tokens types.TokenList) {
 				value += string(scanner.Peek())
 			}
 			scanner.Next()
-			tokens.Add("string", value, scanner.Line())
+			tokens.Add(types.STRING, value, scanner.Line())
 			continue
 		}
 
@@ -142,7 +119,7 @@ func Run(code []byte) (tokens types.TokenList) {
 				value += string(scanner.Peek())
 			}
 			scanner.Next()
-			tokens.Add("string", value, scanner.Line())
+			tokens.Add(types.STRING, value, scanner.Line())
 			continue
 		}
 
@@ -156,7 +133,7 @@ func Run(code []byte) (tokens types.TokenList) {
 				value += string(scanner.Peek())
 			}
 
-			tokens.Add("builtin", value, scanner.Line())
+			tokens.Add(types.BUILTIN, value, scanner.Line())
 			continue
 		}
 
@@ -170,33 +147,26 @@ func Run(code []byte) (tokens types.TokenList) {
 				value += string(scanner.Peek())
 			}
 
-			if contains(keywords, value) {
-				tokens.Add("keyword", value, scanner.Line())
-			} else if contains(booleans, value) {
-				tokens.Add("bool", value, scanner.Line())
+			if IsKeyword(value) {
+				tokens.Add(types.KEYWORD, value, scanner.Line())
 			} else {
-				tokens.Add("identifier", value, scanner.Line())
+				tokens.Add(types.IDENTIFIER, value, scanner.Line())
 			}
 			continue
 		}
 
-		if contains(operators, string(scanner.Peek())) {
+		if IsOperator(string(scanner.Peek())) {
 			var value string = ""
 
-			for ; scanner.HasNext() && contains(operators, string(scanner.Peek())); scanner.Next() {
+			for ; scanner.HasNext() && IsOperator(string(scanner.Peek())); scanner.Next() {
 				value += string(scanner.Peek())
 			}
-			tokens.Add("operator", value, scanner.Line())
+			tokens.Add(types.OPERATOR, value, scanner.Line())
 			continue
 		}
 
-		errors.FatalError(fmt.Sprintf(errors.LEXER_UNEXPECTED_TOKEN, scanner.Line(), string(scanner.Peek())), 1)
+		errors.FatalError(errors.F(errors.LEXER_UNEXPECTED_TOKEN, scanner.Line(), string(scanner.Peek())), 1)
 	}
-	tokens.Add("eof", "eof", scanner.Line())
+	tokens.Add(types.EOF, types.EOF, scanner.Line())
 	return tokens
-}
-
-func contains(par map[string]bool, char string) bool {
-	_, dContains := par[char]
-	return dContains
 }

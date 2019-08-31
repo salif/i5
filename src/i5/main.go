@@ -1,8 +1,6 @@
 package i5
 
 import (
-	"fmt"
-
 	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/interpreter"
 	"github.com/i5/i5/src/io/console"
@@ -41,7 +39,7 @@ func ParseArgs() {
 		case "default":
 			console.SetOutput(console.Default)
 		default:
-			errors.FatalError(fmt.Sprintf(errors.ARGS_UNKNOWN_CLR, *_output), 1)
+			errors.FatalError(errors.F(errors.ARGS_UNKNOWN_CLR, *_output), 1)
 		}
 	}
 
@@ -86,8 +84,8 @@ options:
     --code                      print code
     --tokens                    print tokens
     --ast                       print ast
-    --output='string'           set output format
+    --output='format'           set output format:
                                 ('html', 'no-color', 'default')
-    --eval='string'             eval code
+    --eval='code'               eval code
     `)
 }

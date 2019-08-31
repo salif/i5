@@ -19,7 +19,7 @@ $ go get -u github.com/i5/i5
 ## Usage
 
 ```sh
- $ i5 file.i5
+ $ i5 [options] [file.i5] [arguments]
 ```
 
 ## Community

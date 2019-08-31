@@ -1,9 +1,9 @@
 package i5
 
 import (
-	"fmt"
 	"strings"
 
+	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/types"
 )
@@ -12,60 +12,58 @@ func PrintCode(tokens types.TokenList) {
 	const tab string = "    "
 	var tabs int = 0
 	var output strings.Builder
-	output.WriteString(fmt.Sprintf("%3d ", 1))
+	output.WriteString(errors.F("%3d ", 1))
 
 	for i := 0; i < tokens.Size(); i++ {
 		var token types.Token = tokens.Get(i)
 		var tkn string = token.Kind
-		if tkn == "keyword" || tkn == "bool" {
-			output.WriteString(fmt.Sprint(console.Color{Value: token.Value}.Red(), " "))
-		} else if tkn == "identifier" {
-			output.WriteString(fmt.Sprint(console.Color{Value: token.Value}.Green()))
-		} else if tkn == "string" {
-			output.WriteString(fmt.Sprint(console.Color{Value: "\"" + token.Value + "\""}.Yellow()))
-		} else if tkn == "number" {
-			output.WriteString(fmt.Sprint(console.Color{Value: token.Value}.Magenta()))
-		} else if tkn == "builtin" {
-			output.WriteString(fmt.Sprint(console.Color{Value: token.Value}.Cyan()))
-		} else if tkn == "operator" {
-			output.WriteString(fmt.Sprint(console.Color{Value: " " + token.Value + " "}.Red()))
-		} else if tkn == "dlm" {
-			output.WriteString(fmt.Sprint(", "))
-		} else if tkn == "eol" {
-			output.WriteString(fmt.Sprintln())
-			output.WriteString(fmt.Sprintf("%3d ", token.Line+1))
-			output.WriteString(fmt.Sprint(strings.Repeat(tab, tabs)))
-		} else if tkn == "eof" {
-		} else if tkn == "{" {
-			output.WriteString(fmt.Sprint(" {"))
+		if tkn == types.KEYWORD {
+			output.WriteString(console.Color{Value: token.Value}.Red().String() + " ")
+		} else if tkn == types.IDENTIFIER {
+			output.WriteString(console.Color{Value: token.Value}.Green().String())
+		} else if tkn == types.STRING {
+			output.WriteString(console.Color{Value: "\"" + token.Value + "\""}.Yellow().String())
+		} else if tkn == types.NUMBER {
+			output.WriteString(console.Color{Value: token.Value}.Magenta().String())
+		} else if tkn == types.BUILTIN {
+			output.WriteString(console.Color{Value: token.Value}.Cyan().String())
+		} else if tkn == types.OPERATOR {
+			output.WriteString(console.Color{Value: " " + token.Value + " "}.Red().String())
+		} else if tkn == types.COMMA {
+			output.WriteString(", ")
+		} else if tkn == types.EOL {
+			output.WriteString("\n")
+			output.WriteString(errors.F("%3d ", token.Line+1))
+			output.WriteString(strings.Repeat(tab, tabs))
+		} else if tkn == types.EOF {
+		} else if tkn == types.BRACKET && token.Value == "{" {
+			output.WriteString(" {")
 			tabs++
-		} else if tkn == "}" {
-			output.WriteString(fmt.Sprint("\u0008\u0008\u0008\u0008"))
-			output.WriteString(fmt.Sprint("} "))
+		} else if tkn == types.BRACKET && token.Value == "}" {
+			output.WriteString("\u0008\u0008\u0008\u0008")
+			output.WriteString("} ")
 			tabs--
 			if tabs < 0 {
 				tabs = 0
 			}
-		} else if tkn == ")" {
-			output.WriteString(fmt.Sprint(")"))
 		} else {
-			output.WriteString(fmt.Sprint(token.Value))
+			output.WriteString(token.Value)
 		}
 	}
-	output.WriteString(fmt.Sprintln())
+	output.WriteString("\n")
 	console.Println(output.String())
 }
 
 func PrintTokens(tokens types.TokenList) {
 	var output strings.Builder
-	output.WriteString(fmt.Sprintln(" ",
+	output.WriteString(errors.LN(" ",
 		console.Color{Value: "Line"}.Cyan(),
 		console.Color{Value: "Type"}.Red(),
 		console.Color{Value: "Value"}.Yellow()))
-	output.WriteString(fmt.Sprintln())
+	output.WriteString("\n")
 	for i := 0; i < tokens.Size(); i++ {
 		var tkn types.Token = tokens.Get(i)
-		output.WriteString(fmt.Sprintln(console.Color{Value: fmt.Sprintf("%3d ", tkn.Line)}.Cyan(),
+		output.WriteString(errors.LN(console.Color{Value: errors.F("%3d ", tkn.Line)}.Cyan(),
 			console.Color{Value: tkn.Kind}.Red(),
 			console.Color{Value: tkn.Value}.Yellow()))
 	}

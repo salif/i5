@@ -12,13 +12,13 @@ func Run(_tokens types.TokenList) types.Node {
 	tokens = _tokens
 	var rootNode types.Node = types.Node{
 		Kind: "program",
-		Dlm:  "eol",
+		Dlm:  types.EOL,
 		Body: []types.Node{},
 	}
-	Walk(&rootNode.Body, "eof")
+	Walk(&rootNode.Body, types.EOF, types.EOF)
 	rootNode.Body = append(rootNode.Body, types.Node{
-		Kind:  "eol",
-		Value: "eol",
+		Kind:  types.EOL,
+		Value: types.EOL,
 	})
 	var newRootNode types.Node
 	Group(rootNode, &newRootNode)

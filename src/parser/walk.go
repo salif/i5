@@ -2,28 +2,28 @@ package parser
 
 import "github.com/i5/i5/src/types"
 
-func Walk(node *[]types.Node, until string) {
+func Walk(node *[]types.Node, untilKind string, untilValue string) {
 	current++
 	var tkn types.Token = tokens.Get(current)
-	if tkn.Kind == until {
+	if tkn.Kind == untilKind && tkn.Value == untilValue {
 		return
 	}
-	if tkn.Kind == "(" {
+	if tkn.Kind == types.BRACKET && tkn.Value == "(" {
 		var n types.Node = types.Node{
 			Kind: "args",
 			Dlm:  "Dlm",
 			Body: []types.Node{},
 		}
-		Walk(&n.Body, ")")
+		Walk(&n.Body, types.BRACKET, ")")
 
 		*node = append(*node, n)
-	} else if tkn.Kind == "{" {
+	} else if tkn.Kind == types.BRACKET && tkn.Value == "{" {
 		var n types.Node = types.Node{
 			Kind: "body",
 			Dlm:  "eol",
 			Body: []types.Node{},
 		}
-		Walk(&n.Body, "}")
+		Walk(&n.Body, types.BRACKET, "}")
 		*node = append(*node, n)
 	} else {
 		*node = append(*node, types.Node{
@@ -32,7 +32,7 @@ func Walk(node *[]types.Node, until string) {
 		})
 	}
 
-	if tkn.Kind != until {
-		Walk(node, until)
+	if !(tkn.Kind == untilKind && tkn.Value == untilValue) {
+		Walk(node, untilKind, untilValue)
 	}
 }
