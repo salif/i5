@@ -1,19 +1,17 @@
 package errors
 
 import (
-	"github.com/i5/i5/src/io/console"
-	"github.com/i5/i5/src/types"
 	"os"
+
+	"github.com/i5/i5/src/io/console"
 )
 
-func NewFatalError(text interface{}, status int) types.Node {
-	console.Println(console.Color("error:", "red"), text)
-	Exit(status)
-	return types.Node{}
+func Error(text interface{}, status int) {
+	console.Println(console.Color{Value: "error:"}.Red(), text)
 }
 
-func NewFatalLexerError(text string, line int, char string, status int) {
-	console.Printf(console.Color("error: ", "red")+text, line, char)
+func FatalError(text interface{}, status int) {
+	console.Println(console.Color{Value: "error:"}.Red(), text)
 	Exit(status)
 }
 

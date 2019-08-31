@@ -1,9 +1,11 @@
 package console
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type output struct {
-	clr     func(string, string) string
+	clr     func(string, string) Color
 	print   func(...interface{})
 	println func(...interface{})
 	printf  func(string, ...interface{})
@@ -38,14 +40,14 @@ func Printf(format string, toWrite ...interface{}) {
 	printf(format, toWrite...)
 }
 
-func defaultPrint(toWrite ...interface{}) {
-	fmt.Print(toWrite...)
+func defaultPrint(text ...interface{}) {
+	fmt.Print(text...)
 }
 
-func defaultPrintln(toWrite ...interface{}) {
-	fmt.Println(toWrite...)
+func defaultPrintln(text ...interface{}) {
+	fmt.Println(text...)
 }
 
-func defaultPrintf(format string, toWrite ...interface{}) {
-	fmt.Printf(format, toWrite...)
+func defaultPrintf(format string, text ...interface{}) {
+	fmt.Printf(format, text...)
 }

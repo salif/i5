@@ -9,17 +9,21 @@ package lexer
 // eol eof
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/types"
 )
 
 var (
 	keywords map[string]bool = map[string]bool{
-		"if": true, "elif": true, "else": true, "for": true, "break": true, "continue": true, "fn": true, "return": true, "try": true, "catch": true}
+		"if": true, "elif": true, "else": true, "for": true, "break": true,
+		"continue": true, "fn": true, "return": true, "try": true, "catch": true}
 	booleans map[string]bool = map[string]bool{
 		"true": true, "false": true}
 	operators map[string]bool = map[string]bool{
-		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true, "|": true, "%": true, "!": true, "<": true, ">": true, ":": true}
+		"+": true, "-": true, "*": true, "/": true, "=": true, "&": true,
+		"|": true, "%": true, "!": true, "<": true, ">": true, ":": true}
 	bbp map[string]bool = map[string]bool{
 		"{": true, "}": true, "(": true, ")": true, "[": true, "]": true}
 )
@@ -28,7 +32,7 @@ func Run(code []byte) (tokens types.TokenList) {
 	tokens.Init()
 	var scanner Scanner
 	scanner.Init(code, func(length int, position int, line int) {
-		errors.NewFatalLexerError(errors.SCANNER_OUT_OF_RANGE, line, "", 1)
+		errors.FatalError(fmt.Sprintf(errors.SCANNER_OUT_OF_RANGE, line, ""), 1)
 	})
 
 	for scanner.HasNext() {
@@ -147,7 +151,8 @@ func Run(code []byte) (tokens types.TokenList) {
 			var value string = ""
 
 			// if char is "_" or string(a-z) or number(0-9)
-			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekEquals(36) || scanner.PeekBetween(97, 122) || scanner.PeekBetween(48, 57)); scanner.Next() {
+			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekEquals(36) ||
+				scanner.PeekBetween(97, 122) || scanner.PeekBetween(48, 57)); scanner.Next() {
 				value += string(scanner.Peek())
 			}
 
@@ -160,7 +165,8 @@ func Run(code []byte) (tokens types.TokenList) {
 			var value string = ""
 
 			// if char is "_" or string(a-z) or string(A-Z) or number(0-9)
-			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekBetween(97, 122) || scanner.PeekBetween(65, 90) || scanner.PeekBetween(48, 57)); scanner.Next() {
+			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekBetween(97, 122) ||
+				scanner.PeekBetween(65, 90) || scanner.PeekBetween(48, 57)); scanner.Next() {
 				value += string(scanner.Peek())
 			}
 
@@ -184,7 +190,7 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		errors.NewFatalLexerError(errors.LEXER_UNEXPECTED_TOKEN, scanner.Line(), string(scanner.Peek()), 1)
+		errors.FatalError(fmt.Sprintf(errors.LEXER_UNEXPECTED_TOKEN, scanner.Line(), string(scanner.Peek())), 1)
 	}
 	tokens.Add("eof", "eof", scanner.Line())
 	return tokens

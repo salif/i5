@@ -2,34 +2,66 @@ package console
 
 import "html"
 
-var clr func(string, string) string = defaultColor
+var clr func(string, string) Color = defaultColor
 
-func Color(text string, color string) string {
-	return clr(text, color)
+type Color struct {
+	Value string
 }
 
-func defaultColor(text string, color string) string {
+func (c Color) String() string {
+	return c.Value
+}
+
+func (c Color) ValueOf(color string) Color {
+	return clr(c.Value, color)
+}
+
+func (c Color) Red() Color {
+	return clr(c.Value, "red")
+}
+
+func (c Color) Green() Color {
+	return clr(c.Value, "green")
+}
+
+func (c Color) Yellow() Color {
+	return clr(c.Value, "yellow")
+}
+
+func (c Color) Blue() Color {
+	return clr(c.Value, "blue")
+}
+
+func (c Color) Magenta() Color {
+	return clr(c.Value, "magenta")
+}
+
+func (c Color) Cyan() Color {
+	return clr(c.Value, "cyan")
+}
+
+func defaultColor(text string, color string) Color {
 	if color == "red" {
-		return "\x1b[91m" + text + "\x1b[0m"
+		return Color{"\x1b[91m" + text + "\x1b[0m"}
 	} else if color == "green" {
-		return "\x1b[92m" + text + "\x1b[0m"
+		return Color{"\x1b[92m" + text + "\x1b[0m"}
 	} else if color == "yellow" {
-		return "\x1b[93m" + text + "\x1b[0m"
+		return Color{"\x1b[93m" + text + "\x1b[0m"}
 	} else if color == "blue" {
-		return "\x1b[94m" + text + "\x1b[0m"
+		return Color{"\x1b[94m" + text + "\x1b[0m"}
 	} else if color == "magenta" {
-		return "\x1b[95m" + text + "\x1b[0m"
+		return Color{"\x1b[95m" + text + "\x1b[0m"}
 	} else if color == "cyan" {
-		return "\x1b[96m" + text + "\x1b[0m"
+		return Color{"\x1b[96m" + text + "\x1b[0m"}
 	} else {
-		return text
+		return Color{text}
 	}
 }
 
-func htmlColor(text string, color string) string {
-	return "<span style='color:" + color + ";'>" + html.EscapeString(text) + "</span>"
+func htmlColor(text string, color string) Color {
+	return Color{"<span style='color:" + color + ";'>" + html.EscapeString(text) + "</span>"}
 }
 
-func noColor(text string, color string) string {
-	return text
+func noColor(text string, color string) Color {
+	return Color{text}
 }

@@ -58,14 +58,14 @@ func (s *ArgsParser) Parse() {
 				if contains {
 					*ar = arg[index+1:]
 				} else {
-					errors.NewFatalError(fmt.Sprintf(errors.ARGS_UNKNOWN, arg[:index]), 1)
+					errors.FatalError(fmt.Sprintf(errors.ARGS_UNKNOWN, arg[:index]), 1)
 				}
 			} else {
 				var ar, contains = s.bools[arg]
 				if contains {
 					*ar = true
 				} else {
-					errors.NewFatalError(fmt.Sprintf(errors.ARGS_UNKNOWN, arg), 1)
+					errors.FatalError(fmt.Sprintf(errors.ARGS_UNKNOWN, arg), 1)
 				}
 			}
 		} else {

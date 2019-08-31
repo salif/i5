@@ -41,9 +41,10 @@ func ParseArgs() {
 		case "default":
 			console.SetOutput(console.Default)
 		default:
-			errors.NewFatalError(fmt.Sprintf(errors.ARGS_UNKNOWN_CLR, *_output), 1)
+			errors.FatalError(fmt.Sprintf(errors.ARGS_UNKNOWN_CLR, *_output), 1)
 		}
 	}
+
 	if len(*_eval) > 0 {
 		Run(*_eval, *_args, false)
 	} else if len(*_args) > 0 {
