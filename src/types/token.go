@@ -7,9 +7,6 @@ type Token struct {
 }
 
 const (
-	BRACKET    = "bracket"
-	COMMA      = "comma"
-	DOT        = "dot"
 	OPERATOR   = "operator"
 	NUMBER     = "number"
 	STRING     = "string"

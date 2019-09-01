@@ -16,35 +16,36 @@ func PrintCode(tokens types.TokenList) {
 
 	for i := 0; i < tokens.Size(); i++ {
 		var token types.Token = tokens.Get(i)
-		var tkn string = token.Kind
-		if tkn == types.KEYWORD {
+		if token.Kind == types.KEYWORD {
 			output.WriteString(console.Color{Value: token.Value}.Red().String() + " ")
-		} else if tkn == types.IDENTIFIER {
+		} else if token.Kind == types.IDENTIFIER {
 			output.WriteString(console.Color{Value: token.Value}.Green().String())
-		} else if tkn == types.STRING {
+		} else if token.Kind == types.STRING {
 			output.WriteString(console.Color{Value: "\"" + token.Value + "\""}.Yellow().String())
-		} else if tkn == types.NUMBER {
+		} else if token.Kind == types.NUMBER {
 			output.WriteString(console.Color{Value: token.Value}.Magenta().String())
-		} else if tkn == types.BUILTIN {
+		} else if token.Kind == types.BUILTIN {
 			output.WriteString(console.Color{Value: token.Value}.Cyan().String())
-		} else if tkn == types.OPERATOR {
-			output.WriteString(console.Color{Value: " " + token.Value + " "}.Red().String())
-		} else if tkn == types.COMMA {
-			output.WriteString(", ")
-		} else if tkn == types.EOL {
+		} else if token.Kind == types.EOL {
 			output.WriteString("\n")
 			output.WriteString(errors.F("%3d ", token.Line+1))
 			output.WriteString(strings.Repeat(tab, tabs))
-		} else if tkn == types.EOF {
-		} else if tkn == types.BRACKET && token.Value == "{" {
-			output.WriteString(" {")
-			tabs++
-		} else if tkn == types.BRACKET && token.Value == "}" {
-			output.WriteString("\u0008\u0008\u0008\u0008")
-			output.WriteString("} ")
-			tabs--
-			if tabs < 0 {
-				tabs = 0
+		} else if token.Kind == types.EOF {
+		} else if token.Kind == types.OPERATOR {
+			if token.Value == "{" {
+				output.WriteString(" {")
+				tabs++
+			} else if token.Value == "}" {
+				output.WriteString("\u0008\u0008\u0008\u0008")
+				output.WriteString("} ")
+				tabs--
+				if tabs < 0 {
+					tabs = 0
+				}
+			} else if token.Value == "(" || token.Value == ")" {
+				output.WriteString(token.Value)
+			} else {
+				output.WriteString(console.Color{Value: " " + token.Value + " "}.Red().String())
 			}
 		} else {
 			output.WriteString(token.Value)
