@@ -8,6 +8,7 @@ import (
 	"github.com/i5/i5/src/lexer"
 	"github.com/i5/i5/src/parser"
 	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/printer"
 )
 
 var (
@@ -59,13 +60,13 @@ func Run(name string, arguments []string, isFile bool) {
 	}
 	if *_code || *_tokens || *_ast {
 		if *_code {
-			PrintCode(tokenList)
+			printer.Code(tokenList)
 		}
 		if *_tokens {
-			PrintTokens(tokenList)
+			printer.Tokens(tokenList)
 		}
 		if *_ast {
-			PrintAst(parser.Run(tokenList), 0, "red")
+			printer.Ast(parser.Run(tokenList), 0, "red")
 		}
 	} else {
 		interpreter.Run(parser.Run(tokenList))

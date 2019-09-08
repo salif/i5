@@ -126,8 +126,8 @@ func Run(code []byte) (tokens types.TokenList) {
 				value += string(scanner.Peek())
 			}
 
-			if IsKeyword(value) {
-				tokens.Add(types.KEYWORD, value, scanner.Line())
+			if kToken, isKeyword := IsKeyword(value); isKeyword {
+				tokens.Add(kToken, value, scanner.Line())
 			} else {
 				tokens.Add(types.IDENTIFIER, value, scanner.Line())
 			}
@@ -140,160 +140,171 @@ func Run(code []byte) (tokens types.TokenList) {
 		case EQ:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, "==", scanner.Line())
+				tokens.Add(types.EQEQ, types.EQEQ, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "=", scanner.Line())
+				tokens.Add(types.EQ, types.EQ, scanner.Line())
 			}
 		// !
 		case NOT:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, "!=", scanner.Line())
+				tokens.Add(types.NOTEQ, types.NOTEQ, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "!", scanner.Line())
+				tokens.Add(types.NOT, types.NOT, scanner.Line())
 			}
 		// +
 		case PLUS:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, "+=", scanner.Line())
+				tokens.Add(types.PLUSEQ, types.PLUSEQ, scanner.Line())
 				scanner.Next()
 			} else if scanner.Peek() == PLUS {
-				tokens.Add(types.OPERATOR, "++", scanner.Line())
+				tokens.Add(types.PLUSPLUS, types.PLUSPLUS, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "+", scanner.Line())
+				tokens.Add(types.PLUS, types.PLUS, scanner.Line())
 			}
 		// -
 		case MINUS:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, "-=", scanner.Line())
+				tokens.Add(types.MINUSEQ, types.MINUSEQ, scanner.Line())
 				scanner.Next()
 			} else if scanner.Peek() == MINUS {
-				tokens.Add(types.OPERATOR, "--", scanner.Line())
+				tokens.Add(types.MINUSMINUS, types.MINUSMINUS, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "-", scanner.Line())
+				tokens.Add(types.MINUS, types.MINUS, scanner.Line())
 			}
 		// *
 		case MULTIPLY:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, "*=", scanner.Line())
+				tokens.Add(types.MULTIPLYEQ, types.MULTIPLYEQ, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "*", scanner.Line())
+				tokens.Add(types.MULTIPLY, types.MULTIPLY, scanner.Line())
 			}
 		// /
 		case DIVIDE:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, "/=", scanner.Line())
+				tokens.Add(types.DIVIDEEQ, types.DIVIDEEQ, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "/", scanner.Line())
+				tokens.Add(types.DIVIDE, types.DIVIDE, scanner.Line())
 			}
 		// %
 		case MODULO:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, "%=", scanner.Line())
+				tokens.Add(types.MODULOEQ, types.MODULOEQ, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "%", scanner.Line())
+				tokens.Add(types.MODULO, types.MODULO, scanner.Line())
 			}
 		// &
 		case AND:
 			scanner.Next()
 			if scanner.Peek() == AND {
-				tokens.Add(types.OPERATOR, "&&", scanner.Line())
+				tokens.Add(types.ANDAND, types.ANDAND, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "&", scanner.Line())
+				tokens.Add(types.AND, types.AND, scanner.Line())
 			}
 		// |
 		case OR:
 			scanner.Next()
 			if scanner.Peek() == OR {
-				tokens.Add(types.OPERATOR, "||", scanner.Line())
+				tokens.Add(types.OROR, types.OROR, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "|", scanner.Line())
+				tokens.Add(types.OR, types.OR, scanner.Line())
 			}
+		// ^
+		case XOR:
+			tokens.Add(types.XOR, types.XOR, scanner.Line())
+			scanner.Next()
+		// ~
+		case BNOT:
+			tokens.Add(types.BNOT, types.BNOT, scanner.Line())
+			scanner.Next()
 		// <
 		case LT:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, "<=", scanner.Line())
+				tokens.Add(types.LTEQ, types.LTEQ, scanner.Line())
 				scanner.Next()
 			} else if scanner.Peek() == LT {
-				tokens.Add(types.OPERATOR, "<<", scanner.Line())
+				tokens.Add(types.LTLT, types.LTLT, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, "<", scanner.Line())
+				tokens.Add(types.LT, types.LT, scanner.Line())
 			}
 		// >
 		case GT:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, ">=", scanner.Line())
+				tokens.Add(types.GTEQ, types.GTEQ, scanner.Line())
 				scanner.Next()
 			} else if scanner.Peek() == GT {
-				tokens.Add(types.OPERATOR, ">>", scanner.Line())
+				tokens.Add(types.GTGT, types.GTGT, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, ">", scanner.Line())
+				tokens.Add(types.GT, types.GT, scanner.Line())
 			}
 		// :
 		case COLON:
 			scanner.Next()
 			if scanner.Peek() == EQ {
-				tokens.Add(types.OPERATOR, ":=", scanner.Line())
+				tokens.Add(types.COLONEQ, types.COLONEQ, scanner.Line())
+				scanner.Next()
+			} else if scanner.Peek() == COLON {
+				tokens.Add(types.COLONCOLON, types.COLONCOLON, scanner.Line())
 				scanner.Next()
 			} else {
-				tokens.Add(types.OPERATOR, ":", scanner.Line())
+				tokens.Add(types.COLON, types.COLON, scanner.Line())
 			}
 		// .
 		case DOT:
-			tokens.Add(types.OPERATOR, ".", scanner.Line())
+			tokens.Add(types.DOT, types.DOT, scanner.Line())
 			scanner.Next()
 		// ,
 		case COMMA:
-			tokens.Add(types.OPERATOR, ",", scanner.Line())
+			tokens.Add(types.COMMA, types.COMMA, scanner.Line())
 			scanner.Next()
 		// (
 		case LPAREN:
-			tokens.Add(types.OPERATOR, "(", scanner.Line())
+			tokens.Add(types.LPAREN, types.LPAREN, scanner.Line())
 			scanner.Next()
 		// )
 		case RPAREN:
-			tokens.Add(types.OPERATOR, ")", scanner.Line())
+			tokens.Add(types.RPAREN, types.RPAREN, scanner.Line())
 			scanner.Next()
 		// {
 		case LBRACE:
-			tokens.Add(types.OPERATOR, "{", scanner.Line())
+			tokens.Add(types.LBRACE, types.LBRACE, scanner.Line())
 			scanner.Next()
 		// }
 		case RBRACE:
-			tokens.Add(types.OPERATOR, "}", scanner.Line())
+			tokens.Add(types.RBRACE, types.RBRACE, scanner.Line())
 			scanner.Next()
 		// [
 		case LBRACKET:
-			tokens.Add(types.OPERATOR, "[", scanner.Line())
+			tokens.Add(types.LBRACKET, types.LBRACKET, scanner.Line())
 			scanner.Next()
 		// ]
 		case RBRACKET:
-			tokens.Add(types.OPERATOR, "]", scanner.Line())
+			tokens.Add(types.RBRACKET, types.RBRACKET, scanner.Line())
 			scanner.Next()
 		// ?
 		case QM:
-			tokens.Add(types.OPERATOR, "?", scanner.Line())
+			tokens.Add(types.QM, types.QM, scanner.Line())
 			scanner.Next()
 		default:
-			errors.FatalError(errors.F(errors.LEXER_UNEXPECTED_TOKEN, scanner.Line(), string(scanner.Peek())), 1)
+			errors.FatalError(errors.F(errors.LEXER_UNEXPECTED_TOKEN, string(scanner.Peek()), scanner.Line()), 1)
 		}
 	}
 	tokens.Add(types.EOF, types.EOF, scanner.Line())

@@ -7,7 +7,7 @@ import (
 	"github.com/i5/i5/src/io/console"
 )
 
-func Error(text interface{}, status int) {
+func Error(text interface{}) {
 	console.Println(console.Color{Value: "error:"}.Red(), text)
 }
 

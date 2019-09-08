@@ -1,5 +1,7 @@
 package lexer
 
+import "github.com/i5/i5/src/types"
+
 const (
 	EQ       = 61
 	NOT      = 33
@@ -10,6 +12,8 @@ const (
 	MODULO   = 37
 	AND      = 38
 	OR       = 124
+	XOR      = 94
+	BNOT     = 126
 	LT       = 60
 	GT       = 62
 	COLON    = 58
@@ -24,37 +28,33 @@ const (
 	QM       = 63
 )
 
-func IsKeyword(char string) bool {
+func IsKeyword(char string) (string, bool) {
 	switch char {
 	case "if":
-		return true
+		return types.IF, true
 	case "elif":
-		return true
+		return types.ELIF, true
 	case "else":
-		return true
+		return types.ELSE, true
 	case "for":
-		return true
+		return types.FOR, true
 	case "break":
-		return true
+		return types.BREAK, true
 	case "continue":
-		return true
+		return types.CONTINUE, true
 	case "fn":
-		return true
+		return types.FN, true
 	case "return":
-		return true
-	case "try":
-		return true
-	case "catch":
-		return true
+		return types.RETURN, true
 	case "import":
-		return true
+		return types.IMPORT, true
 	case "true":
-		return true
+		return types.TRUE, true
 	case "false":
-		return true
+		return types.FALSE, true
 	case "nil":
-		return true
+		return types.NIL, true
 	default:
-		return false
+		return "", false
 	}
 }

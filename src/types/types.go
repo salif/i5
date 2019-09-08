@@ -1,8 +1,7 @@
 package types
 
-type Node struct {
-	Kind  string
+type Token struct {
+	Type  string
 	Value string
-	Body  []Node
-	Dlm   string
+	Line  int
 }
