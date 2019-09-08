@@ -16,6 +16,7 @@ type If struct {
 func (i If) Value() string {
 	return i.Token.Value
 }
+
 func (i If) String() string {
 	var out bytes.Buffer
 	out.WriteString("if ")

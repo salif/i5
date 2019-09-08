@@ -12,6 +12,7 @@ func (p Program) Value() string {
 	}
 	return ""
 }
+
 func (p Program) String() string {
 	var out bytes.Buffer
 	for _, s := range p.Body {

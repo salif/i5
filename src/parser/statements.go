@@ -33,7 +33,7 @@ func (p *Parser) parseIf() ast.Statement {
 
 	p.next() // skip 'if' or 'elif'
 
-	expression.Condition = p.parseGroup()
+	expression.Condition = p.parseExpression(LOWEST)
 
 	expression.Consequence = p.parseBlock()
 
@@ -71,7 +71,7 @@ func (p *Parser) parseReturn() ast.Statement {
 func (p *Parser) parseImport() ast.Statement {
 	stmt := ast.Import{Token: p.peek}
 	p.next() // skip 'import'
-	stmt.Val = p.parseString()
+	stmt.Val = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt

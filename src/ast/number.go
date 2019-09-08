@@ -10,6 +10,7 @@ type Number struct {
 func (n Number) Value() string {
 	return n.Token.Value
 }
+
 func (n Number) String() string {
 	return n.Token.Value
 }
