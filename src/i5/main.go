@@ -11,16 +11,23 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
+const (
+	MajorVersion = "0"
+	MinorVersion = "0.0"
+	PatchVersion = "0.0.0"
+)
+
 var (
-	ap      ArgsParser = InitArgsParser()
-	_help              = ap.Bool("help")
-	_init              = ap.Bool("init")
-	_tokens            = ap.Bool("tokens")
-	_code              = ap.Bool("code")
-	_ast               = ap.Bool("ast")
-	_output            = ap.String("output")
-	_eval              = ap.String("eval")
-	_args              = ap.Default()
+	ap       ArgsParser = InitArgsParser()
+	_help               = ap.Bool("help")
+	_init               = ap.Bool("init")
+	_tokens             = ap.Bool("tokens")
+	_code               = ap.Bool("code")
+	_ast                = ap.Bool("ast")
+	_output             = ap.String("output")
+	_eval               = ap.String("eval")
+	_version            = ap.Bool("version")
+	_args               = ap.Default()
 )
 
 func ParseArgs() {
@@ -29,12 +36,17 @@ func ParseArgs() {
 
 	if ap.Empty() || *_help {
 		PrintHelp()
-		errors.Exit(0)
+		return
 	}
 
 	if *_init {
 		InitModule()
-		errors.Exit(0)
+		return
+	}
+
+	if *_version {
+		PrintVersion()
+		return
 	}
 
 	if len(*_output) > 0 {
@@ -79,6 +91,10 @@ func Run(name string, arguments []string, isFile bool) {
 	}
 }
 
+func PrintVersion() {
+	console.Println("Version: v" + MinorVersion)
+}
+
 func PrintHelp() {
 	console.Println(`
 Usage:
@@ -90,10 +106,11 @@ options:
     --help                      print help
     --code                      print code
     --tokens                    print tokens
-    --ast                       print ast
+    --ast                       print abstract syntax tree
     --output='format'           set output format:
                                 ('html', 'no-color', 'default')
-    --eval='code'               eval code
+    --eval='code'               evaluate code
     --init                      initialize new module
+    --version                   print current version
     `)
 }

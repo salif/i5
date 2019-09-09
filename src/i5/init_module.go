@@ -10,10 +10,7 @@ func InitModule() {
 	if err != "" {
 		errors.FatalError(err, 1)
 	}
-	var err2 string = file.Write("main.i5", newEmptyTemplate(), 0744)
-	if err2 != "" {
-		errors.FatalError(err2, 1)
-	}
+	file.Write("main.i5", newEmptyTemplate(), 0744)
 }
 
 func newEmptyTemplate() string {
@@ -34,7 +31,7 @@ func newModuleTemplate() string {
 	"main": "main.i5",
 	"dependencies": {
 		"@i5": ">0.0.1"
-	}
+	},
 	"author": {
 		"name": "",
 		"email": "",
