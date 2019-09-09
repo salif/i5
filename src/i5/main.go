@@ -7,13 +7,14 @@ import (
 	"github.com/i5/i5/src/io/file"
 	"github.com/i5/i5/src/lexer"
 	"github.com/i5/i5/src/parser"
-	"github.com/i5/i5/src/types"
 	"github.com/i5/i5/src/printer"
+	"github.com/i5/i5/src/types"
 )
 
 var (
 	ap      ArgsParser = InitArgsParser()
 	_help              = ap.Bool("help")
+	_init              = ap.Bool("init")
 	_tokens            = ap.Bool("tokens")
 	_code              = ap.Bool("code")
 	_ast               = ap.Bool("ast")
@@ -28,6 +29,11 @@ func ParseArgs() {
 
 	if ap.Empty() || *_help {
 		PrintHelp()
+		errors.Exit(0)
+	}
+
+	if *_init {
+		InitModule()
 		errors.Exit(0)
 	}
 
@@ -88,5 +94,6 @@ options:
     --output='format'           set output format:
                                 ('html', 'no-color', 'default')
     --eval='code'               eval code
+    --init                      initialize new module
     `)
 }
