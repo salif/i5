@@ -9,6 +9,8 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.peek.Type {
 	case types.IF:
 		return p.parseIf()
+	case types.FOR:
+		return p.parseFor()
 	case types.FN:
 		return p.parseFn()
 	case types.RETURN:
@@ -44,6 +46,14 @@ func (p *Parser) parseIf() ast.Statement {
 		expression.Alternative = p.parseBlock()
 	}
 
+	return expression
+}
+
+func (p *Parser) parseFor() ast.Statement {
+	expression := ast.For{Token: p.peek}
+	p.next() // skip 'for'
+	expression.Condition = p.parseExpression(LOWEST)
+	expression.Body = p.parseBlock()
 	return expression
 }
 

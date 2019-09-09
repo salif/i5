@@ -109,19 +109,27 @@ func (p *Parser) parseExpressionList(end string) []ast.Expression {
 	return list
 }
 
+func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
+	p.next()
+	expr := ast.AlienFn{Token: p.peek}
+	expr.Alien = alien
+	expr.Function = p.parseExpression(DOT)
+	return expr
+}
+
 func (p *Parser) parsePrefix() ast.Expression {
-	expression := ast.Prefix{
+	expr := ast.Prefix{
 		Token:    p.peek,
 		Operator: p.peek.Value,
 	}
 
 	p.next()
-	expression.Right = p.parseExpression(PREFIX)
-	return expression
+	expr.Right = p.parseExpression(PREFIX)
+	return expr
 }
 
 func (p *Parser) parseInfix(left ast.Expression) ast.Expression {
-	expression := ast.Infix{
+	expr := ast.Infix{
 		Token:    p.peek,
 		Operator: p.peek.Value,
 		Left:     left,
@@ -129,6 +137,17 @@ func (p *Parser) parseInfix(left ast.Expression) ast.Expression {
 
 	precedence := p.precedence()
 	p.next()
-	expression.Right = p.parseExpression(precedence)
-	return expression
+	expr.Right = p.parseExpression(precedence)
+	return expr
+}
+
+func (p *Parser) parseSuffix(left ast.Expression) ast.Expression {
+	expr := ast.Suffix{
+		Token: p.peek,
+	}
+
+	expr.Left = left
+	expr.Operator = p.peek.Value
+	p.next()
+	return expr
 }

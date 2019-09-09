@@ -27,7 +27,7 @@ const (
 	PREFIX
 	INCDEC
 	CALL
-	PRO
+	DOT
 )
 
 var precedences = map[string]int{
@@ -61,7 +61,7 @@ var precedences = map[string]int{
 	types.PLUSPLUS:   INCDEC,
 	types.MINUSMINUS: INCDEC,
 	types.LPAREN:     CALL,
-	types.DOT:        PRO,
+	types.DOT:        DOT,
 }
 
 func Run(tokens types.TokenList) ast.Program {
@@ -88,6 +88,10 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.prefixFunctions[types.FALSE] = p.parseBool
 	p.prefixFunctions[types.NIL] = p.parseNil
 	p.prefixFunctions[types.LPAREN] = p.parseGroup
+	p.prefixFunctions[types.NOT] = p.parsePrefix
+	p.prefixFunctions[types.PLUSPLUS] = p.parsePrefix
+	p.prefixFunctions[types.MINUSMINUS] = p.parsePrefix
+	p.prefixFunctions[types.BNOT] = p.parsePrefix
 
 	p.infixFunctions[types.OROR] = p.parseInfix
 	p.infixFunctions[types.ANDAND] = p.parseInfix
@@ -111,6 +115,15 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.infixFunctions[types.DIVIDE] = p.parseInfix
 	p.infixFunctions[types.MODULO] = p.parseInfix
 	p.infixFunctions[types.LPAREN] = p.parseCall
+	p.infixFunctions[types.PLUSPLUS] = p.parseSuffix
+	p.infixFunctions[types.AND] = p.parseInfix
+	p.infixFunctions[types.OR] = p.parseInfix
+	p.infixFunctions[types.XOR] = p.parseInfix
+	p.infixFunctions[types.LTLT] = p.parseInfix
+	p.infixFunctions[types.GTGT] = p.parseInfix
+	p.infixFunctions[types.DOT] = p.parseAlienFn
+	p.infixFunctions[types.PLUSPLUS] = p.parseSuffix
+	p.infixFunctions[types.MINUSMINUS] = p.parseSuffix
 
 	p.next()
 }
