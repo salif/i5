@@ -30,29 +30,35 @@ const (
 
 func IsKeyword(char string) (string, bool) {
 	switch char {
-	case "if":
+	case types.IF:
 		return types.IF, true
-	case "elif":
+	case types.ELIF:
 		return types.ELIF, true
-	case "else":
+	case types.ELSE:
 		return types.ELSE, true
-	case "for":
+	case types.FOR:
 		return types.FOR, true
-	case "break":
+	case types.BREAK:
 		return types.BREAK, true
-	case "continue":
+	case types.CONTINUE:
 		return types.CONTINUE, true
-	case "fn":
+	case types.SWITCH:
+		return types.SWITCH, true
+	case types.CASE:
+		return types.CASE, true
+	case types.FN:
 		return types.FN, true
-	case "return":
+	case types.RETURN:
 		return types.RETURN, true
-	case "import":
+	case types.IMPORT:
 		return types.IMPORT, true
-	case "true":
+	case types.THROW:
+		return types.THROW, true
+	case types.TRUE:
 		return types.TRUE, true
-	case "false":
+	case types.FALSE:
 		return types.FALSE, true
-	case "nil":
+	case types.NIL:
 		return types.NIL, true
 	default:
 		return "", false

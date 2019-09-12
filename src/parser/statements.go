@@ -9,6 +9,8 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.peek.Type {
 	case types.IF:
 		return p.parseIf()
+	case types.SWITCH:
+		return p.parseSwitch()
 	case types.FOR:
 		return p.parseFor()
 	case types.RETURN:
@@ -45,6 +47,37 @@ func (p *Parser) parseIf() ast.Statement {
 	}
 
 	return expression
+}
+
+func (p *Parser) parseSwitch() ast.Statement {
+	stmt := ast.Switch{Token: p.peek}
+	p.next()
+	stmt.Condition = p.parseExpression(LOWEST)
+	cases := []ast.Case{}
+	cs := ast.Case{}
+	p.require(types.EOL)
+	p.next()
+
+	for p.peek.Type == types.CASE {
+		p.next()
+		expr := p.parseExpression(LOWEST)
+		cs.Cases = append(cs.Cases, expr)
+		if p.peek.Type == types.LBRACE {
+			cs.Body = p.parseBlock()
+			cases = append(cases, cs)
+			cs = ast.Case{}
+		} else {
+			p.require(types.EOL)
+			p.next()
+		}
+	}
+	stmt.Cases = cases
+
+	if p.peek.Type == types.ELSE {
+		p.next()
+		stmt.Else = p.parseBlock()
+	}
+	return stmt
 }
 
 func (p *Parser) parseFor() ast.Statement {

@@ -17,9 +17,9 @@ func (b Block) Value() string {
 
 func (b Block) String() string {
 	var out bytes.Buffer
-	out.WriteString("{\n")
+	out.WriteString("{")
 	for _, s := range b.Body {
-		out.WriteString("    " + s.String() + "\n")
+		out.WriteString(s.String() + ";")
 	}
 	out.WriteString("}")
 	return out.String()

@@ -171,41 +171,6 @@ func (p *Parser) parseFn() ast.Expression {
 	return expr
 }
 
-// func (p *Parser) parseFn() ast.Expression {
-// 	p.require(types.FN)
-// 	peek := p.peek
-// 	p.next() // skip 'fn'
-// 	if p.peek.Type != types.IDENTIFIER {
-// 		fn := ast.Function{Token: peek}
-// 		fn.Anonymous = true
-// 		fn.Params = p.parseParams()
-// 		if p.peek.Type == types.META {
-// 			returns := []types.Token{}
-// 			fn.Return = returns
-// 			fn.Strict = true
-// 			p.next()
-// 		}
-// 		fn.Body = p.parseBlock()
-// 		return fn
-// 	}
-// 	expr := ast.Assign{Token: types.Token{Type: types.EQ, Value: types.EQ, Line: p.peek.Line}}
-// 	fn := ast.Function{Token: peek}
-// 	exprs := ast.ExprList{}
-// 	exprs.Exprs = append(exprs.Exprs, p.parseIdentifier())
-// 	expr.Left = exprs
-// 	fn.Anonymous = false
-// 	fn.Params = p.parseParams()
-// 	if p.peek.Type == types.META {
-// 		returns := []types.Token{}
-// 		fn.Return = returns
-// 		fn.Strict = true
-// 		p.next()
-// 	}
-// 	fn.Body = p.parseBlock()
-// 	expr.Right = fn
-// 	return expr
-// }
-
 func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
 	p.next()
 	expr := ast.AlienFn{Token: p.peek}
