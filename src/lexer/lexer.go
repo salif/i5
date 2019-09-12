@@ -116,6 +116,20 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
+		// if char is "@"
+		if scanner.PeekEquals(64) {
+			var value string = ""
+
+			// if char is "_" or string(a-z) or number(0-9)
+			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekEquals(64) ||
+				scanner.PeekBetween(97, 122) || scanner.PeekBetween(48, 57)); scanner.Next() {
+				value += string(scanner.Peek())
+			}
+
+			tokens.Add(types.META, value, scanner.Line())
+			continue
+		}
+
 		// if char is "_" or string(a-z) or string(A-Z)
 		if scanner.PeekEquals(95) || scanner.PeekBetween(97, 122) || scanner.PeekBetween(65, 90) {
 			var value string = ""

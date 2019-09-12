@@ -4,6 +4,7 @@ const (
 	NUMBER     = "number"
 	STRING     = "string"
 	BUILTIN    = "builtin"
+	META       = "meta"
 	IDENTIFIER = "identifier"
 	EOL        = "new line"
 	EOF        = "end of file"
