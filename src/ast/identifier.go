@@ -3,8 +3,10 @@ package ast
 import "github.com/i5/i5/src/types"
 
 type Identifier struct {
-	Token types.Token
-	Val   string
+	Token  types.Token
+	Type   types.Token
+	Strict bool
+	Val    string
 }
 
 func (i Identifier) Value() string {
@@ -12,7 +14,11 @@ func (i Identifier) Value() string {
 }
 
 func (i Identifier) String() string {
-	return i.Val
+	result := i.Val
+	if i.Strict {
+		result += " " + i.Type.Value
+	}
+	return result
 }
 
 func (i Identifier) expression() {}

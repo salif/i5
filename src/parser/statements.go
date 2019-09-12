@@ -11,8 +11,6 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseIf()
 	case types.FOR:
 		return p.parseFor()
-	case types.FN:
-		return p.parseFn()
 	case types.RETURN:
 		return p.parseReturn()
 	case types.IMPORT:
@@ -55,18 +53,6 @@ func (p *Parser) parseFor() ast.Statement {
 	expression.Condition = p.parseExpression(LOWEST)
 	expression.Body = p.parseBlock()
 	return expression
-}
-
-func (p *Parser) parseFn() ast.Statement {
-	fn := ast.Function{Token: p.peek}
-	p.next() // skip 'fn'
-	p.require(types.IDENTIFIER)
-	fn.Function = p.peek.Value
-	p.next() // skip function name
-	fn.Params = p.parseParams()
-	fn.Body = p.parseBlock()
-
-	return fn
 }
 
 func (p *Parser) parseReturn() ast.Statement {

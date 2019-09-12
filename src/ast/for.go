@@ -10,6 +10,7 @@ type For struct {
 	Token     types.Token
 	Condition Expression
 	Body      Block
+	Return    Expression
 }
 
 func (f For) Value() string {
@@ -24,4 +25,4 @@ func (f For) String() string {
 	out.WriteString(f.Body.String())
 	return out.String()
 }
-func (i For) statement() {}
+func (f For) statement() {}

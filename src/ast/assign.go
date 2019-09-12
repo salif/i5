@@ -9,7 +9,7 @@ import (
 type Assign struct {
 	Token types.Token
 	Left  Expression
-	Val   Expression
+	Right Expression
 }
 
 func (a Assign) Value() string {
@@ -18,9 +18,14 @@ func (a Assign) Value() string {
 
 func (a Assign) String() string {
 	var out bytes.Buffer
-	out.WriteString(a.Left.String())
-	out.WriteString(a.Value())
-	out.WriteString(a.Val.String())
+	switch a.Right.(type) {
+	case Function:
+		out.WriteString(a.Right.Value() + " " + a.Left.String() + a.Right.String())
+	default:
+		out.WriteString(a.Left.String())
+		out.WriteString(a.Value())
+		out.WriteString(a.Right.String())
+	}
 	return out.String()
 }
 

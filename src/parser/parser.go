@@ -16,6 +16,7 @@ const (
 	NOT
 	ASSIGN
 	EQ
+	COMMA
 	CONCAT
 	LTGT
 	BTWOR
@@ -43,6 +44,7 @@ var precedences = map[string]int{
 	types.MODULOEQ:   ASSIGN,
 	types.EQEQ:       EQ,
 	types.NOTEQ:      EQ,
+	types.COMMA:      COMMA,
 	types.COLON:      CONCAT,
 	types.LT:         LTGT,
 	types.GT:         LTGT,
@@ -80,10 +82,12 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.position = 0
 	p.peek = types.Token{}
 
+	p.prefixFunctions[types.FN] = p.parseFn
 	p.prefixFunctions[types.IDENTIFIER] = p.parseIdentifier
 	p.prefixFunctions[types.NUMBER] = p.parseNumber
 	p.prefixFunctions[types.STRING] = p.parseString
 	p.prefixFunctions[types.BUILTIN] = p.parseBuiltin
+	p.prefixFunctions[types.META] = p.parseMeta
 	p.prefixFunctions[types.TRUE] = p.parseBool
 	p.prefixFunctions[types.FALSE] = p.parseBool
 	p.prefixFunctions[types.NIL] = p.parseNil
@@ -92,10 +96,11 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.prefixFunctions[types.PLUSPLUS] = p.parsePrefix
 	p.prefixFunctions[types.MINUSMINUS] = p.parsePrefix
 	p.prefixFunctions[types.BNOT] = p.parsePrefix
+	p.prefixFunctions[types.MINUS] = p.parsePrefix
 
 	p.infixFunctions[types.OROR] = p.parseInfix
 	p.infixFunctions[types.ANDAND] = p.parseInfix
-	p.infixFunctions[types.EQ] = p.parseInfix
+	p.infixFunctions[types.EQ] = p.parseAssign
 	p.infixFunctions[types.COLONEQ] = p.parseInfix
 	p.infixFunctions[types.PLUSEQ] = p.parseInfix
 	p.infixFunctions[types.MINUSEQ] = p.parseInfix
@@ -104,6 +109,7 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.infixFunctions[types.MODULOEQ] = p.parseInfix
 	p.infixFunctions[types.EQEQ] = p.parseInfix
 	p.infixFunctions[types.NOTEQ] = p.parseInfix
+	p.infixFunctions[types.COMMA] = p.parseList
 	p.infixFunctions[types.COLON] = p.parseInfix
 	p.infixFunctions[types.LT] = p.parseInfix
 	p.infixFunctions[types.GT] = p.parseInfix
@@ -167,24 +173,22 @@ func (p *Parser) expect(b bool) {
 
 func (p *Parser) parseProgram() ast.Program {
 	program := ast.Program{}
-	program.Body = []ast.Statement{}
+	program.Body = []ast.Expression{}
 
 	for p.peek.Type != types.EOF {
 		if p.peek.Type == types.EOL {
 			p.next()
 			continue
 		}
-		stmt := p.parseStatement()
-		if stmt != nil {
-			program.Body = append(program.Body, stmt)
-		}
+		expr := p.parseExpression(LOWEST)
+		program.Body = append(program.Body, expr)
 	}
 
 	return program
 }
 
-func (p *Parser) parseParams() []ast.Identifier {
-	identifiers := []ast.Identifier{}
+func (p *Parser) parseParams() []ast.Expression {
+	identifiers := []ast.Expression{}
 	p.require(types.LPAREN)
 	p.next() // skip '('
 
@@ -193,16 +197,7 @@ func (p *Parser) parseParams() []ast.Identifier {
 		return identifiers
 	}
 
-	p.require(types.IDENTIFIER)
-	identifiers = append(identifiers, ast.Identifier{Token: p.peek, Val: p.peek.Value})
-	p.next()
-
-	for p.peek.Value == types.COMMA {
-		p.next() // skip ','
-		p.require(types.IDENTIFIER)
-		identifiers = append(identifiers, ast.Identifier{Token: p.peek, Val: p.peek.Value})
-		p.next() // skip argument
-	}
+	identifiers = p.parseExpressionList(types.RBRACE)
 
 	p.require(types.RPAREN)
 	p.next() // skip ')'

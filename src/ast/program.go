@@ -3,7 +3,7 @@ package ast
 import "bytes"
 
 type Program struct {
-	Body []Statement
+	Body []Expression
 }
 
 func (p Program) Value() string {
@@ -16,7 +16,7 @@ func (p Program) Value() string {
 func (p Program) String() string {
 	var out bytes.Buffer
 	for _, s := range p.Body {
-		out.WriteString(s.String())
+		out.WriteString(s.String() + "\n")
 	}
 	return out.String()
 }

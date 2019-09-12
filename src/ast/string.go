@@ -12,7 +12,7 @@ func (s String) Value() string {
 }
 
 func (s String) String() string {
-	return s.Token.Value
+	return "\"" + s.Token.Value + "\""
 }
 
 func (s String) expression() {}

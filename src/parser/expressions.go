@@ -28,8 +28,13 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 func (p *Parser) parseIdentifier() ast.Expression {
 	p.require(types.IDENTIFIER)
-	expr := ast.Identifier{Token: p.peek, Val: p.peek.Value}
+	expr := ast.Identifier{Token: p.peek, Val: p.peek.Value, Strict: false}
 	p.next()
+	if p.peek.Type == types.META {
+		expr.Type = p.peek
+		expr.Strict = true
+		p.next()
+	}
 	return expr
 }
 
@@ -56,6 +61,13 @@ func (p *Parser) parseString() ast.Expression {
 func (p *Parser) parseBuiltin() ast.Expression {
 	p.require(types.BUILTIN)
 	expr := ast.Builtin{Token: p.peek, Val: p.peek.Value}
+	p.next()
+	return expr
+}
+
+func (p *Parser) parseMeta() ast.Expression {
+	p.require(types.META)
+	expr := ast.Meta{Token: p.peek, Val: p.peek.Value}
 	p.next()
 	return expr
 }
@@ -108,6 +120,91 @@ func (p *Parser) parseExpressionList(end string) []ast.Expression {
 
 	return list
 }
+
+func (p *Parser) parseList(expr ast.Expression) ast.Expression {
+	list := ast.ExprList{}
+	list.Exprs = append(list.Exprs, expr)
+
+	for p.peek.Type == types.COMMA {
+		p.next() // skip ','
+		list.Exprs = append(list.Exprs, p.parseExpression(LOWEST))
+	}
+
+	return list
+}
+
+func (p *Parser) parseAssign(left ast.Expression) ast.Expression {
+	expr := ast.Assign{Token: p.peek}
+	expr.Left = left
+	p.require(types.EQ)
+	p.next()
+	expr.Right = p.parseExpression(LOWEST)
+	return expr
+}
+
+func (p *Parser) parseFn() ast.Expression {
+	p.require(types.FN)
+	fn := ast.Function{Token: p.peek}
+	var expr ast.Assign
+	p.next() // skip 'fn'
+	if p.peek.Type != types.IDENTIFIER {
+		fn.Anonymous = true
+	} else {
+		fn.Anonymous = false
+		expr = ast.Assign{Token: types.Token{Type: types.EQ, Value: types.EQ, Line: p.peek.Line}}
+		exprs := ast.ExprList{}
+		exprs.Exprs = append(exprs.Exprs, p.parseIdentifier())
+		expr.Left = exprs
+	}
+
+	fn.Params = p.parseParams()
+	if p.peek.Type == types.META {
+		list := p.parseList(p.parseExpression(LOWEST))
+		fn.Return = list
+		fn.Strict = true
+	}
+	fn.Body = p.parseBlock()
+	if fn.Anonymous {
+		return fn
+	}
+	expr.Right = fn
+	return expr
+}
+
+// func (p *Parser) parseFn() ast.Expression {
+// 	p.require(types.FN)
+// 	peek := p.peek
+// 	p.next() // skip 'fn'
+// 	if p.peek.Type != types.IDENTIFIER {
+// 		fn := ast.Function{Token: peek}
+// 		fn.Anonymous = true
+// 		fn.Params = p.parseParams()
+// 		if p.peek.Type == types.META {
+// 			returns := []types.Token{}
+// 			fn.Return = returns
+// 			fn.Strict = true
+// 			p.next()
+// 		}
+// 		fn.Body = p.parseBlock()
+// 		return fn
+// 	}
+// 	expr := ast.Assign{Token: types.Token{Type: types.EQ, Value: types.EQ, Line: p.peek.Line}}
+// 	fn := ast.Function{Token: peek}
+// 	exprs := ast.ExprList{}
+// 	exprs.Exprs = append(exprs.Exprs, p.parseIdentifier())
+// 	expr.Left = exprs
+// 	fn.Anonymous = false
+// 	fn.Params = p.parseParams()
+// 	if p.peek.Type == types.META {
+// 		returns := []types.Token{}
+// 		fn.Return = returns
+// 		fn.Strict = true
+// 		p.next()
+// 	}
+// 	fn.Body = p.parseBlock()
+// 	expr.Right = fn
+// 	return expr
+// }
 
 func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
 	p.next()
