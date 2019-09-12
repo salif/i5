@@ -1,0 +1,27 @@
+#!/usr/bin/env i5
+
+fn main() {
+	variable = 4
+	switch variable
+	case 1
+	case 2 {
+		$print("variable is 1 or 2")
+	}
+	case 3 {
+		$print("variable is 3")
+	}
+	case 4 {
+		$print("variable is 4")
+	}
+	case 5
+	case 6
+	case 7
+	case 8
+	case 9 {
+		$print("variable is between 5 and 9")
+	}
+	else {
+		$print("unknown variable")
+	}
+	# output: variable is 4
+}

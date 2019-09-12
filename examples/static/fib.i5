@@ -1,13 +1,13 @@
 #!/usr/bin/env i5
 
-fn main() {
+fn main() @void {
 	fib(35)
 }
-fn fib(x) {
+fn fib(x @num) @num {
 	if (x == 0) {
 		return 0
 	} elif (x == 1) {
 		return 1
 	}
-	return fib(x-1) + fib(x-2)
+	return fib(x - 1) + fib(x - 2)
 }

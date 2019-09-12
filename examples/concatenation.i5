@@ -1,3 +1,5 @@
+#!/usr/bin/env i5
+
 fn main() {
 	variable = 1
 	variable := 2
