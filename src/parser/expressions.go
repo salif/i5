@@ -172,10 +172,17 @@ func (p *Parser) parseFn() ast.Expression {
 }
 
 func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
-	p.next()
 	expr := ast.AlienFn{Token: p.peek}
+	p.next()
 	expr.Alien = alien
 	expr.Function = p.parseExpression(DOT)
+	return expr
+}
+
+func (p *Parser) parseImport() ast.Expression {
+	expr := ast.Import{Token: p.peek}
+	p.next()
+	expr.Val = p.parseExpression(LOWEST)
 	return expr
 }
 

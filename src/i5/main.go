@@ -92,7 +92,7 @@ func Run(name string, arguments []string, isFile bool) {
 }
 
 func PrintVersion() {
-	console.Println("Version: v" + MinorVersion)
+	console.Println("i5 version: v" + MinorVersion)
 }
 
 func PrintHelp() {

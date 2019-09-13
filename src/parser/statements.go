@@ -15,8 +15,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseFor()
 	case types.RETURN:
 		return p.parseReturn()
-	case types.IMPORT:
-		return p.parseImport()
+	case types.THROW:
+		return p.parseThrow()
 	default:
 		return p.parseExprStatement()
 	}
@@ -81,11 +81,11 @@ func (p *Parser) parseSwitch() ast.Statement {
 }
 
 func (p *Parser) parseFor() ast.Statement {
-	expression := ast.For{Token: p.peek}
+	stmt := ast.For{Token: p.peek}
 	p.next() // skip 'for'
-	expression.Condition = p.parseExpression(LOWEST)
-	expression.Body = p.parseBlock()
-	return expression
+	stmt.Condition = p.parseExpression(LOWEST)
+	stmt.Body = p.parseBlock()
+	return stmt
 }
 
 func (p *Parser) parseReturn() ast.Statement {
@@ -97,9 +97,9 @@ func (p *Parser) parseReturn() ast.Statement {
 	return stmt
 }
 
-func (p *Parser) parseImport() ast.Statement {
-	stmt := ast.Import{Token: p.peek}
-	p.next() // skip 'import'
+func (p *Parser) parseThrow() ast.Statement {
+	stmt := ast.Throw{Token: p.peek}
+	p.next() // skip 'throw'
 	stmt.Val = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL

@@ -83,6 +83,7 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.peek = types.Token{}
 
 	p.prefixFunctions[types.FN] = p.parseFn
+	p.prefixFunctions[types.IMPORT] = p.parseImport
 	p.prefixFunctions[types.IDENTIFIER] = p.parseIdentifier
 	p.prefixFunctions[types.NUMBER] = p.parseNumber
 	p.prefixFunctions[types.STRING] = p.parseString
