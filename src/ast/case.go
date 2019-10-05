@@ -3,12 +3,9 @@ package ast
 
 import (
 	"bytes"
-
-	"github.com/i5/i5/src/types"
 )
 
 type Case struct {
-	Token types.Token
 	Cases []Expression
 	Body  *Block
 }

@@ -3,18 +3,11 @@ package ast
 
 import (
 	"bytes"
-
-	"github.com/i5/i5/src/types"
 )
 
 type Prefix struct {
-	Token    types.Token
 	Operator string
 	Right    Expression
-}
-
-func (p Prefix) Value() string {
-	return p.Token.Value
 }
 
 func (p Prefix) String() string {

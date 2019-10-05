@@ -4,25 +4,19 @@ package ast
 import (
 	"bytes"
 	"strings"
-
-	"github.com/i5/i5/src/types"
 )
 
 type Function struct {
-	Token     types.Token
+	Value     string
 	Anonymous bool
 	Params    []*Identifier
 	Body      *Block
 }
 
-func (f Function) Value() string {
-	return f.Token.Value
-}
-
 func (f Function) String() string {
 	var out bytes.Buffer
 	if f.Anonymous {
-		out.WriteString(f.Value())
+		out.WriteString(f.Value)
 	}
 	params := []string{}
 	for _, p := range f.Params {

@@ -3,18 +3,11 @@ package ast
 
 import (
 	"bytes"
-
-	"github.com/i5/i5/src/types"
 )
 
 type Suffix struct {
-	Token    types.Token
 	Left     Expression
 	Operator string
-}
-
-func (s Suffix) Value() string {
-	return s.Token.Value
 }
 
 func (s Suffix) String() string {

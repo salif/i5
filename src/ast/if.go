@@ -3,29 +3,24 @@ package ast
 
 import (
 	"bytes"
-
-	"github.com/i5/i5/src/types"
 )
 
 type If struct {
-	Token       types.Token
+	Value       string
 	Condition   Expression
 	Consequence *Block
 	Alternative *Block
 }
 
-func (i If) Value() string {
-	return i.Token.Value
-}
-
 func (i If) String() string {
 	var out bytes.Buffer
-	out.WriteString("if ")
+	out.WriteString(i.Value)
+	out.WriteString(" ")
 	out.WriteString(i.Condition.String())
 	out.WriteString(" ")
 	out.WriteString(i.Consequence.String())
-	if i.Alternative.Body != nil {
-		out.WriteString("else ")
+	if i.Alternative != nil {
+		out.WriteString(" else ")
 		out.WriteString(i.Alternative.String())
 	}
 	return out.String()

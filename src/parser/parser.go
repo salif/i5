@@ -66,7 +66,7 @@ var precedences = map[string]int{
 }
 
 func Run(tokens types.TokenList) *ast.Program {
-	var parser Parser = Parser{
+	parser := Parser{
 		tokenlist:       types.TokenList{},
 		position:        0,
 		prefixFunctions: make(map[string]prefixFunction),
@@ -198,7 +198,7 @@ func (p *Parser) parseParams() []*ast.Identifier {
 
 	for p.peek.Type != types.RPAREN {
 		p.require(types.IDENTIFIER)
-		ident := &ast.Identifier{Token: p.peek, Val: p.peek.Value}
+		ident := &ast.Identifier{Value: p.peek.Value}
 		p.next()
 		identifiers = append(identifiers, ident)
 	}
@@ -209,7 +209,7 @@ func (p *Parser) parseParams() []*ast.Identifier {
 }
 
 func (p *Parser) parseBlock() *ast.Block {
-	block := &ast.Block{Token: p.peek}
+	block := &ast.Block{}
 	p.require(types.LBRACE)
 	p.next() // skip '{'
 	p.require(types.EOL)

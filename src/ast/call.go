@@ -4,18 +4,11 @@ package ast
 import (
 	"bytes"
 	"strings"
-
-	"github.com/i5/i5/src/types"
 )
 
 type Call struct {
-	Token     types.Token
-	Function  Expression
+	Caller    Expression
 	Arguments []Expression
-}
-
-func (c Call) Value() string {
-	return c.Token.Value
 }
 
 func (c Call) String() string {
@@ -24,7 +17,7 @@ func (c Call) String() string {
 	for _, a := range c.Arguments {
 		args = append(args, a.String())
 	}
-	out.WriteString(c.Function.String())
+	out.WriteString(c.Caller.String())
 	out.WriteString("(")
 	out.WriteString(strings.Join(args, ", "))
 	out.WriteString(")")

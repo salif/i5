@@ -3,23 +3,18 @@ package ast
 
 import (
 	"bytes"
-
-	"github.com/i5/i5/src/types"
 )
 
 type While struct {
-	Token     types.Token
+	Value     string
 	Condition Expression
 	Body      *Block
 }
 
-func (w While) Value() string {
-	return w.Token.Value
-}
-
 func (w While) String() string {
 	var out bytes.Buffer
-	out.WriteString("while ")
+	out.WriteString(w.Value)
+	out.WriteString(" ")
 	out.WriteString(w.Condition.String())
 	out.WriteString(" ")
 	out.WriteString(w.Body.String())

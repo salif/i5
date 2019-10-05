@@ -28,12 +28,12 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 			ret = Eval(expr, env)
 		}
 
-		Eval(&ast.Call{Function: &ast.Identifier{Val: "main"}, Arguments: []ast.Expression{}}, env)
+		Eval(&ast.Call{Caller: &ast.Identifier{Value: "main"}, Arguments: []ast.Expression{}}, env)
 		// TODO errors.FatalError("main function not found", 1)
 		return ret
 
 	case *ast.Expr:
-		return Eval(node.Expr, env)
+		return Eval(node.Body, env)
 
 	case *ast.Block:
 		return evalBlock(node, env)
@@ -46,13 +46,13 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		result := Eval(node.Right, env)
 		switch left := node.Left.(type) {
 		case *ast.ExprList:
-			env.Set(left.Exprs[0].Value(), result)
+			env.Set(left.Body[0].String(), result)
 		default:
 			errors.FatalError("left assign: expected ast.ExprList", 1)
 		}
 		return nil
 	case *ast.Call:
-		function := Eval(node.Function, env)
+		function := Eval(node.Caller, env)
 		args := evalExpressions(node.Arguments, env)
 		return callFunction(function, args)
 	case *ast.Function:
@@ -62,11 +62,11 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 	case *ast.Builtin:
 		return evalBuiltin(node, env)
 	case *ast.Number:
-		return &object.Number{Value: node.Val}
+		return &object.Number{Value: node.Value}
 	case *ast.String:
-		return &object.String{Value: node.Val}
+		return &object.String{Value: node.Value}
 	case *ast.Bool:
-		return &object.Bool{Value: node.Val}
+		return &object.Bool{Value: node.Value}
 	case *ast.Nil:
 		return &object.Nil{}
 	case *ast.Prefix:
@@ -87,19 +87,19 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 }
 
 func evalIdentifier(node *ast.Identifier, env *object.Env) object.Object {
-	if val, ok := env.Get(node.Val); ok {
+	if val, ok := env.Get(node.Value); ok {
 		return val
 	} else {
-		errors.FatalError(errors.F("%v: identifier not found", node.Val), 1)
+		errors.FatalError(errors.F("%v: identifier not found", node.Value), 1)
 		return nil
 	}
 }
 
 func evalBuiltin(node *ast.Builtin, env *object.Env) object.Object {
-	if builtin, ok := builtins.Get(node.Val); ok {
+	if builtin, ok := builtins.Get(node.Value); ok {
 		return builtin
 	} else {
-		errors.FatalError(errors.F("%v: builtin not found", node.Val), 1)
+		errors.FatalError(errors.F("%v: builtin not found", node.Value), 1)
 		return nil
 	}
 }
@@ -125,7 +125,7 @@ func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Env {
 	env := fn.Env.Clone()
 
 	for paramIdx, param := range fn.Params {
-		env.Set(param.Val, args[paramIdx])
+		env.Set(param.Value, args[paramIdx])
 	}
 
 	return env

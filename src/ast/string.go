@@ -1,19 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/types"
-
 type String struct {
-	Token types.Token
-	Val   string
-}
-
-func (s String) Value() string {
-	return s.Token.Value
+	Value string
 }
 
 func (s String) String() string {
-	return "\"" + s.Token.Value + "\""
+	return "\"" + s.Value + "\""
 }
 
 func (s String) expression() {}

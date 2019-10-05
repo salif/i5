@@ -26,15 +26,15 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseExprStatement() *ast.Expr {
-	stmt := &ast.Expr{Token: p.peek}
-	stmt.Expr = p.parseExpression(LOWEST)
+	stmt := &ast.Expr{}
+	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt
 }
 
 func (p *Parser) parseIf() ast.Statement {
-	expression := &ast.If{Token: p.peek}
+	expression := &ast.If{Value: p.peek.Type}
 
 	p.next() // skip 'if' or 'elif'
 
@@ -53,7 +53,7 @@ func (p *Parser) parseIf() ast.Statement {
 }
 
 func (p *Parser) parseSwitch() ast.Statement {
-	stmt := &ast.Switch{Token: p.peek}
+	stmt := &ast.Switch{Value: p.peek.Type}
 	p.next()
 	stmt.Condition = p.parseExpression(LOWEST)
 	cases := []ast.Case{}
@@ -84,7 +84,7 @@ func (p *Parser) parseSwitch() ast.Statement {
 }
 
 func (p *Parser) parseWhile() ast.Statement {
-	stmt := &ast.While{Token: p.peek}
+	stmt := &ast.While{Value: p.peek.Type}
 	p.next() // skip 'while'
 	stmt.Condition = p.parseExpression(LOWEST)
 	stmt.Body = p.parseBlock()
@@ -92,7 +92,7 @@ func (p *Parser) parseWhile() ast.Statement {
 }
 
 func (p *Parser) parseReturn() ast.Statement {
-	stmt := &ast.Return{Token: p.peek}
+	stmt := &ast.Return{Value: p.peek.Type}
 	p.next() // skip 'return'
 	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
@@ -101,16 +101,16 @@ func (p *Parser) parseReturn() ast.Statement {
 }
 
 func (p *Parser) parseThrow() ast.Statement {
-	stmt := &ast.Throw{Token: p.peek}
+	stmt := &ast.Throw{Value: p.peek.Type}
 	p.next() // skip 'throw'
-	stmt.Val = p.parseExpression(LOWEST)
+	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt
 }
 
 func (p *Parser) parseTry() ast.Statement {
-	stmt := &ast.Try{Token: p.peek}
+	stmt := &ast.Try{Value: p.peek.Type}
 	// TODO implement it
 	return stmt
 }

@@ -3,24 +3,19 @@ package ast
 
 import (
 	"bytes"
-
-	"github.com/i5/i5/src/types"
 )
 
 type Switch struct {
-	Token     types.Token
+	Value     string
 	Condition Expression
 	Cases     []Case
 	Else      *Block
 }
 
-func (s Switch) Value() string {
-	return s.Token.Value
-}
-
 func (s Switch) String() string {
 	var out bytes.Buffer
-	out.WriteString("switch ")
+	out.WriteString(s.Value)
+	out.WriteString(" ")
 	out.WriteString(s.Condition.String() + " {")
 	for _, i := range s.Cases {
 		out.WriteString(i.String() + ";")

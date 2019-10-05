@@ -1,18 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/types"
-
 type Nil struct {
-	Token types.Token
-}
-
-func (n Nil) Value() string {
-	return n.Token.Value
+	Value string
 }
 
 func (n Nil) String() string {
-	return n.Token.Value
+	return n.Value
 }
 
 func (n Nil) expression() {}

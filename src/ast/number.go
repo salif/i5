@@ -1,19 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/types"
+import "fmt"
 
 type Number struct {
-	Token types.Token
-	Val   int64
-}
-
-func (n Number) Value() string {
-	return n.Token.Value
+	Value int64
 }
 
 func (n Number) String() string {
-	return n.Token.Value
+	return fmt.Sprintf("%v", n.Value)
 }
 
 func (n Number) expression() {}

@@ -1,19 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/types"
+import "fmt"
 
 type Bool struct {
-	Token types.Token
-	Val   bool
-}
-
-func (b Bool) Value() string {
-	return b.Token.Value
+	Value bool
 }
 
 func (b Bool) String() string {
-	return b.Token.Value
+	return fmt.Sprintf("%v", b.Value)
 }
 
 func (b Bool) expression() {}

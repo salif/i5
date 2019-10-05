@@ -3,35 +3,21 @@ package ast
 
 import (
 	"bytes"
-
-	"github.com/i5/i5/src/types"
 )
 
 type Assign struct {
-	Token types.Token
+	Value string
 	Left  Expression
 	Right Expression
 }
 
-func (a Assign) Value() string {
-	return a.Token.Value
-}
-
 func (a Assign) String() string {
 	var out bytes.Buffer
-	switch a.Right.(type) {
-	case Function:
-		out.WriteString(a.Right.Value())
-		out.WriteString(" ")
-		out.WriteString(a.Left.String())
-		out.WriteString(a.Right.String())
-	default:
-		out.WriteString(a.Left.String())
-		out.WriteString(" ")
-		out.WriteString(a.Value())
-		out.WriteString(" ")
-		out.WriteString(a.Right.String())
-	}
+	out.WriteString(a.Left.String())
+	out.WriteString(" ")
+	out.WriteString(a.Value)
+	out.WriteString(" ")
+	out.WriteString(a.Right.String())
 	return out.String()
 }
 

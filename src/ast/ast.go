@@ -2,7 +2,6 @@
 package ast
 
 type Node interface {
-	Value() string
 	String() string
 }
 

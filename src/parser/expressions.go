@@ -29,7 +29,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 func (p *Parser) parseIdentifier() ast.Expression {
 	p.require(types.IDENTIFIER)
-	expr := &ast.Identifier{Token: p.peek, Val: p.peek.Value}
+	expr := &ast.Identifier{Value: p.peek.Value}
 	p.next()
 	return expr
 }
@@ -42,34 +42,34 @@ func (p *Parser) parseNumber() ast.Expression {
 		errors.FatalError(errors.F("could not parse %q as number", p.peek.Value), 1)
 	}
 
-	expr := &ast.Number{Token: p.peek, Val: value}
+	expr := &ast.Number{Value: value}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseString() ast.Expression {
 	p.require(types.STRING)
-	expr := &ast.String{Token: p.peek, Val: p.peek.Value}
+	expr := &ast.String{Value: p.peek.Value}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseBuiltin() ast.Expression {
 	p.require(types.BUILTIN)
-	expr := &ast.Builtin{Token: p.peek, Val: p.peek.Value}
+	expr := &ast.Builtin{Value: p.peek.Value}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseBool() ast.Expression {
-	expr := &ast.Bool{Token: p.peek, Val: p.peek.Type == types.TRUE}
+	expr := &ast.Bool{Value: p.peek.Type == types.TRUE}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseNil() ast.Expression {
 	p.require(types.NIL)
-	expr := &ast.Nil{Token: p.peek}
+	expr := &ast.Nil{Value: p.peek.Value}
 	p.next()
 	return expr
 }
@@ -86,7 +86,7 @@ func (p *Parser) parseGroup() ast.Expression {
 func (p *Parser) parseCall(fn ast.Expression) ast.Expression {
 	p.require(types.LPAREN)
 	p.next() // skip '('
-	expr := &ast.Call{Token: p.peek, Function: fn}
+	expr := &ast.Call{Caller: fn}
 	expr.Arguments = p.parseExpressionList(types.RPAREN)
 	p.require(types.RPAREN)
 	p.next() // skip ')'
@@ -112,18 +112,18 @@ func (p *Parser) parseExpressionList(end string) []ast.Expression {
 
 func (p *Parser) parseList(expr ast.Expression) ast.Expression {
 	list := &ast.ExprList{}
-	list.Exprs = append(list.Exprs, expr)
+	list.Body = append(list.Body, expr)
 
 	for p.peek.Type == types.COMMA {
 		p.next() // skip ','
-		list.Exprs = append(list.Exprs, p.parseExpression(LOWEST))
+		list.Body = append(list.Body, p.parseExpression(LOWEST))
 	}
 
 	return list
 }
 
 func (p *Parser) parseAssign(left ast.Expression) ast.Expression {
-	expr := &ast.Assign{Token: p.peek}
+	expr := &ast.Assign{Value: p.peek.Type}
 	expr.Left = left
 	p.require(types.EQ)
 	p.next()
@@ -133,16 +133,16 @@ func (p *Parser) parseAssign(left ast.Expression) ast.Expression {
 
 func (p *Parser) parseFn() ast.Expression {
 	p.require(types.FN)
-	fn := &ast.Function{Token: p.peek}
+	fn := &ast.Function{Value: p.peek.Type}
 	var expr *ast.Assign
 	p.next() // skip 'fn'
 	if p.peek.Type != types.IDENTIFIER {
 		fn.Anonymous = true
 	} else {
 		fn.Anonymous = false
-		expr = &ast.Assign{Token: types.Token{Type: types.EQ, Value: types.EQ, Line: p.peek.Line}}
+		expr = &ast.Assign{Value: types.EQ}
 		exprs := &ast.ExprList{}
-		exprs.Exprs = append(exprs.Exprs, p.parseIdentifier())
+		exprs.Body = append(exprs.Body, p.parseIdentifier())
 		expr.Left = exprs
 	}
 
@@ -156,7 +156,7 @@ func (p *Parser) parseFn() ast.Expression {
 }
 
 func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
-	expr := &ast.AlienFn{Token: p.peek}
+	expr := &ast.AlienFn{}
 	p.next()
 	expr.Alien = alien
 	expr.Function = p.parseExpression(DOT)
@@ -164,30 +164,21 @@ func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseImport() ast.Expression {
-	expr := &ast.Import{Token: p.peek}
+	expr := &ast.Import{Value: p.peek.Type}
 	p.next()
-	expr.Val = p.parseExpression(LOWEST)
+	expr.Body = p.parseExpression(LOWEST)
 	return expr
 }
 
 func (p *Parser) parsePrefix() ast.Expression {
-	expr := &ast.Prefix{
-		Token:    p.peek,
-		Operator: p.peek.Value,
-	}
-
+	expr := &ast.Prefix{Operator: p.peek.Value}
 	p.next()
 	expr.Right = p.parseExpression(PREFIX)
 	return expr
 }
 
 func (p *Parser) parseInfix(left ast.Expression) ast.Expression {
-	expr := &ast.Infix{
-		Token:    p.peek,
-		Operator: p.peek.Value,
-		Left:     left,
-	}
-
+	expr := &ast.Infix{Operator: p.peek.Value, Left: left}
 	precedence := p.precedence()
 	p.next()
 	expr.Right = p.parseExpression(precedence)
@@ -195,12 +186,7 @@ func (p *Parser) parseInfix(left ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseSuffix(left ast.Expression) ast.Expression {
-	expr := &ast.Suffix{
-		Token: p.peek,
-	}
-
-	expr.Left = left
-	expr.Operator = p.peek.Value
+	expr := &ast.Suffix{Operator: p.peek.Value, Left: left}
 	p.next()
 	return expr
 }
