@@ -1,5 +1,4 @@
-// Adapted from https://github.com/prologic/monkey-lang/blob/v1.3.5/parser/parser.go
-
+// SPDX-License-Identifier: GPL-3.0-or-later
 package parser
 
 import (
@@ -66,7 +65,7 @@ var precedences = map[string]int{
 	types.DOT:        DOT,
 }
 
-func Run(tokens types.TokenList) ast.Program {
+func Run(tokens types.TokenList) *ast.Program {
 	var parser Parser = Parser{
 		tokenlist:       types.TokenList{},
 		position:        0,
@@ -172,8 +171,8 @@ func (p *Parser) expect(b bool) {
 	}
 }
 
-func (p *Parser) parseProgram() ast.Program {
-	program := ast.Program{}
+func (p *Parser) parseProgram() *ast.Program {
+	program := &ast.Program{}
 	program.Body = []ast.Expression{}
 
 	for p.peek.Type != types.EOF {
@@ -188,8 +187,8 @@ func (p *Parser) parseProgram() ast.Program {
 	return program
 }
 
-func (p *Parser) parseParams() []ast.Expression {
-	identifiers := []ast.Expression{}
+func (p *Parser) parseParams() []*ast.Identifier {
+	identifiers := []*ast.Identifier{}
 	p.require(types.LPAREN)
 	p.next() // skip '('
 
@@ -198,15 +197,15 @@ func (p *Parser) parseParams() []ast.Expression {
 		return identifiers
 	}
 
-	identifiers = p.parseExpressionList(types.RBRACE)
+	identifiers = p.parseIdentifierList(types.RBRACE)
 
 	p.require(types.RPAREN)
 	p.next() // skip ')'
 	return identifiers
 }
 
-func (p *Parser) parseBlock() ast.Block {
-	block := ast.Block{Token: p.peek}
+func (p *Parser) parseBlock() *ast.Block {
+	block := &ast.Block{Token: p.peek}
 	p.require(types.LBRACE)
 	p.next() // skip '{'
 	p.require(types.EOL)

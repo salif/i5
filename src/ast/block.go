@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
 import (
@@ -25,4 +26,4 @@ func (b Block) String() string {
 	return out.String()
 }
 
-func (b Block) expression() {}
+func (b Block) statement() {}

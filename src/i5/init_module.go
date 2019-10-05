@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package i5
 
 import (
@@ -24,20 +25,15 @@ fn main() {
 
 func newModuleTemplate() string {
 	return `{
-	"name": "",
-	"version": "",
-	"description": "",
-	"url": "",
-	"main": "main.i5",
-	"dependencies": {
-		"@i5": ">0.0.1"
-	},
-	"author": {
-		"name": "",
-		"email": "",
-		"url": ""
-	},
-	"license": ""
+    "name": "",
+    "version": "",
+    "description": "",
+    "main": "main.i5",
+    "author": {
+        "name": "",
+        "email": ""
+    },
+    "license": ""
 }
 `
 }

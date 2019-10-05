@@ -1,13 +1,11 @@
 #
-#
 # I5 PROGRAMMING LANGUAGE
 #
 #     OPEN SOURCE : https://github.com/i5/i5
 #     AUTHORS : SALIF MEHMED, MAX BASE
-#               https://github.com/BaseMax
+#
 #               https://github.com/salifm
-#
-#
+#               https://github.com/BaseMax
 #
 
 SYNTAX RULES
@@ -56,5 +54,5 @@ SYNTAX RULES
   (-|+|)[0-9]+\.[0-9]+
   'true'
   'false'
-  'null'
+  'nil'
 

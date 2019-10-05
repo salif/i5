@@ -1,4 +1,4 @@
-// Adapted from https://github.com/prologic/monkey-lang/blob/v1.3.5/ast/ast.go
+// SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
 type Node interface {

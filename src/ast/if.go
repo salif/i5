@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
 import (
@@ -9,8 +10,8 @@ import (
 type If struct {
 	Token       types.Token
 	Condition   Expression
-	Consequence Block
-	Alternative Block
+	Consequence *Block
+	Alternative *Block
 }
 
 func (i If) Value() string {

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package lexer
 
 import (
@@ -105,6 +106,7 @@ func Run(code []byte) (tokens types.TokenList) {
 		// if char is "$"
 		if scanner.PeekEquals(36) {
 			var value string = ""
+			scanner.Next()
 
 			// if char is "_" or string(a-z) or number(0-9)
 			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekEquals(36) ||

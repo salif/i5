@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
 import (
@@ -10,7 +11,7 @@ type Switch struct {
 	Token     types.Token
 	Condition Expression
 	Cases     []Case
-	Else      Block
+	Else      *Block
 }
 
 func (s Switch) Value() string {

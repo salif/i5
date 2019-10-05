@@ -1,0 +1,31 @@
+#!/usr/bin/env i5
+
+fn main() {
+	try {
+		file = $file.open("file.txt")
+	} catch(err) {
+		if err.name == "not found" {
+			$print("file not found!")
+			# output: "file not found!"
+		} else {
+			$print("unknown error")
+		}
+	} finally {
+		file.close()
+	}
+
+	try {
+		divide(2, 0)
+	} catch(err) {
+		$print("error: ":err.message)
+		# output: "error: can not divide by zero!"
+	}
+}
+
+fn divide(a b) {
+	if b == 0 {
+		throw "can not divide by zero!"
+	} else {
+		return a / b
+	}
+}

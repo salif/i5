@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package parser
 
 import (
@@ -28,7 +29,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 func (p *Parser) parseIdentifier() ast.Expression {
 	p.require(types.IDENTIFIER)
-	expr := ast.Identifier{Token: p.peek, Val: p.peek.Value, Strict: false}
+	expr := &ast.Identifier{Token: p.peek, Val: p.peek.Value, Strict: false}
 	p.next()
 	if p.peek.Type == types.META {
 		expr.Type = p.peek
@@ -46,41 +47,41 @@ func (p *Parser) parseNumber() ast.Expression {
 		errors.FatalError(errors.F("could not parse %q as number", p.peek.Value), 1)
 	}
 
-	expr := ast.Number{Token: p.peek, Val: value}
+	expr := &ast.Number{Token: p.peek, Val: value}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseString() ast.Expression {
 	p.require(types.STRING)
-	expr := ast.String{Token: p.peek, Val: p.peek.Value}
+	expr := &ast.String{Token: p.peek, Val: p.peek.Value}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseBuiltin() ast.Expression {
 	p.require(types.BUILTIN)
-	expr := ast.Builtin{Token: p.peek, Val: p.peek.Value}
+	expr := &ast.Builtin{Token: p.peek, Val: p.peek.Value}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseMeta() ast.Expression {
 	p.require(types.META)
-	expr := ast.Meta{Token: p.peek, Val: p.peek.Value}
+	expr := &ast.Meta{Token: p.peek, Val: p.peek.Value}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseBool() ast.Expression {
-	expr := ast.Bool{Token: p.peek, Val: p.peek.Type == types.TRUE}
+	expr := &ast.Bool{Token: p.peek, Val: p.peek.Type == types.TRUE}
 	p.next()
 	return expr
 }
 
 func (p *Parser) parseNil() ast.Expression {
 	p.require(types.NIL)
-	expr := ast.Nil{Token: p.peek}
+	expr := &ast.Nil{Token: p.peek}
 	p.next()
 	return expr
 }
@@ -97,11 +98,41 @@ func (p *Parser) parseGroup() ast.Expression {
 func (p *Parser) parseCall(fn ast.Expression) ast.Expression {
 	p.require(types.LPAREN)
 	p.next() // skip '('
-	expr := ast.Call{Token: p.peek, Function: fn}
+	expr := &ast.Call{Token: p.peek, Function: fn}
 	expr.Arguments = p.parseExpressionList(types.RPAREN)
 	p.require(types.RPAREN)
 	p.next() // skip ')'
 	return expr
+}
+
+// TODO simplify
+func (p *Parser) parseIdentifierList(end string) []*ast.Identifier {
+	list := []*ast.Identifier{}
+
+	if p.peek.Type == end {
+		return list
+	}
+
+	expr := p.parseExpression(LOWEST)
+	switch expr2 := expr.(type) {
+	case *ast.Identifier:
+		list = append(list, expr2)
+	default:
+		errors.FatalError(errors.F("expected identifier at line %v", p.peek.Line), 1)
+	}
+
+	for p.peek.Type == types.COMMA {
+		p.next() // skip ','
+		expr := p.parseExpression(LOWEST)
+		switch expr2 := expr.(type) {
+		case *ast.Identifier:
+			list = append(list, expr2)
+		default:
+			errors.FatalError(errors.F("expected identifier at line %v", p.peek.Type), 1)
+		}
+	}
+
+	return list
 }
 
 func (p *Parser) parseExpressionList(end string) []ast.Expression {
@@ -122,7 +153,7 @@ func (p *Parser) parseExpressionList(end string) []ast.Expression {
 }
 
 func (p *Parser) parseList(expr ast.Expression) ast.Expression {
-	list := ast.ExprList{}
+	list := &ast.ExprList{}
 	list.Exprs = append(list.Exprs, expr)
 
 	for p.peek.Type == types.COMMA {
@@ -134,7 +165,7 @@ func (p *Parser) parseList(expr ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseAssign(left ast.Expression) ast.Expression {
-	expr := ast.Assign{Token: p.peek}
+	expr := &ast.Assign{Token: p.peek}
 	expr.Left = left
 	p.require(types.EQ)
 	p.next()
@@ -144,15 +175,15 @@ func (p *Parser) parseAssign(left ast.Expression) ast.Expression {
 
 func (p *Parser) parseFn() ast.Expression {
 	p.require(types.FN)
-	fn := ast.Function{Token: p.peek}
-	var expr ast.Assign
+	fn := &ast.Function{Token: p.peek}
+	var expr *ast.Assign
 	p.next() // skip 'fn'
 	if p.peek.Type != types.IDENTIFIER {
 		fn.Anonymous = true
 	} else {
 		fn.Anonymous = false
-		expr = ast.Assign{Token: types.Token{Type: types.EQ, Value: types.EQ, Line: p.peek.Line}}
-		exprs := ast.ExprList{}
+		expr = &ast.Assign{Token: types.Token{Type: types.EQ, Value: types.EQ, Line: p.peek.Line}}
+		exprs := &ast.ExprList{}
 		exprs.Exprs = append(exprs.Exprs, p.parseIdentifier())
 		expr.Left = exprs
 	}
@@ -172,7 +203,7 @@ func (p *Parser) parseFn() ast.Expression {
 }
 
 func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
-	expr := ast.AlienFn{Token: p.peek}
+	expr := &ast.AlienFn{Token: p.peek}
 	p.next()
 	expr.Alien = alien
 	expr.Function = p.parseExpression(DOT)
@@ -180,14 +211,14 @@ func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseImport() ast.Expression {
-	expr := ast.Import{Token: p.peek}
+	expr := &ast.Import{Token: p.peek}
 	p.next()
 	expr.Val = p.parseExpression(LOWEST)
 	return expr
 }
 
 func (p *Parser) parsePrefix() ast.Expression {
-	expr := ast.Prefix{
+	expr := &ast.Prefix{
 		Token:    p.peek,
 		Operator: p.peek.Value,
 	}
@@ -198,7 +229,7 @@ func (p *Parser) parsePrefix() ast.Expression {
 }
 
 func (p *Parser) parseInfix(left ast.Expression) ast.Expression {
-	expr := ast.Infix{
+	expr := &ast.Infix{
 		Token:    p.peek,
 		Operator: p.peek.Value,
 		Left:     left,
@@ -211,7 +242,7 @@ func (p *Parser) parseInfix(left ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseSuffix(left ast.Expression) ast.Expression {
-	expr := ast.Suffix{
+	expr := &ast.Suffix{
 		Token: p.peek,
 	}
 

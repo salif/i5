@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package parser
 
 import (
@@ -22,8 +23,8 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 }
 
-func (p *Parser) parseExprStatement() ast.Expr {
-	stmt := ast.Expr{Token: p.peek}
+func (p *Parser) parseExprStatement() *ast.Expr {
+	stmt := &ast.Expr{Token: p.peek}
 	stmt.Expr = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL
@@ -31,7 +32,7 @@ func (p *Parser) parseExprStatement() ast.Expr {
 }
 
 func (p *Parser) parseIf() ast.Statement {
-	expression := ast.If{Token: p.peek}
+	expression := &ast.If{Token: p.peek}
 
 	p.next() // skip 'if' or 'elif'
 
@@ -40,7 +41,7 @@ func (p *Parser) parseIf() ast.Statement {
 	expression.Consequence = p.parseBlock()
 
 	if p.peek.Type == types.ELIF {
-		expression.Alternative = ast.Block{Body: []ast.Statement{p.parseIf()}}
+		expression.Alternative = &ast.Block{Body: []ast.Statement{p.parseIf()}}
 	} else if p.peek.Type == types.ELSE {
 		p.next() // skip 'else'
 		expression.Alternative = p.parseBlock()
@@ -50,7 +51,7 @@ func (p *Parser) parseIf() ast.Statement {
 }
 
 func (p *Parser) parseSwitch() ast.Statement {
-	stmt := ast.Switch{Token: p.peek}
+	stmt := &ast.Switch{Token: p.peek}
 	p.next()
 	stmt.Condition = p.parseExpression(LOWEST)
 	cases := []ast.Case{}
@@ -81,7 +82,7 @@ func (p *Parser) parseSwitch() ast.Statement {
 }
 
 func (p *Parser) parseFor() ast.Statement {
-	stmt := ast.For{Token: p.peek}
+	stmt := &ast.For{Token: p.peek}
 	p.next() // skip 'for'
 	stmt.Condition = p.parseExpression(LOWEST)
 	stmt.Body = p.parseBlock()
@@ -89,7 +90,7 @@ func (p *Parser) parseFor() ast.Statement {
 }
 
 func (p *Parser) parseReturn() ast.Statement {
-	stmt := ast.Return{Token: p.peek}
+	stmt := &ast.Return{Token: p.peek}
 	p.next() // skip 'return'
 	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
@@ -98,7 +99,7 @@ func (p *Parser) parseReturn() ast.Statement {
 }
 
 func (p *Parser) parseThrow() ast.Statement {
-	stmt := ast.Throw{Token: p.peek}
+	stmt := &ast.Throw{Token: p.peek}
 	p.next() // skip 'throw'
 	stmt.Val = p.parseExpression(LOWEST)
 	p.require(types.EOL)

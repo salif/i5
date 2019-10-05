@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
 import (
@@ -10,8 +11,8 @@ import (
 type Function struct {
 	Token     types.Token
 	Anonymous bool
-	Params    []Expression
-	Body      Block
+	Params    []*Identifier
+	Body      *Block
 	Return    Expression
 	Strict    bool
 }

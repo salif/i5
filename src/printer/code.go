@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package printer
 
 import (
@@ -27,7 +28,7 @@ func Code(tokens types.TokenList) {
 		} else if token.Type == types.NUMBER {
 			output.WriteString(console.Color{Value: token.Value}.Magenta().String())
 		} else if token.Type == types.BUILTIN {
-			output.WriteString(console.Color{Value: token.Value}.Cyan().String())
+			output.WriteString(console.Color{Value: "$" + token.Value}.Cyan().String())
 		} else if token.Type == types.META {
 			output.WriteString(" " + console.Color{Value: token.Value}.Red().String())
 		} else if token.Type == types.EOL {

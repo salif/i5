@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
 import (
@@ -9,7 +10,7 @@ import (
 type For struct {
 	Token     types.Token
 	Condition Expression
-	Body      Block
+	Body      *Block
 	Return    Expression
 }
 

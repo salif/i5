@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
 import (
@@ -9,7 +10,7 @@ import (
 type Case struct {
 	Token types.Token
 	Cases []Expression
-	Body  Block
+	Body  *Block
 }
 
 func (c Case) String() string {

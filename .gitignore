@@ -1,4 +1,5 @@
 *.test
 /i5
 /.vscode/
-/.ignore/
+/.idea/
+.ignore/
