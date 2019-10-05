@@ -29,8 +29,6 @@ func Code(tokens types.TokenList) {
 			output.WriteString(console.Color{Value: token.Value}.Magenta().String())
 		} else if token.Type == types.BUILTIN {
 			output.WriteString(console.Color{Value: "$" + token.Value}.Cyan().String())
-		} else if token.Type == types.META {
-			output.WriteString(" " + console.Color{Value: token.Value}.Red().String())
 		} else if token.Type == types.EOL {
 			output.WriteString("\n")
 			output.WriteString(errors.F("%3d ", token.Line+1))

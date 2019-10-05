@@ -37,8 +37,8 @@ func IsKeyword(char string) (string, bool) {
 		return types.ELIF, true
 	case types.ELSE:
 		return types.ELSE, true
-	case types.FOR:
-		return types.FOR, true
+	case types.WHILE:
+		return types.WHILE, true
 	case types.BREAK:
 		return types.BREAK, true
 	case types.CONTINUE:
@@ -55,6 +55,12 @@ func IsKeyword(char string) (string, bool) {
 		return types.IMPORT, true
 	case types.THROW:
 		return types.THROW, true
+	case types.TRY:
+		return types.TRY, true
+	case types.CATCH:
+		return types.CATCH, true
+	case types.FINALLY:
+		return types.FINALLY, true
 	case types.TRUE:
 		return types.TRUE, true
 	case types.FALSE:

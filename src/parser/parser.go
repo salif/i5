@@ -76,6 +76,14 @@ func Run(tokens types.TokenList) *ast.Program {
 	return parser.parseProgram()
 }
 
+type Parser struct {
+	tokenlist       types.TokenList
+	position        int
+	peek            types.Token
+	prefixFunctions map[string]prefixFunction
+	infixFunctions  map[string]infixFunction
+}
+
 func (p *Parser) Init(tokens types.TokenList) {
 	p.tokenlist = tokens
 	p.position = 0
@@ -87,7 +95,6 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.prefixFunctions[types.NUMBER] = p.parseNumber
 	p.prefixFunctions[types.STRING] = p.parseString
 	p.prefixFunctions[types.BUILTIN] = p.parseBuiltin
-	p.prefixFunctions[types.META] = p.parseMeta
 	p.prefixFunctions[types.TRUE] = p.parseBool
 	p.prefixFunctions[types.FALSE] = p.parseBool
 	p.prefixFunctions[types.NIL] = p.parseNil
@@ -137,14 +144,6 @@ func (p *Parser) Init(tokens types.TokenList) {
 type (
 	prefixFunction func() ast.Expression
 	infixFunction  func(ast.Expression) ast.Expression
-
-	Parser struct {
-		tokenlist       types.TokenList
-		position        int
-		peek            types.Token
-		prefixFunctions map[string]prefixFunction
-		infixFunctions  map[string]infixFunction
-	}
 )
 
 func (p *Parser) next() {
@@ -197,7 +196,12 @@ func (p *Parser) parseParams() []*ast.Identifier {
 		return identifiers
 	}
 
-	identifiers = p.parseIdentifierList(types.RBRACE)
+	for p.peek.Type != types.RPAREN {
+		p.require(types.IDENTIFIER)
+		ident := &ast.Identifier{Token: p.peek, Val: p.peek.Value}
+		p.next()
+		identifiers = append(identifiers, ident)
+	}
 
 	p.require(types.RPAREN)
 	p.next() // skip ')'

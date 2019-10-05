@@ -13,8 +13,6 @@ type Function struct {
 	Anonymous bool
 	Params    []*Identifier
 	Body      *Block
-	Return    Expression
-	Strict    bool
 }
 
 func (f Function) Value() string {
@@ -31,11 +29,8 @@ func (f Function) String() string {
 		params = append(params, p.String())
 	}
 	out.WriteString("(")
-	out.WriteString(strings.Join(params, ", "))
+	out.WriteString(strings.Join(params, " "))
 	out.WriteString(") ")
-	if f.Strict {
-		out.WriteString(f.Return.String() + " ")
-	}
 	out.WriteString(f.Body.String())
 	return out.String()
 }

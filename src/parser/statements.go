@@ -12,12 +12,14 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseIf()
 	case types.SWITCH:
 		return p.parseSwitch()
-	case types.FOR:
-		return p.parseFor()
+	case types.WHILE:
+		return p.parseWhile()
 	case types.RETURN:
 		return p.parseReturn()
 	case types.THROW:
 		return p.parseThrow()
+	case types.TRY:
+		return p.parseTry()
 	default:
 		return p.parseExprStatement()
 	}
@@ -81,9 +83,9 @@ func (p *Parser) parseSwitch() ast.Statement {
 	return stmt
 }
 
-func (p *Parser) parseFor() ast.Statement {
-	stmt := &ast.For{Token: p.peek}
-	p.next() // skip 'for'
+func (p *Parser) parseWhile() ast.Statement {
+	stmt := &ast.While{Token: p.peek}
+	p.next() // skip 'while'
 	stmt.Condition = p.parseExpression(LOWEST)
 	stmt.Body = p.parseBlock()
 	return stmt
@@ -104,5 +106,11 @@ func (p *Parser) parseThrow() ast.Statement {
 	stmt.Val = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL
+	return stmt
+}
+
+func (p *Parser) parseTry() ast.Statement {
+	stmt := &ast.Try{Token: p.peek}
+	// TODO implement it
 	return stmt
 }

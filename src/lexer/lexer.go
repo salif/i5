@@ -32,7 +32,17 @@ func Run(code []byte) (tokens types.TokenList) {
 		// if char is "\"
 		if scanner.PeekEquals(92) {
 			scanner.Next()
-			scanner.Next()
+			// if char is "\r"
+			if scanner.PeekEquals(13) {
+				scanner.Next()
+			}
+			// if char is "\n"
+			if scanner.PeekEquals(10) {
+				scanner.Next()
+				scanner.NextLine()
+			} else {
+				errors.FatalError(errors.F(errors.LEXER_UNEXPECTED_TOKEN, string(92), scanner.Line()), 1)
+			}
 			continue
 		}
 
@@ -115,20 +125,6 @@ func Run(code []byte) (tokens types.TokenList) {
 			}
 
 			tokens.Add(types.BUILTIN, value, scanner.Line())
-			continue
-		}
-
-		// if char is "@"
-		if scanner.PeekEquals(64) {
-			var value string = ""
-
-			// if char is "_" or string(a-z) or number(0-9)
-			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekEquals(64) ||
-				scanner.PeekBetween(97, 122) || scanner.PeekBetween(48, 57)); scanner.Next() {
-				value += string(scanner.Peek())
-			}
-
-			tokens.Add(types.META, value, scanner.Line())
 			continue
 		}
 

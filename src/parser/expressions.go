@@ -29,13 +29,8 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 func (p *Parser) parseIdentifier() ast.Expression {
 	p.require(types.IDENTIFIER)
-	expr := &ast.Identifier{Token: p.peek, Val: p.peek.Value, Strict: false}
+	expr := &ast.Identifier{Token: p.peek, Val: p.peek.Value}
 	p.next()
-	if p.peek.Type == types.META {
-		expr.Type = p.peek
-		expr.Strict = true
-		p.next()
-	}
 	return expr
 }
 
@@ -62,13 +57,6 @@ func (p *Parser) parseString() ast.Expression {
 func (p *Parser) parseBuiltin() ast.Expression {
 	p.require(types.BUILTIN)
 	expr := &ast.Builtin{Token: p.peek, Val: p.peek.Value}
-	p.next()
-	return expr
-}
-
-func (p *Parser) parseMeta() ast.Expression {
-	p.require(types.META)
-	expr := &ast.Meta{Token: p.peek, Val: p.peek.Value}
 	p.next()
 	return expr
 }
@@ -103,36 +91,6 @@ func (p *Parser) parseCall(fn ast.Expression) ast.Expression {
 	p.require(types.RPAREN)
 	p.next() // skip ')'
 	return expr
-}
-
-// TODO simplify
-func (p *Parser) parseIdentifierList(end string) []*ast.Identifier {
-	list := []*ast.Identifier{}
-
-	if p.peek.Type == end {
-		return list
-	}
-
-	expr := p.parseExpression(LOWEST)
-	switch expr2 := expr.(type) {
-	case *ast.Identifier:
-		list = append(list, expr2)
-	default:
-		errors.FatalError(errors.F("expected identifier at line %v", p.peek.Line), 1)
-	}
-
-	for p.peek.Type == types.COMMA {
-		p.next() // skip ','
-		expr := p.parseExpression(LOWEST)
-		switch expr2 := expr.(type) {
-		case *ast.Identifier:
-			list = append(list, expr2)
-		default:
-			errors.FatalError(errors.F("expected identifier at line %v", p.peek.Type), 1)
-		}
-	}
-
-	return list
 }
 
 func (p *Parser) parseExpressionList(end string) []ast.Expression {
@@ -189,11 +147,6 @@ func (p *Parser) parseFn() ast.Expression {
 	}
 
 	fn.Params = p.parseParams()
-	if p.peek.Type == types.META {
-		list := p.parseList(p.parseExpression(LOWEST))
-		fn.Return = list
-		fn.Strict = true
-	}
 	fn.Body = p.parseBlock()
 	if fn.Anonymous {
 		return fn
