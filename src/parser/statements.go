@@ -16,6 +16,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseWhile()
 	case types.RETURN:
 		return p.parseReturn()
+	case types.IMPORT:
+		return p.parseImportStatement()
 	case types.THROW:
 		return p.parseThrow()
 	case types.TRY:
@@ -67,6 +69,8 @@ func (p *Parser) parseSwitch() ast.Statement {
 		cs.Cases = append(cs.Cases, expr)
 		if p.peek.Type == types.LBRACE {
 			cs.Body = p.parseBlock()
+			p.require(types.EOL)
+			p.next()
 			cases = append(cases, cs)
 			cs = ast.Case{}
 		} else {
@@ -80,6 +84,10 @@ func (p *Parser) parseSwitch() ast.Statement {
 		p.next()
 		stmt.Else = p.parseBlock()
 	}
+
+	p.require(types.EOL)
+	p.next() // skip EOL
+
 	return stmt
 }
 
@@ -88,12 +96,23 @@ func (p *Parser) parseWhile() ast.Statement {
 	p.next() // skip 'while'
 	stmt.Condition = p.parseExpression(LOWEST)
 	stmt.Body = p.parseBlock()
+	p.require(types.EOL)
+	p.next() // skip EOL
 	return stmt
 }
 
 func (p *Parser) parseReturn() ast.Statement {
 	stmt := &ast.Return{Value: p.peek.Type}
 	p.next() // skip 'return'
+	stmt.Body = p.parseExpression(LOWEST)
+	p.require(types.EOL)
+	p.next() // skip EOL
+	return stmt
+}
+
+func (p *Parser) parseImportStatement() ast.Statement {
+	stmt := &ast.ImportStatement{Value: p.peek.Type}
+	p.next() // skip 'import'
 	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL
@@ -111,6 +130,21 @@ func (p *Parser) parseThrow() ast.Statement {
 
 func (p *Parser) parseTry() ast.Statement {
 	stmt := &ast.Try{Value: p.peek.Type}
-	// TODO implement it
+	p.next() // skip 'try'
+	stmt.Body = p.parseBlock()
+	if p.peek.Type == types.CATCH {
+		p.next() // skip 'catch'
+		if p.peek.Type == types.IDENTIFIER {
+			stmt.Err = &ast.Identifier{Value: p.peek.Value}
+			p.next()
+		}
+		stmt.Catch = p.parseBlock()
+	}
+	if p.peek.Type == types.FINALLY {
+		p.next() // skip 'finally'
+		stmt.Finally = p.parseBlock()
+	}
+	p.require(types.EOL)
+	p.next() // skip EOL
 	return stmt
 }

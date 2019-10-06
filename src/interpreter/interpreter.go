@@ -44,10 +44,10 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 	case *ast.Assign:
 		result := Eval(node.Right, env)
 		switch left := node.Left.(type) {
-		case *ast.ExprList:
-			env.Set(left.Body[0].StringValue(), result)
+		case *ast.Identifier:
+			env.Set(left.Value, result)
 		default:
-			console.ThrowError(1, "left assign: expected ast.ExprList")
+			console.ThrowError(1, "left assign error")
 		}
 		return nil
 	case *ast.Call:

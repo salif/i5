@@ -3,7 +3,7 @@
 fn main() {
 	try {
 		file = $file.open("file.txt")
-	} catch(err) {
+	} catch err {
 		if err.name == "not found" {
 			$print("file not found!")
 			# output: "file not found!"
@@ -16,7 +16,7 @@ fn main() {
 
 	try {
 		divide(2, 0)
-	} catch(err) {
+	} catch err {
 		$print("error: ":err.message)
 		# output: "error: can not divide by zero!"
 	}

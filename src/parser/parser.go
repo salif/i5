@@ -15,7 +15,6 @@ const (
 	NOT
 	ASSIGN
 	EQ
-	COMMA
 	CONCAT
 	LTGT
 	BTWOR
@@ -43,7 +42,6 @@ var precedences = map[string]int{
 	types.MODULOEQ:   ASSIGN,
 	types.EQEQ:       EQ,
 	types.NOTEQ:      EQ,
-	types.COMMA:      COMMA,
 	types.COLON:      CONCAT,
 	types.LT:         LTGT,
 	types.GT:         LTGT,
@@ -90,7 +88,7 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.peek = types.Token{}
 
 	p.prefixFunctions[types.FN] = p.parseFn
-	p.prefixFunctions[types.IMPORT] = p.parseImport
+	p.prefixFunctions[types.IMPORT] = p.parseImportExpr
 	p.prefixFunctions[types.IDENTIFIER] = p.parseIdentifier
 	p.prefixFunctions[types.NUMBER] = p.parseNumber
 	p.prefixFunctions[types.STRING] = p.parseString
@@ -116,7 +114,7 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.infixFunctions[types.MODULOEQ] = p.parseInfix
 	p.infixFunctions[types.EQEQ] = p.parseInfix
 	p.infixFunctions[types.NOTEQ] = p.parseInfix
-	p.infixFunctions[types.COMMA] = p.parseList
+	// p.infixFunctions[types.COMMA] = p.parseList
 	p.infixFunctions[types.COLON] = p.parseInfix
 	p.infixFunctions[types.LT] = p.parseInfix
 	p.infixFunctions[types.GT] = p.parseInfix
@@ -226,6 +224,5 @@ func (p *Parser) parseBlock() *ast.Block {
 
 	p.require(types.RBRACE)
 	p.next() // skip '}'
-	p.expect(p.peek.Type == types.EOL)
 	return block
 }

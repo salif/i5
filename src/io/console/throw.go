@@ -10,17 +10,17 @@ func PrintError(prefix string, text interface{}) {
 }
 
 func ThrowError(exitCode int, text string, format ...interface{}) {
-	PrintError("error: ", Format(text, format...))
+	PrintError("error:", Format(text, format...))
 	Exit(exitCode)
 }
 
 func ThrowSyntaxError(exitCode int, text string, format ...interface{}) {
-	PrintError("syntax error: ", Format(text, format...))
+	PrintError("syntax error:", Format(text, format...))
 	Exit(exitCode)
 }
 
 func ThrowParsingError(exitCode int, text string, format ...interface{}) {
-	PrintError("parsing error: ", Format(text, format...))
+	PrintError("parsing error:", Format(text, format...))
 	Exit(exitCode)
 }
 

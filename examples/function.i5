@@ -17,7 +17,7 @@ fn main() {
 		hello_user3 = get_user("Invalid User", -1, "Hello")
 		$print(hello_user3)
 		users.push(hello_user3)
-	} catch(err) {
+	} catch err {
 		$print(err.message) # output: "error!"
 	}
 

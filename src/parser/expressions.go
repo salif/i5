@@ -87,13 +87,14 @@ func (p *Parser) parseCall(fn ast.Expression) ast.Expression {
 	p.require(types.LPAREN)
 	p.next() // skip '('
 	expr := &ast.Call{Caller: fn}
-	expr.Arguments = p.parseExpressionList(types.RPAREN)
+	expr.Arguments = p.parseList(types.RPAREN)
+	//console.ThrowParsingError(1, console.PARSER_EXPECTED_ARG, p.peek.Value, p.peek.Line)
 	p.require(types.RPAREN)
 	p.next() // skip ')'
 	return expr
 }
 
-func (p *Parser) parseExpressionList(end string) []ast.Expression {
+func (p *Parser) parseList(end string) []ast.Expression {
 	list := []ast.Expression{}
 
 	if p.peek.Type == end {
@@ -110,21 +111,8 @@ func (p *Parser) parseExpressionList(end string) []ast.Expression {
 	return list
 }
 
-func (p *Parser) parseList(expr ast.Expression) ast.Expression {
-	list := &ast.ExprList{}
-	list.Body = append(list.Body, expr)
-
-	for p.peek.Type == types.COMMA {
-		p.next() // skip ','
-		list.Body = append(list.Body, p.parseExpression(LOWEST))
-	}
-
-	return list
-}
-
 func (p *Parser) parseAssign(left ast.Expression) ast.Expression {
-	expr := &ast.Assign{Value: p.peek.Type}
-	expr.Left = left
+	expr := &ast.Assign{Value: p.peek.Type, Left: left}
 	p.require(types.EQ)
 	p.next()
 	expr.Right = p.parseExpression(LOWEST)
@@ -141,9 +129,7 @@ func (p *Parser) parseFn() ast.Expression {
 	} else {
 		fn.Anonymous = false
 		expr = &ast.Assign{Value: types.EQ}
-		exprs := &ast.ExprList{}
-		exprs.Body = append(exprs.Body, p.parseIdentifier())
-		expr.Left = exprs
+		expr.Left = p.parseIdentifier()
 	}
 
 	fn.Params = p.parseParams()
@@ -156,15 +142,14 @@ func (p *Parser) parseFn() ast.Expression {
 }
 
 func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
-	expr := &ast.AlienFn{}
+	expr := &ast.AlienFn{Alien: alien}
 	p.next()
-	expr.Alien = alien
 	expr.Function = p.parseExpression(DOT)
 	return expr
 }
 
-func (p *Parser) parseImport() ast.Expression {
-	expr := &ast.Import{Value: p.peek.Type}
+func (p *Parser) parseImportExpr() ast.Expression {
+	expr := &ast.ImportExpr{Value: p.peek.Type}
 	p.next()
 	expr.Body = p.parseExpression(LOWEST)
 	return expr
