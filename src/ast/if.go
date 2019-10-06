@@ -12,16 +12,16 @@ type If struct {
 	Alternative *Block
 }
 
-func (i If) String() string {
+func (i If) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString(i.Value)
 	out.WriteString(" ")
-	out.WriteString(i.Condition.String())
+	out.WriteString(i.Condition.StringValue())
 	out.WriteString(" ")
-	out.WriteString(i.Consequence.String())
+	out.WriteString(i.Consequence.StringValue())
 	if i.Alternative != nil {
 		out.WriteString(" else ")
-		out.WriteString(i.Alternative.String())
+		out.WriteString(i.Alternative.StringValue())
 	}
 	return out.String()
 }

@@ -11,13 +11,13 @@ type Call struct {
 	Arguments []Expression
 }
 
-func (c Call) String() string {
+func (c Call) StringValue() string {
 	var out bytes.Buffer
 	args := []string{}
 	for _, a := range c.Arguments {
-		args = append(args, a.String())
+		args = append(args, a.StringValue())
 	}
-	out.WriteString(c.Caller.String())
+	out.WriteString(c.Caller.StringValue())
 	out.WriteString("(")
 	out.WriteString(strings.Join(args, ", "))
 	out.WriteString(")")

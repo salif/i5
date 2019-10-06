@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/i5/i5/src/errors"
+	"github.com/i5/i5/src/io/console"
 )
 
 type ArgsParser struct {
@@ -58,14 +58,14 @@ func (s *ArgsParser) Parse() {
 				if contains {
 					*ar = arg[index+1:]
 				} else {
-					errors.FatalError(errors.F(errors.ARGS_UNKNOWN, arg[:index]), 1)
+					console.ThrowError(127, console.ARGS_UNKNOWN, arg[:index])
 				}
 			} else {
 				var ar, contains = s.bools[arg]
 				if contains {
 					*ar = true
 				} else {
-					errors.FatalError(errors.F(errors.ARGS_UNKNOWN, arg), 1)
+					console.ThrowError(127, console.ARGS_UNKNOWN, arg)
 				}
 			}
 		} else {

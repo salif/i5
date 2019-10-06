@@ -2,7 +2,7 @@
 package ast
 
 type Node interface {
-	String() string
+	StringValue() string
 }
 
 type Statement interface {

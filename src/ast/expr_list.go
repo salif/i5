@@ -11,11 +11,11 @@ type ExprList struct {
 	Body  []Expression
 }
 
-func (e ExprList) String() string {
+func (e ExprList) StringValue() string {
 	var out bytes.Buffer
 	args := []string{}
 	for _, a := range e.Body {
-		args = append(args, a.String())
+		args = append(args, a.StringValue())
 	}
 	out.WriteString(strings.Join(args, ", "))
 	return out.String()

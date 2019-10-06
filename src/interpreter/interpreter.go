@@ -4,7 +4,6 @@ package interpreter
 import (
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/builtins"
-	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/object"
 )
@@ -46,9 +45,9 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		result := Eval(node.Right, env)
 		switch left := node.Left.(type) {
 		case *ast.ExprList:
-			env.Set(left.Body[0].String(), result)
+			env.Set(left.Body[0].StringValue(), result)
 		default:
-			errors.FatalError("left assign: expected ast.ExprList", 1)
+			console.ThrowError(1, "left assign: expected ast.ExprList")
 		}
 		return nil
 	case *ast.Call:
@@ -90,7 +89,7 @@ func evalIdentifier(node *ast.Identifier, env *object.Env) object.Object {
 	if val, ok := env.Get(node.Value); ok {
 		return val
 	} else {
-		errors.FatalError(errors.F("%v: identifier not found", node.Value), 1)
+		console.ThrowError(1, "%v: identifier not found", node.Value)
 		return nil
 	}
 }
@@ -99,7 +98,7 @@ func evalBuiltin(node *ast.Builtin, env *object.Env) object.Object {
 	if builtin, ok := builtins.Get(node.Value); ok {
 		return builtin
 	} else {
-		errors.FatalError(errors.F("%v: builtin not found", node.Value), 1)
+		console.ThrowError(1, "%v: builtin not found", node.Value)
 		return nil
 	}
 }

@@ -5,7 +5,7 @@ type Nil struct {
 	Value string
 }
 
-func (n Nil) String() string {
+func (n Nil) StringValue() string {
 	return n.Value
 }
 

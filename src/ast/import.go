@@ -10,11 +10,11 @@ type Import struct {
 	Body  Expression
 }
 
-func (i Import) String() string {
+func (i Import) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString(i.Value)
 	out.WriteString("(")
-	out.WriteString(i.Body.String())
+	out.WriteString(i.Body.StringValue())
 	out.WriteString(")")
 	return out.String()
 }

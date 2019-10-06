@@ -5,9 +5,9 @@ type Expr struct {
 	Body Expression
 }
 
-func (ex Expr) String() string {
+func (ex Expr) StringValue() string {
 	if ex.Body != nil {
-		return ex.Body.String()
+		return ex.Body.StringValue()
 	}
 	return ""
 }

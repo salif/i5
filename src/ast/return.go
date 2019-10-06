@@ -10,12 +10,12 @@ type Return struct {
 	Body  Expression
 }
 
-func (rs Return) String() string {
+func (rs Return) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString(rs.Value)
 	out.WriteString(" ")
 	if rs.Body != nil {
-		out.WriteString(rs.Body.String())
+		out.WriteString(rs.Body.StringValue())
 	}
 	return out.String()
 }

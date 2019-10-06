@@ -2,9 +2,10 @@
 package lexer
 
 import (
-	"github.com/i5/i5/src/errors"
-	"github.com/i5/i5/src/types"
 	"testing"
+
+	"github.com/i5/i5/src/io/console"
+	"github.com/i5/i5/src/types"
 )
 
 var (
@@ -20,6 +21,6 @@ var (
 func TestRun(t *testing.T) {
 	var res1 types.TokenList = Run(test1)
 	if res1.Size() != test_s1 {
-		t.Errorf(errors.TEST_GOT_WANT, res1.Size(), test_s1)
+		t.Errorf(console.TEST_GOT_WANT, res1.Size(), test_s1)
 	}
 }

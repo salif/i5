@@ -10,11 +10,11 @@ type Prefix struct {
 	Right    Expression
 }
 
-func (p Prefix) String() string {
+func (p Prefix) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("(")
 	out.WriteString(p.Operator)
-	out.WriteString(p.Right.String())
+	out.WriteString(p.Right.StringValue())
 	out.WriteString(")")
 	return out.String()
 }

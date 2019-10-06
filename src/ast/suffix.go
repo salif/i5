@@ -10,10 +10,10 @@ type Suffix struct {
 	Operator string
 }
 
-func (s Suffix) String() string {
+func (s Suffix) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("(")
-	out.WriteString(s.Left.String())
+	out.WriteString(s.Left.StringValue())
 	out.WriteString(s.Operator)
 	out.WriteString(")")
 	return out.String()

@@ -10,11 +10,11 @@ type Case struct {
 	Body  *Block
 }
 
-func (c Case) String() string {
+func (c Case) StringValue() string {
 	var out bytes.Buffer
 	for _, i := range c.Cases {
-		out.WriteString("case " + i.String() + ";")
+		out.WriteString("case " + i.StringValue() + ";")
 	}
-	out.WriteString(c.Body.String())
+	out.WriteString(c.Body.StringValue())
 	return out.String()
 }

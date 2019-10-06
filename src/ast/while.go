@@ -11,13 +11,13 @@ type While struct {
 	Body      *Block
 }
 
-func (w While) String() string {
+func (w While) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString(w.Value)
 	out.WriteString(" ")
-	out.WriteString(w.Condition.String())
+	out.WriteString(w.Condition.StringValue())
 	out.WriteString(" ")
-	out.WriteString(w.Body.String())
+	out.WriteString(w.Body.StringValue())
 	return out.String()
 }
 func (w While) statement() {}

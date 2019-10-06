@@ -5,7 +5,7 @@ type String struct {
 	Value string
 }
 
-func (s String) String() string {
+func (s String) StringValue() string {
 	return "\"" + s.Value + "\""
 }
 

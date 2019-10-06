@@ -5,7 +5,7 @@ type Builtin struct {
 	Value string
 }
 
-func (b Builtin) String() string {
+func (b Builtin) StringValue() string {
 	return "$" + b.Value
 }
 

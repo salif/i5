@@ -5,21 +5,21 @@ import (
 	"strconv"
 
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/errors"
+	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/types"
 )
 
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixFunctions[p.peek.Type]
 	if prefix == nil {
-		errors.FatalError(errors.F("unexpected '%v' at line %v", p.peek.Value, p.peek.Line), 1)
+		console.ThrowParsingError(1, console.PARSER_UNEXPECTED, p.peek.Value, p.peek.Line)
 	}
 	leftExpression := prefix()
 
 	for p.peek.Type != types.EOL && precedence < p.precedence() {
 		infix := p.infixFunctions[p.peek.Type]
 		if infix == nil {
-			errors.FatalError(errors.F("unexpected '%v' at line %v", p.peek.Value, p.peek.Line), 1)
+			console.ThrowParsingError(1, console.PARSER_UNEXPECTED, p.peek.Value, p.peek.Line)
 		}
 		leftExpression = infix(leftExpression)
 	}
@@ -39,7 +39,7 @@ func (p *Parser) parseNumber() ast.Expression {
 	value, err := strconv.ParseInt(p.peek.Value, 0, 64)
 
 	if err != nil {
-		errors.FatalError(errors.F("could not parse %q as number", p.peek.Value), 1)
+		console.ThrowParsingError(1, console.PARSER_NOT_NUMBER, p.peek.Value)
 	}
 
 	expr := &ast.Number{Value: value}

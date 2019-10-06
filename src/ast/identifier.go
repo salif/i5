@@ -5,7 +5,7 @@ type Identifier struct {
 	Value string
 }
 
-func (i Identifier) String() string {
+func (i Identifier) StringValue() string {
 	return i.Value
 }
 

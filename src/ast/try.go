@@ -10,11 +10,11 @@ type Try struct {
 	Body  *Block
 }
 
-func (t Try) String() string {
+func (t Try) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString(t.Value)
 	out.WriteString(" ")
-	out.WriteString(t.Body.String())
+	out.WriteString(t.Body.StringValue())
 	return out.String()
 }
 func (t Try) statement() {}

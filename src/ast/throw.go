@@ -10,11 +10,11 @@ type Throw struct {
 	Body  Expression
 }
 
-func (t Throw) String() string {
+func (t Throw) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString(t.Value)
 	out.WriteString("(")
-	out.WriteString(t.Body.String())
+	out.WriteString(t.Body.StringValue())
 	out.WriteString(")")
 	return out.String()
 }

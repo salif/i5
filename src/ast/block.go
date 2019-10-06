@@ -9,11 +9,11 @@ type Block struct {
 	Body []Statement
 }
 
-func (b Block) String() string {
+func (b Block) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("{")
 	for _, s := range b.Body {
-		out.WriteString(s.String())
+		out.WriteString(s.StringValue())
 		out.WriteString("; ")
 	}
 	out.WriteString("}")

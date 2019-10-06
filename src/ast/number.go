@@ -7,7 +7,7 @@ type Number struct {
 	Value int64
 }
 
-func (n Number) String() string {
+func (n Number) StringValue() string {
 	return fmt.Sprintf("%v", n.Value)
 }
 

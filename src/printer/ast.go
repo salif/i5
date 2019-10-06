@@ -7,5 +7,5 @@ import (
 )
 
 func Ast(_ast ast.Node, tabs int, _color string) {
-	console.Println(_ast.String())
+	console.Println(_ast.StringValue())
 }

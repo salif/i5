@@ -3,7 +3,7 @@ package parser
 
 import (
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/errors"
+	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/types"
 )
 
@@ -160,7 +160,7 @@ func (p *Parser) precedence() int {
 
 func (p *Parser) require(expected string) {
 	if expected != p.peek.Type {
-		errors.FatalError(errors.F(errors.PARSER_EXPECTED_FOUND, expected, p.peek.Value, p.peek.Line), 1)
+		console.ThrowParsingError(1, console.PARSER_EXPECTED_FOUND, expected, p.peek.Value, p.peek.Line)
 	}
 }
 

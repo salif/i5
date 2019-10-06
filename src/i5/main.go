@@ -2,7 +2,6 @@
 package i5
 
 import (
-	"github.com/i5/i5/src/errors"
 	"github.com/i5/i5/src/interpreter"
 	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/io/file"
@@ -59,7 +58,7 @@ func ParseArgs() {
 		case "default":
 			console.SetOutput(console.Default)
 		default:
-			errors.FatalError(errors.F(errors.ARGS_UNKNOWN_CLR, *_output), 1)
+			console.ThrowError(1, console.ARGS_UNKNOWN_CLR, *_output)
 		}
 	}
 

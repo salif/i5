@@ -10,13 +10,13 @@ type AlienFn struct {
 	Function Expression
 }
 
-func (a AlienFn) String() string {
+func (a AlienFn) StringValue() string {
 	var out bytes.Buffer
 
 	out.WriteString("(")
-	out.WriteString(a.Alien.String())
+	out.WriteString(a.Alien.StringValue())
 	out.WriteString(".")
-	out.WriteString(a.Function.String())
+	out.WriteString(a.Function.StringValue())
 	out.WriteString(")")
 
 	return out.String()

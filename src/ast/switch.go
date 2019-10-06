@@ -12,17 +12,17 @@ type Switch struct {
 	Else      *Block
 }
 
-func (s Switch) String() string {
+func (s Switch) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString(s.Value)
 	out.WriteString(" ")
-	out.WriteString(s.Condition.String() + " {")
+	out.WriteString(s.Condition.StringValue() + " {")
 	for _, i := range s.Cases {
-		out.WriteString(i.String() + ";")
+		out.WriteString(i.StringValue() + ";")
 	}
 	if s.Else.Body != nil {
 		out.WriteString("else ")
-		out.WriteString(s.Else.String())
+		out.WriteString(s.Else.StringValue())
 	}
 	return out.String()
 }

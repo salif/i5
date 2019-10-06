@@ -11,13 +11,13 @@ type Assign struct {
 	Right Expression
 }
 
-func (a Assign) String() string {
+func (a Assign) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(a.Left.String())
+	out.WriteString(a.Left.StringValue())
 	out.WriteString(" ")
 	out.WriteString(a.Value)
 	out.WriteString(" ")
-	out.WriteString(a.Right.String())
+	out.WriteString(a.Right.StringValue())
 	return out.String()
 }
 

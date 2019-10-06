@@ -7,7 +7,7 @@ type Bool struct {
 	Value bool
 }
 
-func (b Bool) String() string {
+func (b Bool) StringValue() string {
 	return fmt.Sprintf("%v", b.Value)
 }
 

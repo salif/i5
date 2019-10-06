@@ -7,10 +7,10 @@ type Program struct {
 	Body []Expression
 }
 
-func (p Program) String() string {
+func (p Program) StringValue() string {
 	var out bytes.Buffer
 	for _, s := range p.Body {
-		out.WriteString(s.String() + "; ")
+		out.WriteString(s.StringValue() + "; ")
 	}
 	return out.String()
 }

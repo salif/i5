@@ -11,12 +11,12 @@ type Infix struct {
 	Right    Expression
 }
 
-func (i Infix) String() string {
+func (i Infix) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("(")
-	out.WriteString(i.Left.String())
+	out.WriteString(i.Left.StringValue())
 	out.WriteString(" " + i.Operator + " ")
-	out.WriteString(i.Right.String())
+	out.WriteString(i.Right.StringValue())
 	out.WriteString(")")
 	return out.String()
 }

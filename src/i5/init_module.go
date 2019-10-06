@@ -2,14 +2,14 @@
 package i5
 
 import (
-	"github.com/i5/i5/src/errors"
+	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/io/file"
 )
 
 func InitModule() {
 	var err string = file.Write("module.json", newModuleTemplate(), 0644)
 	if err != "" {
-		errors.FatalError(err, 1)
+		console.ThrowError(1, err)
 	}
 	file.Write("main.i5", newEmptyTemplate(), 0744)
 }
