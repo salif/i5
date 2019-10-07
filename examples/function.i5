@@ -3,7 +3,7 @@
 fn main() {
 	print("begin") # output: "begin"
 
-	users = $array()
+	users = $array.new()
 
 	hello_user1 = get_user("User", 1, "Hello")
 	$print(hello_user1) # output: "Hello User1!"
@@ -21,7 +21,7 @@ fn main() {
 		$print(err.message) # output: "error!"
 	}
 
-	print_array(users, ", ") # output: Hello User1!, Hi User2!
+	print_array(users, ", ") # output: "Hello User1!, Hi User2!"
 
 	print("end") # output: "end"
 }
@@ -30,8 +30,7 @@ fn print(text) {
 	$print(text)
 }
 
-# comments in arguments are not required
-fn get_user(`string` user `number` user_num `string` hello) {
+fn get_user(user user_num hello) {
 	if user_num < 0 {
 		throw "Invalid user number!"
 	}

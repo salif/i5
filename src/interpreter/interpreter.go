@@ -2,9 +2,9 @@
 package interpreter
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/builtins"
-	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/object"
 )
 
@@ -18,157 +18,33 @@ func Run(program ast.Node) {
 	Eval(program, object.InitEnv())
 }
 
-func Eval(nodei ast.Node, env *object.Env) object.Object {
-	switch node := nodei.(type) {
+func nativeToBool(input bool) *object.Bool {
+	if input {
+		return TRUE
+	}
+	return FALSE
+}
 
-	case *ast.Program:
-		var ret object.Object
-		for _, expr := range node.Body {
-			ret = Eval(expr, env)
-		}
+func isError(obj object.Object) bool {
+	if obj != nil {
+		return obj.Type() == object.ERROR
+	}
+	return false
+}
 
-		Eval(&ast.Call{Caller: &ast.Identifier{Value: "main"}, Arguments: []ast.Expression{}}, env)
-		// TODO errors.FatalError("main function not found", 1)
-		return ret
-
-	case *ast.Expr:
-		return Eval(node.Body, env)
-
-	case *ast.Block:
-		return evalBlock(node, env)
-
-	case *ast.Return:
-		val := Eval(node.Body, env)
-		return &object.Return{Value: val}
-
-	case *ast.Assign:
-		result := Eval(node.Right, env)
-		switch left := node.Left.(type) {
-		case *ast.Identifier:
-			env.Set(left.Value, result)
-		default:
-			console.ThrowError(1, "left assign error")
-		}
-		return nil
-	case *ast.Call:
-		function := Eval(node.Caller, env)
-		args := evalExpressions(node.Arguments, env)
-		return callFunction(function, args)
-	case *ast.Function:
-		return &object.Function{Params: node.Params, Body: node.Body, Env: env}
-	case *ast.Identifier:
-		return evalIdentifier(node, env)
-	case *ast.Builtin:
-		return evalBuiltin(node, env)
-	case *ast.Number:
-		return &object.Number{Value: node.Value}
-	case *ast.String:
-		return &object.String{Value: node.Value}
-	case *ast.Bool:
-		return &object.Bool{Value: node.Value}
-	case *ast.Nil:
-		return &object.Nil{}
-	case *ast.Prefix:
-		right := Eval(node.Right, env)
-		return evalPrefix(node.Operator, right)
-	case *ast.Infix:
-		left := Eval(node.Left, env)
-		right := Eval(node.Right, env)
-		return evalInfix(node.Operator, left, right)
-	case *ast.Suffix:
-		left := Eval(node.Left, env)
-		return evalSuffix(node.Operator, left)
+func isTrue(obj object.Object) bool {
+	switch obj {
+	case NIL:
+		return false
+	case TRUE:
+		return true
+	case FALSE:
+		return false
 	default:
-		console.Println("eval error", node)
-		// TODO change this
-	}
-	return nil
-}
-
-func evalIdentifier(node *ast.Identifier, env *object.Env) object.Object {
-	if val, ok := env.Get(node.Value); ok {
-		return val
-	} else {
-		console.ThrowError(1, "%v: identifier not found", node.Value)
-		return nil
+		return true
 	}
 }
 
-func evalBuiltin(node *ast.Builtin, env *object.Env) object.Object {
-	if builtin, ok := builtins.Get(node.Value); ok {
-		return builtin
-	} else {
-		console.ThrowError(1, "%v: builtin not found", node.Value)
-		return nil
-	}
-}
-
-func callFunction(fn object.Object, args []object.Object) object.Object {
-	switch fn := fn.(type) {
-
-	case *object.Function:
-		env := extendFunctionEnv(fn, args)
-		return unwrapReturnValue(Eval(fn.Body, env))
-	case *object.Builtin:
-		if result := fn.Function(args...); result != nil {
-			return result
-		}
-		return NIL
-	default:
-		console.Println("not function", fn.Type())
-	}
-	return NIL
-}
-
-func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Env {
-	env := fn.Env.Clone()
-
-	for paramIdx, param := range fn.Params {
-		env.Set(param.Value, args[paramIdx])
-	}
-
-	return env
-}
-
-func unwrapReturnValue(obj object.Object) object.Object {
-	if returnValue, ok := obj.(*object.Return); ok {
-		return returnValue.Value
-	}
-
-	return obj
-}
-
-func evalBlock(block *ast.Block, env *object.Env) object.Object {
-	var result object.Object
-	for _, statement := range block.Body {
-		result = Eval(statement, env)
-		if result != nil {
-			rt := result.Type()
-			if rt == object.RETURN || rt == object.ERROR {
-				return result
-			}
-		}
-	}
-	return result
-}
-
-func evalExpressions(exps []ast.Expression, env *object.Env) []object.Object {
-	var result []object.Object
-	for _, e := range exps {
-		evaluated := Eval(e, env)
-		result = append(result, evaluated)
-	}
-	return result
-}
-
-func evalPrefix(operator string, right object.Object) object.Object {
-	return &object.Error{}
-}
-
-func evalInfix(operator string, left, right object.Object) object.Object {
-	return &object.Error{}
-}
-
-func evalSuffix(operator string, left object.Object) object.Object {
-	return &object.Error{}
+func newError(format string, a ...interface{}) *object.Error {
+	return &object.Error{Message: fmt.Sprintf(format, a...)}
 }

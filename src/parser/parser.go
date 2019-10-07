@@ -82,6 +82,11 @@ type Parser struct {
 	infixFunctions  map[string]infixFunction
 }
 
+type (
+	prefixFunction func() ast.Expression
+	infixFunction  func(ast.Expression) ast.Expression
+)
+
 func (p *Parser) Init(tokens types.TokenList) {
 	p.tokenlist = tokens
 	p.position = 0
@@ -114,7 +119,6 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.infixFunctions[types.MODULOEQ] = p.parseInfix
 	p.infixFunctions[types.EQEQ] = p.parseInfix
 	p.infixFunctions[types.NOTEQ] = p.parseInfix
-	// p.infixFunctions[types.COMMA] = p.parseList
 	p.infixFunctions[types.COLON] = p.parseInfix
 	p.infixFunctions[types.LT] = p.parseInfix
 	p.infixFunctions[types.GT] = p.parseInfix
@@ -138,11 +142,6 @@ func (p *Parser) Init(tokens types.TokenList) {
 
 	p.next()
 }
-
-type (
-	prefixFunction func() ast.Expression
-	infixFunction  func(ast.Expression) ast.Expression
-)
 
 func (p *Parser) next() {
 	p.peek = p.tokenlist.Get(p.position)

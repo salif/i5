@@ -3,6 +3,6 @@ all:
 install:
 	install -m 755 i5 $(DESTDIR)/usr/bin/i5
 uninstall:
-	rm -rf /usr/bin/i5
+	rm -r $(DESTDIR)/usr/bin/i5
 test:
 	go test ./...
