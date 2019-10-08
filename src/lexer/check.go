@@ -71,3 +71,16 @@ func IsKeyword(char string) (string, bool) {
 		return "", false
 	}
 }
+
+func escape(char byte) string {
+	switch char {
+	case 116:
+		return string(9) // if char is 't' return '\t'
+	case 110:
+		return string(10) // if char is 'n' return '\n'
+	case 114:
+		return string(13) // if char is 'r' return '\r'
+	default:
+		return string(char) // else return string(char)
+	}
+}

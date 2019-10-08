@@ -18,7 +18,7 @@ func Run(code []byte) (tokens types.TokenList) {
 
 	for scanner.HasNext() {
 
-		// if char is "\n"
+		// if char is '\n'
 		if scanner.PeekEquals(10) {
 			tokens.Add(types.EOL, types.EOL, scanner.Line())
 			scanner.NextLine()
@@ -26,20 +26,20 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		// if char is "\t" or " " or "\r"
+		// if char is '\t' or ' ' or '\r'
 		if scanner.PeekEquals(9) || scanner.PeekEquals(32) || scanner.PeekEquals(13) {
 			scanner.Next()
 			continue
 		}
 
-		// if char is "\"
+		// if char is '\'
 		if scanner.PeekEquals(92) {
 			scanner.Next()
-			// if char is "\r"
+			// if char is '\r'
 			if scanner.PeekEquals(13) {
 				scanner.Next()
 			}
-			// if char is "\n"
+			// if char is '\n'
 			if scanner.PeekEquals(10) {
 				scanner.Next()
 				scanner.NextLine()
@@ -53,7 +53,7 @@ func Run(code []byte) (tokens types.TokenList) {
 		if scanner.PeekBetween(48, 57) {
 			var value string = ""
 
-			// if char is number(0-9) or "."
+			// if char is number(0-9) or '.'
 			for ; scanner.HasNext() && (scanner.PeekBetween(48, 57) || scanner.PeekEquals(46)); scanner.Next() {
 				value += string(scanner.Peek())
 			}
@@ -61,7 +61,7 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		// if char is "#"
+		// if char is '#'
 		if scanner.PeekEquals(35) {
 			scanner.Next()
 			for ; scanner.HasNext() && scanner.Until(10); scanner.Next() {
@@ -69,7 +69,7 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		// if char is "`"
+		// if char is '`'
 		if scanner.PeekEquals(96) {
 			scanner.Next()
 			for ; scanner.HasNext() && scanner.Until(96); scanner.Next() {
@@ -84,12 +84,16 @@ func Run(code []byte) (tokens types.TokenList) {
 			var value string = ""
 
 			for ; scanner.HasNext() && scanner.Until(34); scanner.Next() {
-				// if char is "\n"
+				// if char is '\n'
 				if scanner.PeekEquals(10) {
 					scanner.NextLine()
 				}
-				// if char is "\"
-				// TODO: if equals(char, 92) {}
+				// if char is '\'
+				if scanner.PeekEquals(92) {
+					scanner.Next()
+					value += escape(scanner.Peek())
+					continue
+				}
 				value += string(scanner.Peek())
 			}
 			scanner.Next()
@@ -103,12 +107,16 @@ func Run(code []byte) (tokens types.TokenList) {
 			var value string = ""
 
 			for ; scanner.HasNext() && scanner.Until(39); scanner.Next() {
-				// if char is "\n"
+				// if char is '\n'
 				if scanner.PeekEquals(10) {
 					scanner.NextLine()
 				}
-				// if char is "\"
-				// TODO: if equals(char, 92) {}
+				// if char is '\'
+				if scanner.PeekEquals(92) {
+					scanner.Next()
+					value += escape(scanner.Peek())
+					continue
+				}
 				value += string(scanner.Peek())
 			}
 			scanner.Next()
@@ -116,12 +124,12 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		// if char is "$"
+		// if char is '$'
 		if scanner.PeekEquals(36) {
 			var value string = ""
 			scanner.Next()
 
-			// if char is "_" or string(a-z) or number(0-9)
+			// if char is '_' or string(a-z) or number(0-9)
 			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekEquals(36) ||
 				scanner.PeekBetween(97, 122) || scanner.PeekBetween(48, 57)); scanner.Next() {
 				value += string(scanner.Peek())
@@ -131,11 +139,11 @@ func Run(code []byte) (tokens types.TokenList) {
 			continue
 		}
 
-		// if char is "_" or string(a-z) or string(A-Z)
+		// if char is '_' or string(a-z) or string(A-Z)
 		if scanner.PeekEquals(95) || scanner.PeekBetween(97, 122) || scanner.PeekBetween(65, 90) {
 			var value string = ""
 
-			// if char is "_" or string(a-z) or string(A-Z) or number(0-9)
+			// if char is '_' or string(a-z) or string(A-Z) or number(0-9)
 			for ; scanner.HasNext() && (scanner.PeekEquals(95) || scanner.PeekBetween(97, 122) ||
 				scanner.PeekBetween(65, 90) || scanner.PeekBetween(48, 57)); scanner.Next() {
 				value += string(scanner.Peek())

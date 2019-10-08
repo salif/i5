@@ -1,0 +1,6 @@
+hello = import("hello_world")
+
+fn main() {
+	hello()
+	# output: "Hello, World!"
+}
