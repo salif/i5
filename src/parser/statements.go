@@ -134,7 +134,7 @@ func (p *Parser) parseTry() ast.Statement {
 	stmt.Body = p.parseBlock()
 	if p.peek.Type == types.CATCH {
 		p.next() // skip 'catch'
-		if p.peek.Type == types.IDENTIFIER {
+		if p.peek.Type == types.IDENT {
 			stmt.Err = &ast.Identifier{Value: p.peek.Value}
 			p.next()
 		}

@@ -2,10 +2,11 @@
 package types
 
 const (
-	NUMBER     = "number"
+	INT        = "integer"
+	FLOAT      = "float"
 	STRING     = "string"
 	BUILTIN    = "builtin"
-	IDENTIFIER = "identifier"
+	IDENT      = "identifier"
 	EOL        = "new line"
 	EOF        = "end of file"
 	IF         = "if"

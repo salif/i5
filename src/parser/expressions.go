@@ -29,21 +29,34 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 }
 
 func (p *Parser) parseIdentifier() ast.Expression {
-	p.require(types.IDENTIFIER)
+	p.require(types.IDENT)
 	expr := &ast.Identifier{Value: p.peek.Value}
 	p.next()
 	return expr
 }
 
-func (p *Parser) parseNumber() ast.Expression {
-	p.require(types.NUMBER)
+func (p *Parser) parseInteger() ast.Expression {
+	p.require(types.INT)
 	value, err := strconv.ParseInt(p.peek.Value, 0, 64)
 
 	if err != nil {
-		console.ThrowParsingError(1, constants.PARSER_NOT_NUMBER, p.peek.Value)
+		console.ThrowParsingError(1, constants.PARSER_NOT_INT, p.peek.Value)
 	}
 
-	expr := &ast.Number{Value: value}
+	expr := &ast.Integer{Value: value}
+	p.next()
+	return expr
+}
+
+func (p *Parser) parseFloat() ast.Expression {
+	p.require(types.FLOAT)
+	value, err := strconv.ParseFloat(p.peek.Value, 64)
+
+	if err != nil {
+		console.ThrowParsingError(1, constants.PARSER_NOT_FLOAT, p.peek.Value)
+	}
+
+	expr := &ast.Float{Value: value}
 	p.next()
 	return expr
 }
@@ -125,7 +138,7 @@ func (p *Parser) parseFn() ast.Expression {
 	fn := &ast.Function{Value: p.peek.Type}
 	var expr *ast.Assign
 	p.next() // skip 'fn'
-	if p.peek.Type != types.IDENTIFIER {
+	if p.peek.Type != types.IDENT {
 		fn.Anonymous = true
 	} else {
 		fn.Anonymous = false

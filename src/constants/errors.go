@@ -11,7 +11,8 @@ const (
 
 	PARSER_EXPECTED_FOUND string = "expected '%v', found '%v' at line %v"
 	PARSER_UNEXPECTED     string = "unexpected '%v' at line %v"
-	PARSER_NOT_NUMBER     string = "could not parse %q as number"
+	PARSER_NOT_INT        string = "could not parse %v as integer"
+	PARSER_NOT_FLOAT      string = "could not parse %v as float"
 	PARSER_EXPECTED_ARG   string = "expected ',' or ')', found '%v' at line %v"
 
 	FILE_NOT_FOUND    string = "%v: no such file or directory"

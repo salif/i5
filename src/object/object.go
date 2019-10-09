@@ -17,7 +17,8 @@ type Immutable interface {
 }
 
 const (
-	NUMBER   = "number"
+	INTEGER  = "integer"
+	FLOAT    = "float"
 	STRING   = "string"
 	BOOL     = "bool"
 	NIL      = "nil"

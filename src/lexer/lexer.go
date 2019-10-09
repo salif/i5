@@ -55,11 +55,24 @@ func Run(code []byte) (tokens types.TokenList) {
 		if scanner.PeekBetween(48, 57) {
 			var value string = ""
 
-			// if char is number(0-9) or '.'
-			for ; scanner.HasNext() && (scanner.PeekBetween(48, 57) || scanner.PeekEquals(46)); scanner.Next() {
+			// if char is number(0-9)
+			for ; scanner.HasNext() && scanner.PeekBetween(48, 57); scanner.Next() {
 				value += string(scanner.Peek())
 			}
-			tokens.Add(types.NUMBER, value, scanner.Line())
+
+			// if char is '.'
+			if scanner.HasNext() && scanner.PeekEquals(46) {
+				value += "."
+				scanner.Next()
+
+				// if char is number(0-9)
+				for ; scanner.HasNext() && scanner.PeekBetween(48, 57); scanner.Next() {
+					value += string(scanner.Peek())
+				}
+				tokens.Add(types.FLOAT, value, scanner.Line())
+			} else {
+				tokens.Add(types.INT, value, scanner.Line())
+			}
 			continue
 		}
 
@@ -154,7 +167,7 @@ func Run(code []byte) (tokens types.TokenList) {
 			if kToken, isKeyword := IsKeyword(value); isKeyword {
 				tokens.Add(kToken, value, scanner.Line())
 			} else {
-				tokens.Add(types.IDENTIFIER, value, scanner.Line())
+				tokens.Add(types.IDENT, value, scanner.Line())
 			}
 			continue
 		}

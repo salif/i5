@@ -20,17 +20,22 @@ func evalPrefix(operator string, right object.Object) object.Object {
 		} else {
 			return newError("unknown operator: %s%s", operator, right.Type())
 		}
-	case "~", "-":
-		value := right.(*object.Number).Value
-		switch operator {
-		case "!":
-			return FALSE
-		case "~":
-			return &object.Number{Value: ^value}
-		case "-":
-			return &object.Number{Value: -value}
-		default:
-			return newError("unknown operator: %s", operator)
+	case "~":
+		if right.Type() == object.INTEGER {
+			value := right.(*object.Integer).Value
+			return &object.Integer{Value: ^value}
+		} else {
+			return newError("unknown operator: %s%s", operator, right.Type())
+		}
+	case "-":
+		if right.Type() == object.INTEGER {
+			value := right.(*object.Integer).Value
+			return &object.Integer{Value: -value}
+		} else if right.Type() == object.FLOAT {
+			value := right.(*object.Float).Value
+			return &object.Float{Value: -value}
+		} else {
+			return newError("unknown operator: %s%s", operator, right.Type())
 		}
 	case "++", "--":
 		return newError("not implemented yet: %s%s", operator, right.Type())

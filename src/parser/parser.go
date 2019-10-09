@@ -95,8 +95,9 @@ func (p *Parser) Init(tokens types.TokenList) {
 
 	p.prefixFunctions[types.FN] = p.parseFn
 	p.prefixFunctions[types.IMPORT] = p.parseImportExpr
-	p.prefixFunctions[types.IDENTIFIER] = p.parseIdentifier
-	p.prefixFunctions[types.NUMBER] = p.parseNumber
+	p.prefixFunctions[types.IDENT] = p.parseIdentifier
+	p.prefixFunctions[types.INT] = p.parseInteger
+	p.prefixFunctions[types.FLOAT] = p.parseFloat
 	p.prefixFunctions[types.STRING] = p.parseString
 	p.prefixFunctions[types.BUILTIN] = p.parseBuiltin
 	p.prefixFunctions[types.TRUE] = p.parseBool
@@ -195,7 +196,7 @@ func (p *Parser) parseParams() []*ast.Identifier {
 	}
 
 	for p.peek.Type != types.RPAREN {
-		p.require(types.IDENTIFIER)
+		p.require(types.IDENT)
 		ident := &ast.Identifier{Value: p.peek.Value}
 		p.next()
 		identifiers = append(identifiers, ident)

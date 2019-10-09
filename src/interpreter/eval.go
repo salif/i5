@@ -62,8 +62,10 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return evalIdentifier(node, env)
 	case *ast.Builtin:
 		return evalBuiltin(node, env)
-	case *ast.Number:
-		return &object.Number{Value: node.Value}
+	case *ast.Integer:
+		return &object.Integer{Value: node.Value}
+	case *ast.Float:
+		return &object.Float{Value: node.Value}
 	case *ast.String:
 		return &object.String{Value: node.Value}
 	case *ast.Bool:

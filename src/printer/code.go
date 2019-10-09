@@ -20,14 +20,14 @@ func printCode(tokens types.TokenList) {
 
 		if _, isKeyword := lexer.IsKeyword(token.Value); isKeyword {
 			output.WriteString(console.Red(token.Value) + " ")
-		} else if token.Type == types.IDENTIFIER {
+		} else if token.Type == types.IDENT {
 			output.WriteString(console.Green(token.Value))
-			if tokens.Get(i+1).Type == types.IDENTIFIER {
+			if tokens.Get(i+1).Type == types.IDENT {
 				output.WriteString(" ")
 			}
 		} else if token.Type == types.STRING {
 			output.WriteString(console.Yellow("\"" + token.Value + "\""))
-		} else if token.Type == types.NUMBER {
+		} else if token.Type == types.INT || token.Type == types.FLOAT {
 			output.WriteString(console.Magenta(token.Value))
 		} else if token.Type == types.BUILTIN {
 			output.WriteString(console.Cyan("$" + token.Value))
