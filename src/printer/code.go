@@ -9,7 +9,7 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func Code(tokens types.TokenList) {
+func printCode(tokens types.TokenList) {
 	const tab string = "    "
 	var tabs int = 0
 	var output strings.Builder

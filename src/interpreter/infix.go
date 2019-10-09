@@ -6,6 +6,9 @@ import (
 )
 
 func evalInfix(operator string, left, right object.Object) object.Object {
+	if operator == ":" {
+		return &object.String{Value: left.StringValue() + right.StringValue()}
+	}
 	if left.Type() == right.Type() && left.Type() == object.NUMBER {
 		return evalNumberInfix(operator, left, right)
 	} else if left.Type() == right.Type() && left.Type() == object.STRING {

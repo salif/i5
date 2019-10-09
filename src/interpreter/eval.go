@@ -3,7 +3,6 @@ package interpreter
 
 import (
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/object"
 )
 
@@ -20,9 +19,7 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 			}
 		}
 
-		Eval(&ast.Call{Caller: &ast.Identifier{Value: "main"}, Arguments: []ast.Expression{}}, env)
-		// TODO errors.FatalError("main function not found", 1)
-		return ret
+		return Eval(&ast.Call{Caller: &ast.Identifier{Value: "main"}, Arguments: []ast.Expression{}}, env)
 
 	case *ast.Expr:
 		return Eval(node.Body, env)
@@ -38,14 +35,15 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return &object.Return{Value: val}
 
 	case *ast.Assign:
-		result := Eval(node.Right, env)
-		switch left := node.Left.(type) {
-		case *ast.Identifier:
-			env.Set(left.Value, result)
-		default:
-			console.ThrowError(1, "left assign error")
+		right := Eval(node.Right, env)
+		if isError(right) {
+			return right
 		}
-		return nil
+		if ident, ok := node.Left.(*ast.Identifier); ok {
+			env.Set(ident.Value, right)
+		} else {
+			return newError("can not assign to %v", node.Left.StringValue())
+		}
 	case *ast.Call:
 		function := Eval(node.Caller, env)
 		if isError(function) {
@@ -83,7 +81,7 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		left := Eval(node.Left, env)
 		return evalSuffix(node.Operator, left)
 	default:
-		console.Println("eval error", node)
+		return nil
 	}
 	return nil
 }

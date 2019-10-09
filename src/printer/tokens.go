@@ -9,7 +9,7 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func Tokens(tokens types.TokenList) {
+func printTokens(tokens types.TokenList) {
 	var output strings.Builder
 	output.WriteString(fmt.Sprintln(" ",
 		console.Cyan("Line"),

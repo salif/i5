@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/i5/i5/src/ast"
+	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/object"
 )
 
@@ -14,8 +15,23 @@ var (
 	NIL   = &object.Nil{}
 )
 
-func Run(program ast.Node) {
-	Eval(program, object.InitEnv())
+func RunPackage(dir string, arguments []string) {
+	console.ThrowError(1, "not implemented yet")
+	// TODO
+}
+
+func RunModule(module string, arguments []string) {
+	console.ThrowError(1, "not implemented yet")
+	// TODO
+}
+
+func RunFile(program ast.Node, arguments []string) {
+	err := Eval(program, object.InitEnv())
+	if err == nil {
+		console.ThrowError(1, "not implemented yet")
+	} else if err.Type() == object.ERROR {
+		console.ThrowError(1, err.StringValue())
+	}
 }
 
 func nativeToBool(input bool) *object.Bool {

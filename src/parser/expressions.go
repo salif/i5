@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/i5/i5/src/ast"
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/types"
 )
@@ -12,14 +13,14 @@ import (
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixFunctions[p.peek.Type]
 	if prefix == nil {
-		console.ThrowParsingError(1, console.PARSER_UNEXPECTED, p.peek.Value, p.peek.Line)
+		console.ThrowParsingError(1, constants.PARSER_UNEXPECTED, p.peek.Value, p.peek.Line)
 	}
 	leftExpression := prefix()
 
 	for p.peek.Type != types.EOL && precedence < p.precedence() {
 		infix := p.infixFunctions[p.peek.Type]
 		if infix == nil {
-			console.ThrowParsingError(1, console.PARSER_UNEXPECTED, p.peek.Value, p.peek.Line)
+			console.ThrowParsingError(1, constants.PARSER_UNEXPECTED, p.peek.Value, p.peek.Line)
 		}
 		leftExpression = infix(leftExpression)
 	}
@@ -39,7 +40,7 @@ func (p *Parser) parseNumber() ast.Expression {
 	value, err := strconv.ParseInt(p.peek.Value, 0, 64)
 
 	if err != nil {
-		console.ThrowParsingError(1, console.PARSER_NOT_NUMBER, p.peek.Value)
+		console.ThrowParsingError(1, constants.PARSER_NOT_NUMBER, p.peek.Value)
 	}
 
 	expr := &ast.Number{Value: value}

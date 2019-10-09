@@ -2,40 +2,36 @@
 package i5
 
 import (
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/interpreter"
 	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/io/file"
 	"github.com/i5/i5/src/lexer"
 	"github.com/i5/i5/src/parser"
 	"github.com/i5/i5/src/printer"
-	"github.com/i5/i5/src/types"
-)
-
-const (
-	MajorVersion = "0"
-	MinorVersion = "0.0"
-	PatchVersion = "0.0.0"
 )
 
 var (
-	ap       ArgsParser = InitArgsParser()
-	_help               = ap.Bool("help")
-	_init               = ap.Bool("init")
-	_tokens             = ap.Bool("tokens")
-	_code               = ap.Bool("code")
-	_ast                = ap.Bool("ast")
-	_output             = ap.String("output")
-	_eval               = ap.String("eval")
-	_version            = ap.Bool("version")
-	_args               = ap.Default()
+	ap ArgsParser = InitArgsParser("i5 [options] [file] [arguments]", "Options")
+
+	_help    = ap.Bool("help", "print help")
+	_code    = ap.Bool("code", "print code")
+	_tokens  = ap.Bool("tokens", "print tokens")
+	_ast     = ap.Bool("ast", "print abstract syntax tree")
+	_output  = ap.String("output", "set output format", "format")
+	_eval    = ap.String("eval", "evaluate code", "code")
+	_init    = ap.Bool("init", "initialize new module")
+	_version = ap.Bool("version", "print current version")
+	_args    = ap.Default()
 )
 
+// Parse CLI arguments
 func ParseArgs() {
 
 	ap.Parse()
 
 	if ap.Empty() || *_help {
-		PrintHelp()
+		ap.PrintHelp()
 		return
 	}
 
@@ -58,59 +54,53 @@ func ParseArgs() {
 		case "default":
 			console.SetOutput(console.Default)
 		default:
-			console.ThrowError(1, console.ARGS_UNKNOWN_CLR, *_output)
+			console.ThrowError(1, constants.ARGS_UNKNOWN_CLR, *_output)
 		}
 	}
 
 	if len(*_eval) > 0 {
-		Run(*_eval, *_args, false)
+		runEval(*_eval, *_args)
 	} else if len(*_args) > 0 {
-		Run((*_args)[0], *_args, true)
+		runFileOrPackage((*_args)[0], *_args)
 	}
 }
 
-func Run(name string, arguments []string, isFile bool) {
-	var tokenList types.TokenList
-	if isFile {
-		tokenList = lexer.Run(file.Read(name))
-	} else {
-		tokenList = lexer.Run([]byte(name))
-	}
+func runEval(content string, arguments []string) {
 	if *_code || *_tokens || *_ast {
-		if *_code {
-			printer.Code(tokenList)
-		}
-		if *_tokens {
-			printer.Tokens(tokenList)
-		}
-		if *_ast {
-			printer.Ast(parser.Run(tokenList), 0, "red")
-		}
+		printer.Print(content, false, *_code, *_tokens, *_ast)
 	} else {
-		interpreter.Run(parser.Run(tokenList))
+		interpreter.RunFile(parser.Run(lexer.Run([]byte(content))), arguments)
 	}
 }
 
-func PrintVersion() {
-	console.Println("i5 version: v" + MinorVersion)
+func runFile(name string, arguments []string) {
+	if *_code || *_tokens || *_ast {
+		printer.Print(name, true, *_code, *_tokens, *_ast)
+	} else {
+		interpreter.RunFile(parser.Run(lexer.Run(file.Read(name))), arguments)
+	}
+}
+func runPackage(name string, arguments []string) {
+	if file.Exists(constants.I5_MOD_FILE_NAME) {
+		interpreter.RunModule(name, arguments)
+	} else {
+		interpreter.RunPackage(name, arguments)
+	}
 }
 
-func PrintHelp() {
-	console.Println(`
-Usage:
+func runFileOrPackage(name string, arguments []string) {
+	var result int = file.Info(name)
+	switch result {
+	case 1:
+		console.ThrowError(1, constants.FILE_NOT_FOUND, name)
+	case 2:
+		runPackage(name, arguments)
+	case 3:
+		runFile(name, arguments)
+	}
+}
 
-    i5 [options] [file] [arguments]
-
-options:
-
-    --help                      print help
-    --code                      print code
-    --tokens                    print tokens
-    --ast                       print abstract syntax tree
-    --output='format'           set output format:
-                                ('html', 'no-color', 'default')
-    --eval='code'               evaluate code
-    --init                      initialize new module
-    --version                   print current version
-    `)
+// Print current minor version
+func PrintVersion() {
+	console.Printf("i5 version: v%v\n", constants.MINOR_VERSION)
 }

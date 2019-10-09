@@ -1,23 +1,18 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 package file
 
 import (
 	"io/ioutil"
-	"os"
 
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/io/console"
 )
 
-func Read(fileName string) []byte {
-	info, err := os.Stat(fileName)
-	if os.IsNotExist(err) {
-		console.ThrowError(1, console.FILE_READ_NOT_FOUND, fileName)
-	} else if info.IsDir() {
-		console.ThrowError(1, console.FILE_READ_DIR, fileName)
-	}
-
-	file, err := ioutil.ReadFile(fileName)
+// Read file or throw error
+func Read(name string) []byte {
+	content, err := ioutil.ReadFile(name)
 	if err != nil {
-		console.ThrowError(1, console.FILE_READ_CANNOT_READ, fileName)
+		console.ThrowError(1, constants.FILE_CANNOT_READ, name)
 	}
-	return file
+	return content
 }
