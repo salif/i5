@@ -65,8 +65,6 @@ func IsKeyword(char string) (string, bool) {
 		return types.TRUE, true
 	case types.FALSE:
 		return types.FALSE, true
-	case types.NIL:
-		return types.NIL, true
 	default:
 		return "", false
 	}

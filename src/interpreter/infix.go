@@ -2,11 +2,13 @@
 package interpreter
 
 import (
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
+	"github.com/i5/i5/src/types"
 )
 
-func evalInfix(operator string, left, right object.Object) object.Object {
-	if operator == ":" {
+func evalInfix(operator string, left, right object.Object, env *object.Env) object.Object {
+	if operator == types.COLON {
 		return &object.String{Value: left.StringValue() + right.StringValue()}
 	} else if left.Type() == right.Type() && left.Type() == object.INTEGER {
 		return evalIntegerWithIntegerInfix(operator, left, right)
@@ -19,7 +21,7 @@ func evalInfix(operator string, left, right object.Object) object.Object {
 	} else if left.Type() == right.Type() && left.Type() == object.STRING {
 		return evalStringInfix(operator, left, right)
 	}
-	return NIL
+	return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
 }
 
 func evalIntegerWithIntegerInfix(operator string, left, right object.Object) object.Object {
@@ -27,40 +29,40 @@ func evalIntegerWithIntegerInfix(operator string, left, right object.Object) obj
 	rightVal := right.(*object.Integer).Value
 
 	switch operator {
-	case "+":
+	case types.PLUS:
 		return &object.Integer{Value: leftVal + rightVal}
-	case "-":
+	case types.MINUS:
 		return &object.Integer{Value: leftVal - rightVal}
-	case "*":
+	case types.MULTIPLY:
 		return &object.Integer{Value: leftVal * rightVal}
-	case "/":
+	case types.DIVIDE:
 		return &object.Integer{Value: leftVal / rightVal}
-	case "%":
+	case types.MODULO:
 		return &object.Integer{Value: leftVal % rightVal}
-	case "|":
+	case types.OR:
 		return &object.Integer{Value: leftVal | rightVal}
-	case "^":
+	case types.XOR:
 		return &object.Integer{Value: leftVal ^ rightVal}
-	case "&":
+	case types.AND:
 		return &object.Integer{Value: leftVal & rightVal}
-	case "<<":
+	case types.LTLT:
 		return &object.Integer{Value: leftVal << uint64(rightVal)}
-	case ">>":
+	case types.GTGT:
 		return &object.Integer{Value: leftVal >> uint64(rightVal)}
-	case "<":
+	case types.LT:
 		return nativeToBool(leftVal < rightVal)
-	case "<=":
+	case types.LTEQ:
 		return nativeToBool(leftVal <= rightVal)
-	case ">":
+	case types.GT:
 		return nativeToBool(leftVal > rightVal)
-	case ">=":
+	case types.GTEQ:
 		return nativeToBool(leftVal >= rightVal)
-	case "==":
+	case types.EQEQ:
 		return nativeToBool(leftVal == rightVal)
-	case "!=":
+	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return NIL
+		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
 	}
 }
 
@@ -69,28 +71,28 @@ func evalFloatWithFloatInfix(operator string, left, right object.Object) object.
 	rightVal := right.(*object.Float).Value
 
 	switch operator {
-	case "+":
+	case types.PLUS:
 		return &object.Float{Value: leftVal + rightVal}
-	case "-":
+	case types.MINUS:
 		return &object.Float{Value: leftVal - rightVal}
-	case "*":
+	case types.MULTIPLY:
 		return &object.Float{Value: leftVal * rightVal}
-	case "/":
+	case types.DIVIDE:
 		return &object.Float{Value: leftVal / rightVal}
-	case "<":
+	case types.LT:
 		return nativeToBool(leftVal < rightVal)
-	case "<=":
+	case types.LTEQ:
 		return nativeToBool(leftVal <= rightVal)
-	case ">":
+	case types.GT:
 		return nativeToBool(leftVal > rightVal)
-	case ">=":
+	case types.GTEQ:
 		return nativeToBool(leftVal >= rightVal)
-	case "==":
+	case types.EQEQ:
 		return nativeToBool(leftVal == rightVal)
-	case "!=":
+	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return NIL
+		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
 	}
 }
 
@@ -99,28 +101,28 @@ func evalIntegerWithFloatInfix(operator string, left, right object.Object) objec
 	rightVal := right.(*object.Float).Value
 
 	switch operator {
-	case "+":
+	case types.PLUS:
 		return &object.Float{Value: float64(leftVal) + rightVal}
-	case "-":
+	case types.MINUS:
 		return &object.Float{Value: float64(leftVal) - rightVal}
-	case "*":
+	case types.MULTIPLY:
 		return &object.Float{Value: float64(leftVal) * rightVal}
-	case "/":
+	case types.DIVIDE:
 		return &object.Float{Value: float64(leftVal) / rightVal}
-	case "<":
+	case types.LT:
 		return nativeToBool(float64(leftVal) < rightVal)
-	case "<=":
+	case types.LTEQ:
 		return nativeToBool(float64(leftVal) <= rightVal)
-	case ">":
+	case types.GT:
 		return nativeToBool(float64(leftVal) > rightVal)
-	case ">=":
+	case types.GTEQ:
 		return nativeToBool(float64(leftVal) >= rightVal)
-	case "==":
+	case types.EQEQ:
 		return nativeToBool(float64(leftVal) == rightVal)
-	case "!=":
+	case types.NOTEQ:
 		return nativeToBool(float64(leftVal) != rightVal)
 	default:
-		return NIL
+		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
 	}
 }
 
@@ -129,28 +131,28 @@ func evalFloatWithIntegerInfix(operator string, left, right object.Object) objec
 	rightVal := right.(*object.Integer).Value
 
 	switch operator {
-	case "+":
+	case types.PLUS:
 		return &object.Float{Value: leftVal + float64(rightVal)}
-	case "-":
+	case types.MINUS:
 		return &object.Float{Value: leftVal - float64(rightVal)}
-	case "*":
+	case types.MULTIPLY:
 		return &object.Float{Value: leftVal * float64(rightVal)}
-	case "/":
+	case types.DIVIDE:
 		return &object.Float{Value: leftVal / float64(rightVal)}
-	case "<":
+	case types.LT:
 		return nativeToBool(leftVal < float64(rightVal))
-	case "<=":
+	case types.LTEQ:
 		return nativeToBool(leftVal <= float64(rightVal))
-	case ">":
+	case types.GT:
 		return nativeToBool(leftVal > float64(rightVal))
-	case ">=":
+	case types.GTEQ:
 		return nativeToBool(leftVal >= float64(rightVal))
-	case "==":
+	case types.EQEQ:
 		return nativeToBool(leftVal == float64(rightVal))
-	case "!=":
+	case types.NOTEQ:
 		return nativeToBool(leftVal != float64(rightVal))
 	default:
-		return NIL
+		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
 	}
 }
 
@@ -159,12 +161,12 @@ func evalStringInfix(operator string, left, right object.Object) object.Object {
 	rightVal := right.(*object.String).Value
 
 	switch operator {
-	case "==":
+	case types.EQEQ:
 		return nativeToBool(leftVal == rightVal)
-	case "!=":
+	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
 	}
 }
 
@@ -173,15 +175,15 @@ func evalBooleanInfix(operator string, left, right object.Object) object.Object 
 	rightVal := right.(*object.Bool).Value
 
 	switch operator {
-	case "==":
+	case types.EQEQ:
 		return nativeToBool(leftVal == rightVal)
-	case "!=":
+	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
-	case "&&":
+	case types.ANDAND:
 		return nativeToBool(leftVal && rightVal)
-	case "||":
+	case types.OROR:
 		return nativeToBool(leftVal || rightVal)
 	default:
-		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
 	}
 }

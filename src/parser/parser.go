@@ -25,7 +25,6 @@ const (
 	SUM
 	PRODUCT
 	PREFIX
-	INCDEC
 	CALL
 	DOT
 )
@@ -58,8 +57,6 @@ var precedences = map[string]int{
 	types.MULTIPLY:   PRODUCT,
 	types.DIVIDE:     PRODUCT,
 	types.MODULO:     PRODUCT,
-	types.PLUSPLUS:   INCDEC,
-	types.MINUSMINUS: INCDEC,
 	types.LPAREN:     CALL,
 	types.DOT:        DOT,
 }
@@ -102,23 +99,20 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.prefixFunctions[types.BUILTIN] = p.parseBuiltin
 	p.prefixFunctions[types.TRUE] = p.parseBool
 	p.prefixFunctions[types.FALSE] = p.parseBool
-	p.prefixFunctions[types.NIL] = p.parseNil
 	p.prefixFunctions[types.LPAREN] = p.parseGroup
 	p.prefixFunctions[types.NOT] = p.parsePrefix
-	p.prefixFunctions[types.PLUSPLUS] = p.parsePrefix
-	p.prefixFunctions[types.MINUSMINUS] = p.parsePrefix
 	p.prefixFunctions[types.BNOT] = p.parsePrefix
 	p.prefixFunctions[types.MINUS] = p.parsePrefix
 
 	p.infixFunctions[types.OROR] = p.parseInfix
 	p.infixFunctions[types.ANDAND] = p.parseInfix
 	p.infixFunctions[types.EQ] = p.parseAssign
-	p.infixFunctions[types.COLONEQ] = p.parseInfix
-	p.infixFunctions[types.PLUSEQ] = p.parseInfix
-	p.infixFunctions[types.MINUSEQ] = p.parseInfix
-	p.infixFunctions[types.MULTIPLYEQ] = p.parseInfix
-	p.infixFunctions[types.DIVIDEEQ] = p.parseInfix
-	p.infixFunctions[types.MODULOEQ] = p.parseInfix
+	p.infixFunctions[types.COLONEQ] = p.parseAssign
+	p.infixFunctions[types.PLUSEQ] = p.parseAssign
+	p.infixFunctions[types.MINUSEQ] = p.parseAssign
+	p.infixFunctions[types.MULTIPLYEQ] = p.parseAssign
+	p.infixFunctions[types.DIVIDEEQ] = p.parseAssign
+	p.infixFunctions[types.MODULOEQ] = p.parseAssign
 	p.infixFunctions[types.EQEQ] = p.parseInfix
 	p.infixFunctions[types.NOTEQ] = p.parseInfix
 	p.infixFunctions[types.COLON] = p.parseInfix
@@ -132,15 +126,12 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.infixFunctions[types.DIVIDE] = p.parseInfix
 	p.infixFunctions[types.MODULO] = p.parseInfix
 	p.infixFunctions[types.LPAREN] = p.parseCall
-	p.infixFunctions[types.PLUSPLUS] = p.parseSuffix
 	p.infixFunctions[types.AND] = p.parseInfix
 	p.infixFunctions[types.OR] = p.parseInfix
 	p.infixFunctions[types.XOR] = p.parseInfix
 	p.infixFunctions[types.LTLT] = p.parseInfix
 	p.infixFunctions[types.GTGT] = p.parseInfix
 	p.infixFunctions[types.DOT] = p.parseAlienFn
-	p.infixFunctions[types.PLUSPLUS] = p.parseSuffix
-	p.infixFunctions[types.MINUSMINUS] = p.parseSuffix
 
 	p.next()
 }

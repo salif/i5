@@ -3,6 +3,7 @@ package interpreter
 
 import (
 	"github.com/i5/i5/src/ast"
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
 )
 
@@ -36,6 +37,7 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		}
 		if ident, ok := node.Left.(*ast.Identifier); ok {
 			env.Set(ident.Value, right)
+			return right
 		} else {
 			return newError("can not assign to %v", node.Left.StringValue())
 		}
@@ -63,8 +65,6 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return &object.String{Value: node.Value}
 	case *ast.Bool:
 		return nativeToBool(node.Value)
-	case *ast.Nil:
-		return NIL
 	case *ast.Throw:
 		val := Eval(node.Body, env)
 		if isError(val) {
@@ -73,14 +73,14 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return &object.Throw{Value: val}
 	case *ast.Prefix:
 		right := Eval(node.Right, env)
-		return evalPrefix(node.Operator, right)
+		return evalPrefix(node.Operator, right, env)
 	case *ast.Infix:
 		left := Eval(node.Left, env)
 		right := Eval(node.Right, env)
-		return evalInfix(node.Operator, left, right)
+		return evalInfix(node.Operator, left, right, env)
 	case *ast.Suffix:
 		left := Eval(node.Left, env)
-		return evalSuffix(node.Operator, left)
+		return evalSuffix(node.Operator, left, env)
 	case *ast.If:
 		return evalIf(node, env)
 	case *ast.Switch:
@@ -94,7 +94,6 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 	case *ast.Try:
 		return evalTry(node, env)
 	default:
-		return newError("unexpected: %v", node.StringValue())
+		return newError(constants.IR_INVALID_EVAL, node.StringValue())
 	}
-	return newError("unexpected: %v", nodei.StringValue())
 }

@@ -2,6 +2,8 @@
 package constants
 
 const (
+	TEST_GOT_WANT string = "error: got: %v, want: %v"
+
 	ARGS_UNKNOWN     string = "unknown option: %v"
 	ARGS_UNKNOWN_CLR string = "unknown output format: %v"
 	ARGS_NO_FILE     string = "no file specified"
@@ -23,5 +25,10 @@ const (
 	FILE_DIR_EXISTS   string = "%v: directory already exists"
 	FILE_CANNOT_WRITE string = "%v: can not write file"
 
-	TEST_GOT_WANT string = "error: got: %v, want: %v"
+	IR_INVALID_EVAL      string = "invalid expression: %v"
+	IR_INVALID_INFIX     string = "invalid expression: %v %v %v"
+	IR_INVALID_PREFIX    string = "invalid expression: %v %v"
+	IR_INVALID_SUFFIX    string = "invalid expression: %v %v"
+	IR_INVALID_CALL      string = "invalid function caller: %v"
+	IR_BUILTIN_NOT_FOUND string = "builtin not found: %v"
 )

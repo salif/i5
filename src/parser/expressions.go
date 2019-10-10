@@ -81,13 +81,6 @@ func (p *Parser) parseBool() ast.Expression {
 	return expr
 }
 
-func (p *Parser) parseNil() ast.Expression {
-	p.require(types.NIL)
-	expr := &ast.Nil{Value: p.peek.Value}
-	p.next()
-	return expr
-}
-
 func (p *Parser) parseGroup() ast.Expression {
 	p.require(types.LPAREN)
 	p.next() // skip '('
@@ -127,7 +120,6 @@ func (p *Parser) parseList(end string) []ast.Expression {
 
 func (p *Parser) parseAssign(left ast.Expression) ast.Expression {
 	expr := &ast.Assign{Value: p.peek.Type, Left: left}
-	p.require(types.EQ)
 	p.next()
 	expr.Right = p.parseExpression(LOWEST)
 	return expr

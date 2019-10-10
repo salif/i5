@@ -21,7 +21,6 @@ const (
 	FLOAT    = "float"
 	STRING   = "string"
 	BOOL     = "bool"
-	NIL      = "nil"
 	RETURN   = "return"
 	THROW    = "throw"
 	ERROR    = "error"

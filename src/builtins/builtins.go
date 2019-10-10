@@ -5,6 +5,8 @@ import (
 	"github.com/i5/i5/src/object"
 )
 
+var TRUE = &object.Bool{Value: true}
+
 func Get(str string) (object.Object, bool) {
 	builtin, ok := Builtins[str]
 	return builtin, ok

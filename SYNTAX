@@ -54,5 +54,4 @@ SYNTAX RULES
   (-|+|)[0-9]+\.[0-9]+
   'true'
   'false'
-  'nil'
 

@@ -198,9 +198,6 @@ func Run(code []byte) (tokens types.TokenList) {
 			if scanner.Peek() == EQ {
 				tokens.Add(types.PLUSEQ, types.PLUSEQ, scanner.Line())
 				scanner.Next()
-			} else if scanner.Peek() == PLUS {
-				tokens.Add(types.PLUSPLUS, types.PLUSPLUS, scanner.Line())
-				scanner.Next()
 			} else {
 				tokens.Add(types.PLUS, types.PLUS, scanner.Line())
 			}
@@ -209,9 +206,6 @@ func Run(code []byte) (tokens types.TokenList) {
 			scanner.Next()
 			if scanner.Peek() == EQ {
 				tokens.Add(types.MINUSEQ, types.MINUSEQ, scanner.Line())
-				scanner.Next()
-			} else if scanner.Peek() == MINUS {
-				tokens.Add(types.MINUSMINUS, types.MINUSMINUS, scanner.Line())
 				scanner.Next()
 			} else {
 				tokens.Add(types.MINUS, types.MINUS, scanner.Line())

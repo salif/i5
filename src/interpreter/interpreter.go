@@ -12,7 +12,6 @@ import (
 var (
 	TRUE  = &object.Bool{Value: true}
 	FALSE = &object.Bool{Value: false}
-	NIL   = &object.Nil{}
 )
 
 func RunPackage(dir string, arguments []string) {
@@ -40,22 +39,14 @@ func nativeToBool(input bool) *object.Bool {
 }
 
 func isError(obj object.Object) bool {
-	if obj != nil {
-		return obj.Type() == object.ERROR
-	}
-	return false
+	return obj.Type() == object.ERROR
 }
 
 func isTrue(obj object.Object) bool {
-	switch obj {
-	case NIL:
-		return false
-	case TRUE:
+	if obj == TRUE {
 		return true
-	case FALSE:
+	} else {
 		return false
-	default:
-		return true
 	}
 }
 

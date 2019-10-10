@@ -1,13 +1,15 @@
 #!/usr/bin/env i5
 
 fn main() {
-	fib(35)
+	input = $integer.parse(
+		$console.read_line("write number: ")
+	)
+	$print(fib(input))
 }
 
 fn fib(n) {
 	if n < 2 {
 		return n
 	}
-
 	return fib(n - 1) + fib(n - 2)
 }

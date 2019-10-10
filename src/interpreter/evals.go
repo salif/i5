@@ -4,6 +4,7 @@ package interpreter
 import (
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/builtins"
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
 )
 
@@ -17,7 +18,11 @@ func evalProgram(program *ast.Program, env *object.Env) object.Object {
 		}
 	}
 
-	return result
+	if result == nil {
+		return TRUE
+	} else {
+		return result
+	}
 }
 func evalIf(ie *ast.If, env *object.Env) object.Object {
 	condition := Eval(ie.Condition, env)
@@ -31,7 +36,7 @@ func evalIf(ie *ast.If, env *object.Env) object.Object {
 	} else if ie.Alternative != nil {
 		return Eval(ie.Alternative, env)
 	} else {
-		return NIL
+		return condition
 	}
 }
 
@@ -41,8 +46,25 @@ func evalSwitch(s *ast.Switch, env *object.Env) object.Object {
 }
 
 func evalWhile(w *ast.While, env *object.Env) object.Object {
-	return newError("'while' not implemented yet")
-	// TODO
+	var result object.Object
+	for {
+		condition := Eval(w.Condition, env)
+		if isError(condition) {
+			return condition
+		}
+
+		if isTrue(condition) {
+			result = Eval(w.Body, env)
+		} else {
+			break
+		}
+	}
+
+	if result == nil {
+		return TRUE
+	} else {
+		return result
+	}
 }
 
 func evalImportExpr(i *ast.ImportExpr, env *object.Env) object.Object {
@@ -77,27 +99,25 @@ func evalBuiltin(node *ast.Builtin, env *object.Env) object.Object {
 
 func callFunction(fn object.Object, args []object.Object) object.Object {
 	switch fn := fn.(type) {
-
 	case *object.Function:
 		env := extendFunctionEnv(fn, args)
 		return unwrapReturnValue(Eval(fn.Body, env))
 	case *object.Builtin:
 		if result := fn.Function(args...); result != nil {
 			return result
+		} else {
+			return newError(constants.IR_BUILTIN_NOT_FOUND, fn.Name)
 		}
-		return NIL
 	default:
-		return newError("not a function: %s", fn.Type())
+		return newError(constants.IR_INVALID_CALL, fn.Type())
 	}
 }
 
 func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Env {
 	env := fn.Env.Clone()
-
 	for paramIdx, param := range fn.Params {
 		env.Set(param.Value, args[paramIdx])
 	}
-
 	return env
 }
 
@@ -105,7 +125,6 @@ func unwrapReturnValue(obj object.Object) object.Object {
 	if returnValue, ok := obj.(*object.Return); ok {
 		return returnValue.Value
 	}
-
 	return obj
 }
 
@@ -113,12 +132,13 @@ func evalBlock(block *ast.Block, env *object.Env) object.Object {
 	var result object.Object
 	for _, statement := range block.Body {
 		result = Eval(statement, env)
-		if result != nil {
-			rt := result.Type()
-			if rt == object.RETURN || rt == object.ERROR {
-				return result
-			}
+		rt := result.Type()
+		if rt == object.RETURN || rt == object.ERROR {
+			return result
 		}
+	}
+	if result == nil {
+		return TRUE
 	}
 	return result
 }
