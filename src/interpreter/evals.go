@@ -7,6 +7,18 @@ import (
 	"github.com/i5/i5/src/object"
 )
 
+func evalProgram(program *ast.Program, env *object.Env) object.Object {
+	var result object.Object
+	for _, expr := range program.Body {
+		result = Eval(expr, env)
+		switch result := result.(type) {
+		case *object.Error:
+			return result
+		}
+	}
+
+	return result
+}
 func evalIf(ie *ast.If, env *object.Env) object.Object {
 	condition := Eval(ie.Condition, env)
 
@@ -21,6 +33,30 @@ func evalIf(ie *ast.If, env *object.Env) object.Object {
 	} else {
 		return NIL
 	}
+}
+
+func evalSwitch(s *ast.Switch, env *object.Env) object.Object {
+	return newError("'switch' not implemented yet")
+	// TODO
+}
+
+func evalWhile(w *ast.While, env *object.Env) object.Object {
+	return newError("'while' not implemented yet")
+	// TODO
+}
+
+func evalImportExpr(i *ast.ImportExpr, env *object.Env) object.Object {
+	return newError("'import expression' not implemented yet")
+	// TODO
+}
+func evalImportStatement(i *ast.ImportStatement, env *object.Env) object.Object {
+	return newError("'import statement' not implemented yet")
+	// TODO
+}
+
+func evalTry(t *ast.Try, env *object.Env) object.Object {
+	return newError("'try' not implemented yet")
+	// TODO
 }
 
 func evalIdentifier(node *ast.Identifier, env *object.Env) object.Object {

@@ -10,9 +10,21 @@ func (e *Error) Type() TYPE {
 }
 
 func (e *Error) StringValue() string {
-	return "error: " + e.Message
+	return e.Message
 }
 
 func (e *Error) Clone() Object {
 	return &Error{Message: e.Message}
+}
+
+type Throw struct {
+	Value Object
+}
+
+func (t *Throw) Type() TYPE {
+	return THROW
+}
+
+func (t *Throw) StringValue() string {
+	return t.Value.StringValue()
 }

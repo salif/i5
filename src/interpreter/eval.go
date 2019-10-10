@@ -10,15 +10,10 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 	switch node := nodei.(type) {
 
 	case *ast.Program:
-		var ret object.Object
-		for _, expr := range node.Body {
-			ret = Eval(expr, env)
-			switch ret := ret.(type) {
-			case *object.Error:
-				return ret
-			}
+		prog := evalProgram(node, env)
+		if isError(prog) {
+			return prog
 		}
-
 		return Eval(&ast.Call{Caller: &ast.Identifier{Value: "main"}, Arguments: []ast.Expression{}}, env)
 
 	case *ast.Expr:
@@ -56,8 +51,6 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return callFunction(function, args)
 	case *ast.Function:
 		return &object.Function{Params: node.Params, Body: node.Body, Env: env}
-	case *ast.If:
-		return evalIf(node, env)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 	case *ast.Builtin:
@@ -72,6 +65,12 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return nativeToBool(node.Value)
 	case *ast.Nil:
 		return NIL
+	case *ast.Throw:
+		val := Eval(node.Body, env)
+		if isError(val) {
+			return val
+		}
+		return &object.Throw{Value: val}
 	case *ast.Prefix:
 		right := Eval(node.Right, env)
 		return evalPrefix(node.Operator, right)
@@ -82,8 +81,20 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 	case *ast.Suffix:
 		left := Eval(node.Left, env)
 		return evalSuffix(node.Operator, left)
+	case *ast.If:
+		return evalIf(node, env)
+	case *ast.Switch:
+		return evalSwitch(node, env)
+	case *ast.While:
+		return evalWhile(node, env)
+	case *ast.ImportExpr:
+		return evalImportExpr(node, env)
+	case *ast.ImportStatement:
+		return evalImportStatement(node, env)
+	case *ast.Try:
+		return evalTry(node, env)
 	default:
-		return nil
+		return newError("unexpected: %v", node.StringValue())
 	}
-	return nil
+	return newError("unexpected: %v", nodei.StringValue())
 }

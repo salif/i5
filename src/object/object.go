@@ -23,6 +23,7 @@ const (
 	BOOL     = "bool"
 	NIL      = "nil"
 	RETURN   = "return"
+	THROW    = "throw"
 	ERROR    = "error"
 	FUNCTION = "function"
 	BUILTIN  = "builtin"

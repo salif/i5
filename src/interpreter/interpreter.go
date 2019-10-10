@@ -27,9 +27,7 @@ func RunModule(module string, arguments []string) {
 
 func RunFile(program ast.Node, arguments []string) {
 	err := Eval(program, object.InitEnv())
-	if err == nil {
-		console.ThrowError(1, "not implemented yet")
-	} else if err.Type() == object.ERROR {
+	if err.Type() == object.ERROR {
 		console.ThrowError(1, err.StringValue())
 	}
 }
