@@ -13,6 +13,7 @@ const (
 
 	PARSER_EXPECTED_FOUND string = "line %d: expected '%v', found '%v'"
 	PARSER_UNEXPECTED     string = "line %d: unexpected '%v'"
+	PARSER_EXPECTED       string = "line %d: expected '%v'"
 	PARSER_NOT_INT        string = "line %d: could not parse %v as integer"
 	PARSER_NOT_FLOAT      string = "line %d: could not parse %v as float"
 	PARSER_EXPECTED_ARG   string = "line %d: expected ',' or ')', found '%v'"

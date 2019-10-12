@@ -93,7 +93,7 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.peek = types.Token{}
 
 	p.prefixFunctions[types.FN] = p.parseFn
-	p.prefixFunctions[types.IMPORT] = p.parseImportExpr
+	p.prefixFunctions[types.IMPORT] = p.parseImport
 	p.prefixFunctions[types.IDENT] = p.parseIdentifier
 	p.prefixFunctions[types.INT] = p.parseInteger
 	p.prefixFunctions[types.FLOAT] = p.parseFloat
@@ -173,6 +173,9 @@ func (p *Parser) parseProgram() *ast.Program {
 			continue
 		}
 		expr := p.parseExpression(LOWEST)
+		if _, ok := expr.(*ast.Assign); !ok {
+			console.ThrowParsingError(1, constants.PARSER_EXPECTED, expr.GetLine(), "declaration")
+		}
 		program.Body = append(program.Body, expr)
 	}
 

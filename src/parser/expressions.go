@@ -177,8 +177,8 @@ func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
 	return expr
 }
 
-func (p *Parser) parseImportExpr() ast.Expression {
-	expr := &ast.ImportExpr{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseImport() ast.Expression {
+	expr := &ast.Import{Line: p.peek.Line, Value: p.peek.Type}
 	p.next()
 	expr.Body = p.parseExpression(LOWEST)
 	return expr

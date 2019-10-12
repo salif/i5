@@ -13,7 +13,11 @@ func (e *Error) Type() TYPE {
 }
 
 func (e *Error) StringValue() string {
-	return console.Format("line %d: %v", e.Line, e.Message)
+	if e.Line > 0 {
+		return console.Format("line %d: %v", e.Line, e.Message)
+	} else {
+		return console.Format("%v", e.Message)
+	}
 }
 
 func (e *Error) Clone() Object {

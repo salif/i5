@@ -16,8 +16,6 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseWhile()
 	case types.RETURN:
 		return p.parseReturn()
-	case types.IMPORT:
-		return p.parseImportStatement()
 	case types.THROW:
 		return p.parseThrow()
 	case types.TRY:
@@ -108,15 +106,6 @@ func (p *Parser) parseWhile() ast.Statement {
 func (p *Parser) parseReturn() ast.Statement {
 	stmt := &ast.Return{Line: p.peek.Line, Value: p.peek.Type}
 	p.next() // skip 'return'
-	stmt.Body = p.parseExpression(LOWEST)
-	p.require(types.EOL)
-	p.next() // skip EOL
-	return stmt
-}
-
-func (p *Parser) parseImportStatement() ast.Statement {
-	stmt := &ast.ImportStatement{Line: p.peek.Line, Value: p.peek.Type}
-	p.next() // skip 'import'
 	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL

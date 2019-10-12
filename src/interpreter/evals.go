@@ -75,26 +75,57 @@ func evalWhile(w *ast.While, env *object.Env, line int) object.Object {
 				break
 			} else if result.Type() == object.CONTINUE {
 				continue
+			} else if result.Type() == object.ERROR {
+				return result
+			} else if result.Type() == object.RETURN {
+				return result
 			}
 		} else {
 			break
 		}
 	}
+
 	return &object.Void{}
 }
 
-func evalImportExpr(i *ast.ImportExpr, env *object.Env, line int) object.Object {
-	return &object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "import expression"), Line: line}
-	// TODO
-}
-func evalImportStatement(i *ast.ImportStatement, env *object.Env, line int) object.Object {
-	return &object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "import statement"), Line: line}
+func evalImport(i *ast.Import, env *object.Env, line int) object.Object {
+	return &object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "import"), Line: line}
 	// TODO
 }
 
 func evalTry(t *ast.Try, env *object.Env, line int) object.Object {
-	return &object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "try"), Line: line}
-	// TODO
+	result := Eval(t.Body, env)
+	if isError(result) {
+		if t.Catch == nil {
+			return &object.Void{}
+		}
+
+		if t.Err != nil {
+			env.Set(t.Err.Value, result)
+			// TODO make err usable in catch
+		}
+		catchResult := Eval(t.Catch, env)
+
+		switch catchResult.Type() {
+		case object.ERROR:
+			fallthrough
+		case object.RETURN:
+			fallthrough
+		case object.BREAK:
+			fallthrough
+		case object.CONTINUE:
+			return catchResult
+		}
+
+		if t.Finally == nil {
+			return &object.Void{}
+		}
+
+		return Eval(t.Finally, env)
+
+	} else {
+		return result
+	}
 }
 
 func evalIdentifier(node *ast.Identifier, env *object.Env, line int) object.Object {

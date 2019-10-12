@@ -80,7 +80,7 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		if isError(val) {
 			return val
 		}
-		return &object.Error{Message: val.StringValue(), Line: node.GetLine()}
+		return &object.Error{Message: val.StringValue()}
 	case *ast.Prefix:
 		right := Eval(node.Right, env)
 		if isError(right) {
@@ -124,10 +124,8 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return evalSwitch(node, env, node.GetLine())
 	case *ast.While:
 		return evalWhile(node, env, node.GetLine())
-	case *ast.ImportExpr:
-		return evalImportExpr(node, env, node.GetLine())
-	case *ast.ImportStatement:
-		return evalImportStatement(node, env, node.GetLine())
+	case *ast.Import:
+		return evalImport(node, env, node.GetLine())
 	case *ast.Try:
 		return evalTry(node, env, node.GetLine())
 	case *ast.Break:
