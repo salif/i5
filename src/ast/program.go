@@ -4,13 +4,19 @@ package ast
 import "bytes"
 
 type Program struct {
+	Line int
 	Body []Expression
 }
 
-func (p Program) StringValue() string {
+func (this Program) StringValue() string {
 	var out bytes.Buffer
-	for _, s := range p.Body {
-		out.WriteString(s.StringValue() + "; ")
+	for _, s := range this.Body {
+		out.WriteString(s.StringValue())
+		out.WriteString("; ")
 	}
 	return out.String()
+}
+
+func (this Program) GetLine() int {
+	return this.Line
 }

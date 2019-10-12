@@ -1,14 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "fmt"
+import "github.com/i5/i5/src/io/console"
 
 type Bool struct {
+	Line  int
 	Value bool
 }
 
-func (b Bool) StringValue() string {
-	return fmt.Sprintf("%v", b.Value)
+func (this Bool) StringValue() string {
+	return console.Format("%v", this.Value)
 }
 
-func (b Bool) expression() {}
+func (this Bool) GetLine() int {
+	return this.Line
+}
+
+func (this Bool) expression() {}

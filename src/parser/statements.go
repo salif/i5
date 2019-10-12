@@ -22,13 +22,17 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseThrow()
 	case types.TRY:
 		return p.parseTry()
+	case types.BREAK:
+		return p.parseBreak()
+	case types.CONTINUE:
+		return p.parseContinue()
 	default:
 		return p.parseExprStatement()
 	}
 }
 
 func (p *Parser) parseExprStatement() *ast.Expr {
-	stmt := &ast.Expr{}
+	stmt := &ast.Expr{Line: p.peek.Line}
 	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
 	p.next() // skip EOL
@@ -36,7 +40,7 @@ func (p *Parser) parseExprStatement() *ast.Expr {
 }
 
 func (p *Parser) parseIf() ast.Statement {
-	expression := &ast.If{Value: p.peek.Type}
+	expression := &ast.If{Line: p.peek.Line, Value: p.peek.Type}
 
 	p.next() // skip 'if' or 'elif'
 
@@ -45,7 +49,7 @@ func (p *Parser) parseIf() ast.Statement {
 	expression.Consequence = p.parseBlock()
 
 	if p.peek.Type == types.ELIF {
-		expression.Alternative = &ast.Block{Body: []ast.Statement{p.parseIf()}}
+		expression.Alternative = &ast.Block{Line: p.peek.Line, Body: []ast.Statement{p.parseIf()}}
 	} else if p.peek.Type == types.ELSE {
 		p.next() // skip 'else'
 		expression.Alternative = p.parseBlock()
@@ -55,11 +59,11 @@ func (p *Parser) parseIf() ast.Statement {
 }
 
 func (p *Parser) parseSwitch() ast.Statement {
-	stmt := &ast.Switch{Value: p.peek.Type}
+	stmt := &ast.Switch{Line: p.peek.Line, Value: p.peek.Type}
 	p.next()
 	stmt.Condition = p.parseExpression(LOWEST)
 	cases := []ast.Case{}
-	cs := ast.Case{}
+	cs := ast.Case{Line: p.peek.Line}
 	p.require(types.EOL)
 	p.next()
 
@@ -72,7 +76,7 @@ func (p *Parser) parseSwitch() ast.Statement {
 			p.require(types.EOL)
 			p.next()
 			cases = append(cases, cs)
-			cs = ast.Case{}
+			cs = ast.Case{Line: p.peek.Line}
 		} else {
 			p.require(types.EOL)
 			p.next()
@@ -92,7 +96,7 @@ func (p *Parser) parseSwitch() ast.Statement {
 }
 
 func (p *Parser) parseWhile() ast.Statement {
-	stmt := &ast.While{Value: p.peek.Type}
+	stmt := &ast.While{Line: p.peek.Line, Value: p.peek.Type}
 	p.next() // skip 'while'
 	stmt.Condition = p.parseExpression(LOWEST)
 	stmt.Body = p.parseBlock()
@@ -102,7 +106,7 @@ func (p *Parser) parseWhile() ast.Statement {
 }
 
 func (p *Parser) parseReturn() ast.Statement {
-	stmt := &ast.Return{Value: p.peek.Type}
+	stmt := &ast.Return{Line: p.peek.Line, Value: p.peek.Type}
 	p.next() // skip 'return'
 	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
@@ -111,7 +115,7 @@ func (p *Parser) parseReturn() ast.Statement {
 }
 
 func (p *Parser) parseImportStatement() ast.Statement {
-	stmt := &ast.ImportStatement{Value: p.peek.Type}
+	stmt := &ast.ImportStatement{Line: p.peek.Line, Value: p.peek.Type}
 	p.next() // skip 'import'
 	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
@@ -120,7 +124,7 @@ func (p *Parser) parseImportStatement() ast.Statement {
 }
 
 func (p *Parser) parseThrow() ast.Statement {
-	stmt := &ast.Throw{Value: p.peek.Type}
+	stmt := &ast.Throw{Line: p.peek.Line, Value: p.peek.Type}
 	p.next() // skip 'throw'
 	stmt.Body = p.parseExpression(LOWEST)
 	p.require(types.EOL)
@@ -129,13 +133,13 @@ func (p *Parser) parseThrow() ast.Statement {
 }
 
 func (p *Parser) parseTry() ast.Statement {
-	stmt := &ast.Try{Value: p.peek.Type}
+	stmt := &ast.Try{Line: p.peek.Line, Value: p.peek.Type}
 	p.next() // skip 'try'
 	stmt.Body = p.parseBlock()
 	if p.peek.Type == types.CATCH {
 		p.next() // skip 'catch'
 		if p.peek.Type == types.IDENT {
-			stmt.Err = &ast.Identifier{Value: p.peek.Value}
+			stmt.Err = &ast.Identifier{Line: p.peek.Line, Value: p.peek.Value}
 			p.next()
 		}
 		stmt.Catch = p.parseBlock()
@@ -144,6 +148,22 @@ func (p *Parser) parseTry() ast.Statement {
 		p.next() // skip 'finally'
 		stmt.Finally = p.parseBlock()
 	}
+	p.require(types.EOL)
+	p.next() // skip EOL
+	return stmt
+}
+
+func (p *Parser) parseBreak() ast.Statement {
+	stmt := &ast.Break{Line: p.peek.Line, Value: p.peek.Type}
+	p.next() // skip 'break'
+	p.require(types.EOL)
+	p.next() // skip EOL
+	return stmt
+}
+
+func (p *Parser) parseContinue() ast.Statement {
+	stmt := &ast.Continue{Line: p.peek.Line, Value: p.peek.Type}
+	p.next() // skip 'continue'
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt

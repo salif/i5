@@ -6,13 +6,14 @@ import (
 )
 
 type Block struct {
+	Line int
 	Body []Statement
 }
 
-func (b Block) StringValue() string {
+func (this Block) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("{")
-	for _, s := range b.Body {
+	for _, s := range this.Body {
 		out.WriteString(s.StringValue())
 		out.WriteString("; ")
 	}
@@ -20,4 +21,8 @@ func (b Block) StringValue() string {
 	return out.String()
 }
 
-func (b Block) statement() {}
+func (this Block) GetLine() int {
+	return this.Line
+}
+
+func (this Block) statement() {}

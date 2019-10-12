@@ -6,18 +6,23 @@ import (
 )
 
 type Return struct {
+	Line  int
 	Value string
 	Body  Expression
 }
 
-func (rs Return) StringValue() string {
+func (this Return) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(rs.Value)
+	out.WriteString(this.Value)
 	out.WriteString(" ")
-	if rs.Body != nil {
-		out.WriteString(rs.Body.StringValue())
+	if this.Body != nil {
+		out.WriteString(this.Body.StringValue())
 	}
 	return out.String()
 }
 
-func (rs Return) statement() {}
+func (this Return) GetLine() int {
+	return this.Line
+}
+
+func (this Return) statement() {}

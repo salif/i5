@@ -6,16 +6,22 @@ import (
 )
 
 type Suffix struct {
+	Line     int
 	Left     Expression
 	Operator string
 }
 
-func (s Suffix) StringValue() string {
+func (this Suffix) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("(")
-	out.WriteString(s.Left.StringValue())
-	out.WriteString(s.Operator)
+	out.WriteString(this.Left.StringValue())
+	out.WriteString(this.Operator)
 	out.WriteString(")")
 	return out.String()
 }
-func (s Suffix) expression() {}
+
+func (this Suffix) GetLine() int {
+	return this.Line
+}
+
+func (this Suffix) expression() {}

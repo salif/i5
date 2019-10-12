@@ -6,19 +6,26 @@ import (
 )
 
 type Infix struct {
+	Line     int
 	Left     Expression
 	Operator string
 	Right    Expression
 }
 
-func (i Infix) StringValue() string {
+func (this Infix) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("(")
-	out.WriteString(i.Left.StringValue())
-	out.WriteString(" " + i.Operator + " ")
-	out.WriteString(i.Right.StringValue())
+	out.WriteString(this.Left.StringValue())
+	out.WriteString(" ")
+	out.WriteString(this.Operator)
+	out.WriteString(" ")
+	out.WriteString(this.Right.StringValue())
 	out.WriteString(")")
 	return out.String()
 }
 
-func (i Infix) expression() {}
+func (this Infix) GetLine() int {
+	return this.Line
+}
+
+func (this Infix) expression() {}

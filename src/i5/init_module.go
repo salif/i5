@@ -3,7 +3,6 @@ package i5
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 
 	"github.com/i5/i5/src/constants"
@@ -25,7 +24,7 @@ func InitModule() {
 }
 
 func input(b *bufio.Reader, str string, def string) string {
-	fmt.Print(str)
+	console.Print(str)
 	answer, _ := b.ReadString('\n')
 	if answer == "\n" {
 		return def

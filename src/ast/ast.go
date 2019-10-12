@@ -3,6 +3,7 @@ package ast
 
 type Node interface {
 	StringValue() string
+	GetLine() int
 }
 
 type Statement interface {

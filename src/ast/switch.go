@@ -6,24 +6,31 @@ import (
 )
 
 type Switch struct {
+	Line      int
 	Value     string
 	Condition Expression
 	Cases     []Case
 	Else      *Block
 }
 
-func (s Switch) StringValue() string {
+func (this Switch) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(s.Value)
+	out.WriteString(this.Value)
 	out.WriteString(" ")
-	out.WriteString(s.Condition.StringValue() + " {")
-	for _, i := range s.Cases {
-		out.WriteString(i.StringValue() + ";")
+	out.WriteString(this.Condition.StringValue())
+	out.WriteString(" {")
+	for _, i := range this.Cases {
+		out.WriteString(i.StringValue())
+		out.WriteString(";")
 	}
-	if s.Else.Body != nil {
+	if this.Else.Body != nil {
 		out.WriteString("else ")
-		out.WriteString(s.Else.StringValue())
+		out.WriteString(this.Else.StringValue())
 	}
 	return out.String()
 }
-func (s Switch) statement() {}
+func (this Switch) GetLine() int {
+	return this.Line
+}
+
+func (this Switch) statement() {}

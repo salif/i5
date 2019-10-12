@@ -7,21 +7,26 @@ import (
 )
 
 type Call struct {
+	Line      int
 	Caller    Expression
 	Arguments []Expression
 }
 
-func (c Call) StringValue() string {
+func (this Call) StringValue() string {
 	var out bytes.Buffer
 	args := []string{}
-	for _, a := range c.Arguments {
+	for _, a := range this.Arguments {
 		args = append(args, a.StringValue())
 	}
-	out.WriteString(c.Caller.StringValue())
+	out.WriteString(this.Caller.StringValue())
 	out.WriteString("(")
 	out.WriteString(strings.Join(args, ", "))
 	out.WriteString(")")
 	return out.String()
 }
 
-func (c Call) expression() {}
+func (this Call) GetLine() int {
+	return this.Line
+}
+
+func (this Call) expression() {}

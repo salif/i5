@@ -1,14 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "fmt"
+import "github.com/i5/i5/src/io/console"
 
 type Integer struct {
+	Line  int
 	Value int64
 }
 
-func (i Integer) StringValue() string {
-	return fmt.Sprintf("%v", i.Value)
+func (this Integer) StringValue() string {
+	return console.Format("%v", this.Value)
 }
 
-func (i Integer) expression() {}
+func (this Integer) GetLine() int {
+	return this.Line
+}
+
+func (this Integer) expression() {}

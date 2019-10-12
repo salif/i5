@@ -17,11 +17,14 @@ type Immutable interface {
 }
 
 const (
+	VOID     = "undefined"
 	INTEGER  = "integer"
 	FLOAT    = "float"
 	STRING   = "string"
 	BOOL     = "bool"
 	RETURN   = "return"
+	BREAK    = "break"
+	CONTINUE = "continue"
 	THROW    = "throw"
 	ERROR    = "error"
 	FUNCTION = "function"

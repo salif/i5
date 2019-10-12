@@ -2,14 +2,19 @@
 package ast
 
 type Expr struct {
+	Line int
 	Body Expression
 }
 
-func (ex Expr) StringValue() string {
-	if ex.Body != nil {
-		return ex.Body.StringValue()
+func (this Expr) StringValue() string {
+	if this.Body != nil {
+		return this.Body.StringValue()
 	}
 	return ""
 }
 
-func (ex Expr) statement() {}
+func (this Expr) GetLine() int {
+	return this.Line
+}
+
+func (this Expr) statement() {}

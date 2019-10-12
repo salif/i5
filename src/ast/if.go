@@ -6,23 +6,29 @@ import (
 )
 
 type If struct {
+	Line        int
 	Value       string
 	Condition   Expression
 	Consequence *Block
 	Alternative *Block
 }
 
-func (i If) StringValue() string {
+func (this If) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(i.Value)
+	out.WriteString(this.Value)
 	out.WriteString(" ")
-	out.WriteString(i.Condition.StringValue())
+	out.WriteString(this.Condition.StringValue())
 	out.WriteString(" ")
-	out.WriteString(i.Consequence.StringValue())
-	if i.Alternative != nil {
+	out.WriteString(this.Consequence.StringValue())
+	if this.Alternative != nil {
 		out.WriteString(" else ")
-		out.WriteString(i.Alternative.StringValue())
+		out.WriteString(this.Alternative.StringValue())
 	}
 	return out.String()
 }
-func (i If) statement() {}
+
+func (this If) GetLine() int {
+	return this.Line
+}
+
+func (this If) statement() {}

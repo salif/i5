@@ -26,6 +26,7 @@ const (
 	PRODUCT
 	PREFIX
 	CALL
+	QM
 	DOT
 )
 
@@ -58,6 +59,7 @@ var precedences = map[string]int{
 	types.DIVIDE:     PRODUCT,
 	types.MODULO:     PRODUCT,
 	types.LPAREN:     CALL,
+	types.QM:         QM,
 	types.DOT:        DOT,
 }
 
@@ -132,6 +134,7 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.infixFunctions[types.LTLT] = p.parseInfix
 	p.infixFunctions[types.GTGT] = p.parseInfix
 	p.infixFunctions[types.DOT] = p.parseAlienFn
+	p.infixFunctions[types.QM] = p.parseSuffix
 
 	p.next()
 }
@@ -150,7 +153,7 @@ func (p *Parser) precedence() int {
 
 func (p *Parser) require(expected string) {
 	if expected != p.peek.Type {
-		console.ThrowParsingError(1, constants.PARSER_EXPECTED_FOUND, expected, p.peek.Value, p.peek.Line)
+		console.ThrowParsingError(1, constants.PARSER_EXPECTED_FOUND, p.peek.Line, expected, p.peek.Value)
 	}
 }
 
@@ -161,7 +164,7 @@ func (p *Parser) expect(b bool) {
 }
 
 func (p *Parser) parseProgram() *ast.Program {
-	program := &ast.Program{}
+	program := &ast.Program{Line: p.peek.Line}
 	program.Body = []ast.Expression{}
 
 	for p.peek.Type != types.EOF {
@@ -188,7 +191,7 @@ func (p *Parser) parseParams() []*ast.Identifier {
 
 	for p.peek.Type != types.RPAREN {
 		p.require(types.IDENT)
-		ident := &ast.Identifier{Value: p.peek.Value}
+		ident := &ast.Identifier{Line: p.peek.Line, Value: p.peek.Value}
 		p.next()
 		identifiers = append(identifiers, ident)
 	}
@@ -199,7 +202,7 @@ func (p *Parser) parseParams() []*ast.Identifier {
 }
 
 func (p *Parser) parseBlock() *ast.Block {
-	block := &ast.Block{}
+	block := &ast.Block{Line: p.peek.Line}
 	p.require(types.LBRACE)
 	p.next() // skip '{'
 	p.require(types.EOL)

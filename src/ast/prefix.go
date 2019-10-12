@@ -6,16 +6,22 @@ import (
 )
 
 type Prefix struct {
+	Line     int
 	Operator string
 	Right    Expression
 }
 
-func (p Prefix) StringValue() string {
+func (this Prefix) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("(")
-	out.WriteString(p.Operator)
-	out.WriteString(p.Right.StringValue())
+	out.WriteString(this.Operator)
+	out.WriteString(this.Right.StringValue())
 	out.WriteString(")")
 	return out.String()
 }
-func (p Prefix) expression() {}
+
+func (this Prefix) GetLine() int {
+	return this.Line
+}
+
+func (this Prefix) expression() {}

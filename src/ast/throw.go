@@ -6,17 +6,22 @@ import (
 )
 
 type Throw struct {
+	Line  int
 	Value string
 	Body  Expression
 }
 
-func (t Throw) StringValue() string {
+func (this Throw) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(t.Value)
+	out.WriteString(this.Value)
 	out.WriteString("(")
-	out.WriteString(t.Body.StringValue())
+	out.WriteString(this.Body.StringValue())
 	out.WriteString(")")
 	return out.String()
 }
 
-func (t Throw) statement() {}
+func (this Throw) GetLine() int {
+	return this.Line
+}
+
+func (this Throw) statement() {}

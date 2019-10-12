@@ -6,20 +6,25 @@ import (
 )
 
 type AlienFn struct {
+	Line     int
 	Alien    Expression
 	Function Expression
 }
 
-func (a AlienFn) StringValue() string {
+func (this AlienFn) StringValue() string {
 	var out bytes.Buffer
 
 	out.WriteString("(")
-	out.WriteString(a.Alien.StringValue())
+	out.WriteString(this.Alien.StringValue())
 	out.WriteString(".")
-	out.WriteString(a.Function.StringValue())
+	out.WriteString(this.Function.StringValue())
 	out.WriteString(")")
 
 	return out.String()
 }
 
-func (a AlienFn) expression() {}
+func (this AlienFn) GetLine() int {
+	return this.Line
+}
+
+func (this AlienFn) expression() {}

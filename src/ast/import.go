@@ -6,33 +6,43 @@ import (
 )
 
 type ImportExpr struct {
+	Line  int
 	Value string
 	Body  Expression
 }
 
-func (i ImportExpr) StringValue() string {
+func (this ImportExpr) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(i.Value)
+	out.WriteString(this.Value)
 	out.WriteString("(")
-	out.WriteString(i.Body.StringValue())
+	out.WriteString(this.Body.StringValue())
 	out.WriteString(")")
 	return out.String()
 }
 
-func (i ImportExpr) expression() {}
+func (this ImportExpr) GetLine() int {
+	return this.Line
+}
+
+func (this ImportExpr) expression() {}
 
 type ImportStatement struct {
+	Line  int
 	Value string
 	Body  Expression
 }
 
-func (is ImportStatement) StringValue() string {
+func (this ImportStatement) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(is.Value)
+	out.WriteString(this.Value)
 	out.WriteString("(")
-	out.WriteString(is.Body.StringValue())
+	out.WriteString(this.Body.StringValue())
 	out.WriteString(")")
 	return out.String()
 }
 
-func (is ImportStatement) statement() {}
+func (this ImportStatement) GetLine() int {
+	return this.Line
+}
+
+func (this ImportStatement) statement() {}

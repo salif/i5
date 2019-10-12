@@ -3,28 +3,31 @@ package interpreter
 
 import (
 	"github.com/i5/i5/src/constants"
+	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/object"
 	"github.com/i5/i5/src/types"
 )
 
-func evalInfix(operator string, left, right object.Object, env *object.Env) object.Object {
+func evalInfix(operator string, left, right object.Object, env *object.Env, line int) object.Object {
 	if operator == types.COLON {
 		return &object.String{Value: left.StringValue() + right.StringValue()}
 	} else if left.Type() == right.Type() && left.Type() == object.INTEGER {
-		return evalIntegerWithIntegerInfix(operator, left, right)
+		return evalIntegerWithIntegerInfix(operator, left, right, line)
 	} else if left.Type() == right.Type() && left.Type() == object.FLOAT {
-		return evalFloatWithFloatInfix(operator, left, right)
+		return evalFloatWithFloatInfix(operator, left, right, line)
 	} else if left.Type() == object.INTEGER && right.Type() == object.FLOAT {
-		return evalIntegerWithFloatInfix(operator, left, right)
+		return evalIntegerWithFloatInfix(operator, left, right, line)
 	} else if left.Type() == object.FLOAT && right.Type() == object.INTEGER {
-		return evalFloatWithIntegerInfix(operator, left, right)
+		return evalFloatWithIntegerInfix(operator, left, right, line)
 	} else if left.Type() == right.Type() && left.Type() == object.STRING {
-		return evalStringInfix(operator, left, right)
+		return evalStringInfix(operator, left, right, line)
+	} else if left.Type() == right.Type() && left.Type() == object.BOOL {
+		return evalBooleanInfix(operator, left, right, line)
 	}
-	return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+	return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 }
 
-func evalIntegerWithIntegerInfix(operator string, left, right object.Object) object.Object {
+func evalIntegerWithIntegerInfix(operator string, left, right object.Object, line int) object.Object {
 	leftVal := left.(*object.Integer).Value
 	rightVal := right.(*object.Integer).Value
 
@@ -62,11 +65,11 @@ func evalIntegerWithIntegerInfix(operator string, left, right object.Object) obj
 	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
-func evalFloatWithFloatInfix(operator string, left, right object.Object) object.Object {
+func evalFloatWithFloatInfix(operator string, left, right object.Object, line int) object.Object {
 	leftVal := left.(*object.Float).Value
 	rightVal := right.(*object.Float).Value
 
@@ -92,11 +95,11 @@ func evalFloatWithFloatInfix(operator string, left, right object.Object) object.
 	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
-func evalIntegerWithFloatInfix(operator string, left, right object.Object) object.Object {
+func evalIntegerWithFloatInfix(operator string, left, right object.Object, line int) object.Object {
 	leftVal := left.(*object.Integer).Value
 	rightVal := right.(*object.Float).Value
 
@@ -122,11 +125,11 @@ func evalIntegerWithFloatInfix(operator string, left, right object.Object) objec
 	case types.NOTEQ:
 		return nativeToBool(float64(leftVal) != rightVal)
 	default:
-		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
-func evalFloatWithIntegerInfix(operator string, left, right object.Object) object.Object {
+func evalFloatWithIntegerInfix(operator string, left, right object.Object, line int) object.Object {
 	leftVal := left.(*object.Float).Value
 	rightVal := right.(*object.Integer).Value
 
@@ -152,11 +155,11 @@ func evalFloatWithIntegerInfix(operator string, left, right object.Object) objec
 	case types.NOTEQ:
 		return nativeToBool(leftVal != float64(rightVal))
 	default:
-		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
-func evalStringInfix(operator string, left, right object.Object) object.Object {
+func evalStringInfix(operator string, left, right object.Object, line int) object.Object {
 	leftVal := left.(*object.String).Value
 	rightVal := right.(*object.String).Value
 
@@ -166,11 +169,11 @@ func evalStringInfix(operator string, left, right object.Object) object.Object {
 	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
-func evalBooleanInfix(operator string, left, right object.Object) object.Object {
+func evalBooleanInfix(operator string, left, right object.Object, line int) object.Object {
 	leftVal := left.(*object.Bool).Value
 	rightVal := right.(*object.Bool).Value
 
@@ -184,6 +187,6 @@ func evalBooleanInfix(operator string, left, right object.Object) object.Object 
 	case types.OROR:
 		return nativeToBool(leftVal || rightVal)
 	default:
-		return newError(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }

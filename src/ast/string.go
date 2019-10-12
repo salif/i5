@@ -2,11 +2,16 @@
 package ast
 
 type String struct {
+	Line  int
 	Value string
 }
 
-func (s String) StringValue() string {
-	return "\"" + s.Value + "\""
+func (this String) StringValue() string {
+	return "\"" + this.Value + "\""
 }
 
-func (s String) expression() {}
+func (this String) GetLine() int {
+	return this.Line
+}
+
+func (this String) expression() {}

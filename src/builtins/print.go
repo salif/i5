@@ -11,5 +11,5 @@ func Print(obj ...object.Object) object.Object {
 		console.Print(o.StringValue())
 	}
 	console.Println()
-	return TRUE
+	return &object.Void{}
 }

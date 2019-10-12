@@ -6,19 +6,24 @@ import (
 )
 
 type Assign struct {
+	Line  int
 	Value string
 	Left  Expression
 	Right Expression
 }
 
-func (a Assign) StringValue() string {
+func (this Assign) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(a.Left.StringValue())
+	out.WriteString(this.Left.StringValue())
 	out.WriteString(" ")
-	out.WriteString(a.Value)
+	out.WriteString(this.Value)
 	out.WriteString(" ")
-	out.WriteString(a.Right.StringValue())
+	out.WriteString(this.Right.StringValue())
 	return out.String()
 }
 
-func (a Assign) expression() {}
+func (this Assign) GetLine() int {
+	return this.Line
+}
+
+func (this Assign) expression() {}

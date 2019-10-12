@@ -6,5 +6,7 @@ const (
 	MINOR_VERSION string = "0.0"
 	PATCH_VERSION string = "0.0.0"
 
-	I5_MOD_FILE_NAME string = "i5.mod"
+	I5_MOD_FILE_NAME   string = "i5.mod"
+	I5_FILE_EXT        string = ".i5"
+	MAIN_FUNCTION_NAME string = "main"
 )

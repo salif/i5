@@ -6,15 +6,22 @@ import (
 )
 
 type Case struct {
+	Line  int
 	Cases []Expression
 	Body  *Block
 }
 
-func (c Case) StringValue() string {
+func (this Case) StringValue() string {
 	var out bytes.Buffer
-	for _, i := range c.Cases {
-		out.WriteString("case " + i.StringValue() + ";")
+	for _, i := range this.Cases {
+		out.WriteString("case ")
+		out.WriteString(i.StringValue())
+		out.WriteString(";")
 	}
-	out.WriteString(c.Body.StringValue())
+	out.WriteString(this.Body.StringValue())
 	return out.String()
+}
+
+func (this Case) GetLine() int {
+	return this.Line
 }

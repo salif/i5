@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package object
 
+import "github.com/i5/i5/src/io/console"
+
 type Error struct {
+	Line    int
 	Message string
 }
 
@@ -10,21 +13,9 @@ func (e *Error) Type() TYPE {
 }
 
 func (e *Error) StringValue() string {
-	return e.Message
+	return console.Format("line %d: %v", e.Line, e.Message)
 }
 
 func (e *Error) Clone() Object {
-	return &Error{Message: e.Message}
-}
-
-type Throw struct {
-	Value Object
-}
-
-func (t *Throw) Type() TYPE {
-	return THROW
-}
-
-func (t *Throw) StringValue() string {
-	return t.Value.StringValue()
+	return &Error{Message: e.Message, Line: e.Line}
 }

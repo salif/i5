@@ -6,18 +6,24 @@ import (
 )
 
 type While struct {
+	Line      int
 	Value     string
 	Condition Expression
 	Body      *Block
 }
 
-func (w While) StringValue() string {
+func (this While) StringValue() string {
 	var out bytes.Buffer
-	out.WriteString(w.Value)
+	out.WriteString(this.Value)
 	out.WriteString(" ")
-	out.WriteString(w.Condition.StringValue())
+	out.WriteString(this.Condition.StringValue())
 	out.WriteString(" ")
-	out.WriteString(w.Body.StringValue())
+	out.WriteString(this.Body.StringValue())
 	return out.String()
 }
-func (w While) statement() {}
+
+func (this While) GetLine() int {
+	return this.Line
+}
+
+func (this While) statement() {}

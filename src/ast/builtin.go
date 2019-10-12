@@ -2,11 +2,16 @@
 package ast
 
 type Builtin struct {
+	Line  int
 	Value string
 }
 
-func (b Builtin) StringValue() string {
-	return "$" + b.Value
+func (this Builtin) StringValue() string {
+	return "$" + this.Value
 }
 
-func (b Builtin) expression() {}
+func (this Builtin) GetLine() int {
+	return this.Line
+}
+
+func (this Builtin) expression() {}

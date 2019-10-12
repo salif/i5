@@ -2,9 +2,6 @@
 package lexer
 
 import (
-	"fmt"
-	"strconv"
-
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/types"
@@ -15,7 +12,7 @@ func Run(code []byte) (tokens types.TokenList) {
 	tokens.Init()
 	var scanner Scanner
 	scanner.Init(code, func(length int, position int, line int) {
-		console.ThrowSyntaxError(1, constants.LEXER_OUT_OF_RANGE, strconv.Itoa(line), "")
+		console.ThrowSyntaxError(1, constants.LEXER_OUT_OF_RANGE, line, "")
 	})
 
 	for scanner.HasNext() {
@@ -46,7 +43,7 @@ func Run(code []byte) (tokens types.TokenList) {
 				scanner.Next()
 				scanner.NextLine()
 			} else {
-				console.ThrowSyntaxError(1, constants.LEXER_UNEXPECTED_TOKEN, string(92), strconv.Itoa(scanner.Line()))
+				console.ThrowSyntaxError(1, constants.LEXER_UNEXPECTED_TOKEN, scanner.Line(), string(92))
 			}
 			continue
 		}
@@ -336,7 +333,7 @@ func Run(code []byte) (tokens types.TokenList) {
 			tokens.Add(types.QM, types.QM, scanner.Line())
 			scanner.Next()
 		default:
-			console.ThrowSyntaxError(1, constants.LEXER_UNEXPECTED_TOKEN, fmt.Sprintf("%v", scanner.Peek()), strconv.Itoa(scanner.Line()))
+			console.ThrowSyntaxError(1, constants.LEXER_UNEXPECTED_TOKEN, scanner.Line(), console.Format("%v", scanner.Peek()))
 		}
 	}
 	tokens.Add(types.EOF, types.EOF, scanner.Line())

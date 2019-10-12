@@ -12,7 +12,7 @@ import (
 func Read(name string) []byte {
 	content, err := ioutil.ReadFile(name)
 	if err != nil {
-		console.ThrowError(1, constants.FILE_CANNOT_READ, name)
+		console.ThrowError(1, constants.FILE_CANNOT_READ_FILE, name)
 	}
 	return content
 }
