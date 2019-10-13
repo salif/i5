@@ -4,16 +4,28 @@ package ast
 import "github.com/i5/i5/src/io/console"
 
 type Float struct {
-	Line  int
-	Value float64
+	line  int
+	value float64
 }
 
-func (this Float) StringValue() string {
-	return console.Format("%v", this.Value)
+func (this Float) GetType() int {
+	return FLOAT
+}
+
+func (this Float) Print() {
+	console.Printf("%v", this.value)
 }
 
 func (this Float) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Float) expression() {}
+func (this Float) GetValue() float64 {
+	return this.value
+}
+
+func (this Float) Init(line int, value float64) Float {
+	this.line = line
+	this.value = value
+	return this
+}

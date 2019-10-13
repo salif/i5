@@ -8,18 +8,18 @@ type Error struct {
 	Message string
 }
 
-func (e *Error) Type() TYPE {
+func (this Error) Type() TYPE {
 	return ERROR
 }
 
-func (e *Error) StringValue() string {
-	if e.Line > 0 {
-		return console.Format("line %d: %v", e.Line, e.Message)
+func (this Error) StringValue() string {
+	if this.Line > 0 {
+		return console.Format("line %d: %v", this.Line, this.Message)
 	} else {
-		return console.Format("%v", e.Message)
+		return console.Format("%v", this.Message)
 	}
 }
 
-func (e *Error) Clone() Object {
-	return &Error{Message: e.Message, Line: e.Line}
+func (this Error) Clone() Object {
+	return &Error{Message: this.Message, Line: this.Line}
 }

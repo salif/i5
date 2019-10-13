@@ -7,14 +7,14 @@ type Void struct {
 	Value string
 }
 
-func (v *Void) Type() TYPE {
+func (this Void) Type() TYPE {
 	return VOID
 }
 
-func (v *Void) StringValue() string {
-	if v.Value == "" {
+func (this Void) StringValue() string {
+	if this.Value == "" {
 		return VOID
 	} else {
-		return console.Format("undefined '%v'", v.Value)
+		return console.Format("undefined '%v'", this.Value)
 	}
 }

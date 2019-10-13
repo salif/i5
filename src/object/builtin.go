@@ -2,16 +2,15 @@
 package object
 
 type Builtin struct {
-	Name     string
 	RealType TYPE
 	Function func(args ...Object) Object
 	Value    Object
 }
 
-func (b *Builtin) Type() TYPE {
+func (this Builtin) Type() TYPE {
 	return BUILTIN
 }
 
-func (b *Builtin) StringValue() string {
+func (this Builtin) StringValue() string {
 	return "[type: builtin]"
 }

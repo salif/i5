@@ -1,28 +1,40 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import (
-	"bytes"
-)
+import "github.com/i5/i5/src/io/console"
 
 type Return struct {
-	Line  int
-	Value string
-	Body  Expression
+	line  int
+	token string
+	body  Node
 }
 
-func (this Return) StringValue() string {
-	var out bytes.Buffer
-	out.WriteString(this.Value)
-	out.WriteString(" ")
-	if this.Body != nil {
-		out.WriteString(this.Body.StringValue())
+func (this Return) GetType() int {
+	return RETURN
+}
+
+func (this Return) Print() {
+	console.Print(this.token)
+	console.Print(" ")
+	if this.body != nil {
+		this.body.Print()
 	}
-	return out.String()
 }
 
 func (this Return) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Return) statement() {}
+func (this Return) GetBody() Node {
+	return this.body
+}
+
+func (this Return) Init(line int, token string) Return {
+	this.line = line
+	this.token = token
+	return this
+}
+
+func (this *Return) SetBody(body Node) {
+	this.body = body
+}

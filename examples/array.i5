@@ -1,0 +1,11 @@
+#!/usr/bin/env i5
+
+fn main() {
+	array = $array.new()
+	array = $array.push(array, 1)
+	if array? {
+		$print(array)
+	} else {
+		$print("error")
+	}
+}

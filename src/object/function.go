@@ -6,16 +6,16 @@ import (
 )
 
 type Function struct {
-	Params []*ast.Identifier
-	Body   *ast.Block
+	Params []ast.Identifier
+	Body   ast.Block
 	Env    *Env
 }
 
-func (f *Function) Type() TYPE {
+func (this Function) Type() TYPE {
 	return FUNCTION
 }
 
-func (f *Function) StringValue() string {
+func (this Function) StringValue() string {
 	return "[type: function]"
 }
 
@@ -23,10 +23,10 @@ type Return struct {
 	Value Object
 }
 
-func (r *Return) Type() TYPE {
+func (this Return) Type() TYPE {
 	return RETURN
 }
 
-func (r *Return) StringValue() string {
-	return r.Value.StringValue()
+func (this Return) StringValue() string {
+	return this.Value.StringValue()
 }

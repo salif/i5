@@ -1,17 +1,31 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
+import "github.com/i5/i5/src/io/console"
+
 type Builtin struct {
-	Line  int
-	Value string
+	line  int
+	value string
 }
 
-func (this Builtin) StringValue() string {
-	return "$" + this.Value
+func (this Builtin) GetType() int {
+	return BUILTIN
+}
+
+func (this Builtin) Print() {
+	console.Print("$" + this.value)
 }
 
 func (this Builtin) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Builtin) expression() {}
+func (this Builtin) GetValue() string {
+	return this.value
+}
+
+func (this Builtin) Init(line int, value string) Builtin {
+	this.line = line
+	this.value = value
+	return this
+}

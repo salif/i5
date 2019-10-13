@@ -4,16 +4,28 @@ package ast
 import "github.com/i5/i5/src/io/console"
 
 type Bool struct {
-	Line  int
-	Value bool
+	line  int
+	value bool
 }
 
-func (this Bool) StringValue() string {
-	return console.Format("%v", this.Value)
+func (this Bool) GetType() int {
+	return BOOL
+}
+
+func (this Bool) Print() {
+	console.Printf("%v", this.value)
 }
 
 func (this Bool) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Bool) expression() {}
+func (this Bool) GetValue() bool {
+	return this.value
+}
+
+func (this Bool) Init(line int, value bool) Bool {
+	this.line = line
+	this.value = value
+	return this
+}

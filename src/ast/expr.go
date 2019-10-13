@@ -1,20 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-type Expr struct {
-	Line int
-	Body Expression
+type Expression struct {
+	line int
+	body Node
 }
 
-func (this Expr) StringValue() string {
-	if this.Body != nil {
-		return this.Body.StringValue()
-	}
-	return ""
+func (this Expression) GetType() int {
+	return EXPRESSION
 }
 
-func (this Expr) GetLine() int {
-	return this.Line
+func (this Expression) Print() {
+	this.body.Print()
 }
 
-func (this Expr) statement() {}
+func (this Expression) GetLine() int {
+	return this.line
+}
+
+func (this Expression) GetBody() Node {
+	return this.body
+}
+
+func (this Expression) Init(line int, body Node) Expression {
+	this.line = line
+	this.body = body
+	return this
+}

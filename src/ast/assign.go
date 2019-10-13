@@ -1,29 +1,46 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import (
-	"bytes"
-)
+import "github.com/i5/i5/src/io/console"
 
 type Assign struct {
-	Line  int
-	Value string
-	Left  Expression
-	Right Expression
+	line     int
+	operator string
+	left     Node
+	right    Node
 }
 
-func (this Assign) StringValue() string {
-	var out bytes.Buffer
-	out.WriteString(this.Left.StringValue())
-	out.WriteString(" ")
-	out.WriteString(this.Value)
-	out.WriteString(" ")
-	out.WriteString(this.Right.StringValue())
-	return out.String()
+func (this Assign) GetType() int {
+	return ASSIGN
+}
+
+func (this Assign) Print() {
+	this.left.Print()
+	console.Print(" ")
+	console.Print(this.operator)
+	console.Print(" ")
+	this.right.Print()
 }
 
 func (this Assign) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Assign) expression() {}
+func (this Assign) Init(line int, operator string, left Node) Assign {
+	this.line = line
+	this.operator = operator
+	this.left = left
+	return this
+}
+
+func (this Assign) GetLeft() Node {
+	return this.left
+}
+
+func (this Assign) GetRight() Node {
+	return this.right
+}
+
+func (this *Assign) SetRight(right Node) {
+	this.right = right
+}

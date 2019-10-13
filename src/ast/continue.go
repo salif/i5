@@ -1,17 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
+import "github.com/i5/i5/src/io/console"
+
 type Continue struct {
-	Line  int
-	Value string
+	line  int
+	token string
 }
 
-func (this Continue) StringValue() string {
-	return this.Value
+func (this Continue) GetType() int {
+	return CONTINUE
+}
+
+func (this Continue) Print() {
+	console.Print(this.token)
 }
 
 func (this Continue) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Continue) statement() {}
+func (this Continue) Init(line int, token string) Continue {
+	this.line = line
+	this.token = token
+	return this
+}

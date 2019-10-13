@@ -7,10 +7,10 @@ type Float struct {
 	Value float64
 }
 
-func (f *Float) Type() TYPE {
+func (this Float) Type() TYPE {
 	return FLOAT
 }
 
-func (f *Float) StringValue() string {
-	return console.Format("%v", f.Value)
+func (this Float) StringValue() string {
+	return console.Format("%v", this.Value)
 }

@@ -7,10 +7,10 @@ type Bool struct {
 	Value bool
 }
 
-func (b *Bool) Type() TYPE {
+func (this Bool) Type() TYPE {
 	return BOOL
 }
 
-func (b *Bool) StringValue() string {
-	return console.Format("%t", b.Value)
+func (this Bool) StringValue() string {
+	return console.Format("%t", this.Value)
 }

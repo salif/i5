@@ -6,7 +6,7 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseStatement() ast.Statement {
+func (p *Parser) parseStatement() ast.Node {
 	switch p.peek.Type {
 	case types.IF:
 		return p.parseIf()
@@ -29,62 +29,61 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 }
 
-func (p *Parser) parseExprStatement() *ast.Expr {
-	stmt := &ast.Expr{Line: p.peek.Line}
-	stmt.Body = p.parseExpression(LOWEST)
+func (p *Parser) parseExprStatement() ast.Node {
+	stmt := ast.Expression{}.Init(p.peek.Line, p.parseExpression(LOWEST))
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt
 }
 
-func (p *Parser) parseIf() ast.Statement {
-	expression := &ast.If{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseIf() ast.Node {
+	expression := ast.If{}.Init(p.peek.Line, p.peek.Type)
 
 	p.next() // skip 'if' or 'elif'
 
-	expression.Condition = p.parseExpression(LOWEST)
+	expression.SetCondition(p.parseExpression(LOWEST))
 
-	expression.Consequence = p.parseBlock()
+	expression.SetConsequence(p.parseBlock())
 
 	if p.peek.Type == types.ELIF {
-		expression.Alternative = &ast.Block{Line: p.peek.Line, Body: []ast.Statement{p.parseIf()}}
+		expression.SetAlternative(ast.Block{}.Set(p.peek.Line, []ast.Node{p.parseIf()}))
 	} else if p.peek.Type == types.ELSE {
 		p.next() // skip 'else'
-		expression.Alternative = p.parseBlock()
+		expression.SetAlternative(p.parseBlock())
 	}
 
 	return expression
 }
 
-func (p *Parser) parseSwitch() ast.Statement {
-	stmt := &ast.Switch{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseSwitch() ast.Node {
+	stmt := ast.Switch{}.Init(p.peek.Line, p.peek.Type)
 	p.next()
-	stmt.Condition = p.parseExpression(LOWEST)
-	cases := []ast.Case{}
-	cs := ast.Case{Line: p.peek.Line}
+	stmt.SetCondition(p.parseExpression(LOWEST))
+	var cases []ast.Case
+	cs := ast.Case{}.Init(p.peek.Line)
 	p.require(types.EOL)
 	p.next()
 
 	for p.peek.Type == types.CASE {
 		p.next()
 		expr := p.parseExpression(LOWEST)
-		cs.Cases = append(cs.Cases, expr)
+		cs.Append(expr)
 		if p.peek.Type == types.LBRACE {
-			cs.Body = p.parseBlock()
+			cs.SetBody(p.parseBlock())
 			p.require(types.EOL)
 			p.next()
 			cases = append(cases, cs)
-			cs = ast.Case{Line: p.peek.Line}
+			cs = ast.Case{}.Init(p.peek.Line)
 		} else {
 			p.require(types.EOL)
 			p.next()
 		}
 	}
-	stmt.Cases = cases
+	stmt.SetCases(cases)
 
 	if p.peek.Type == types.ELSE {
 		p.next()
-		stmt.Else = p.parseBlock()
+		stmt.SetElse(p.parseBlock())
 	}
 
 	p.require(types.EOL)
@@ -93,65 +92,65 @@ func (p *Parser) parseSwitch() ast.Statement {
 	return stmt
 }
 
-func (p *Parser) parseWhile() ast.Statement {
-	stmt := &ast.While{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseWhile() ast.Node {
+	stmt := ast.While{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // skip 'while'
-	stmt.Condition = p.parseExpression(LOWEST)
-	stmt.Body = p.parseBlock()
+	stmt.SetCondition(p.parseExpression(LOWEST))
+	stmt.SetBody(p.parseBlock())
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt
 }
 
-func (p *Parser) parseReturn() ast.Statement {
-	stmt := &ast.Return{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseReturn() ast.Node {
+	stmt := ast.Return{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // skip 'return'
-	stmt.Body = p.parseExpression(LOWEST)
+	stmt.SetBody(p.parseExpression(LOWEST))
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt
 }
 
-func (p *Parser) parseThrow() ast.Statement {
-	stmt := &ast.Throw{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseThrow() ast.Node {
+	stmt := ast.Throw{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // skip 'throw'
-	stmt.Body = p.parseExpression(LOWEST)
+	stmt.SetBody(p.parseExpression(LOWEST))
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt
 }
 
-func (p *Parser) parseTry() ast.Statement {
-	stmt := &ast.Try{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseTry() ast.Node {
+	stmt := ast.Try{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // skip 'try'
-	stmt.Body = p.parseBlock()
+	stmt.SetBody(p.parseBlock())
 	if p.peek.Type == types.CATCH {
 		p.next() // skip 'catch'
 		if p.peek.Type == types.IDENT {
-			stmt.Err = &ast.Identifier{Line: p.peek.Line, Value: p.peek.Value}
+			stmt.SetErr(ast.Identifier{}.Init(p.peek.Line, p.peek.Value))
 			p.next()
 		}
-		stmt.Catch = p.parseBlock()
+		stmt.SetCatch(p.parseBlock())
 	}
 	if p.peek.Type == types.FINALLY {
 		p.next() // skip 'finally'
-		stmt.Finally = p.parseBlock()
+		stmt.SetFinally(p.parseBlock())
 	}
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt
 }
 
-func (p *Parser) parseBreak() ast.Statement {
-	stmt := &ast.Break{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseBreak() ast.Node {
+	stmt := ast.Break{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // skip 'break'
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt
 }
 
-func (p *Parser) parseContinue() ast.Statement {
-	stmt := &ast.Continue{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseContinue() ast.Node {
+	stmt := ast.Continue{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // skip 'continue'
 	p.require(types.EOL)
 	p.next() // skip EOL

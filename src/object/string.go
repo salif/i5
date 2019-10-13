@@ -5,10 +5,10 @@ type String struct {
 	Value string
 }
 
-func (s *String) Type() TYPE {
+func (this String) Type() TYPE {
 	return STRING
 }
 
-func (s *String) StringValue() string {
-	return s.Value
+func (this String) StringValue() string {
+	return this.Value
 }

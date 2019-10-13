@@ -1,31 +1,60 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import (
-	"bytes"
-)
+import "github.com/i5/i5/src/io/console"
 
 type Infix struct {
-	Line     int
-	Left     Expression
-	Operator string
-	Right    Expression
+	line     int
+	left     Node
+	operator string
+	right    Node
 }
 
-func (this Infix) StringValue() string {
-	var out bytes.Buffer
-	out.WriteString("(")
-	out.WriteString(this.Left.StringValue())
-	out.WriteString(" ")
-	out.WriteString(this.Operator)
-	out.WriteString(" ")
-	out.WriteString(this.Right.StringValue())
-	out.WriteString(")")
-	return out.String()
+func (this Infix) GetType() int {
+	return INFIX
+}
+
+func (this Infix) Print() {
+	console.Print("(")
+	this.left.Print()
+	console.Print(" ")
+	console.Print(this.operator)
+	console.Print(" ")
+	this.right.Print()
+	console.Print(")")
 }
 
 func (this Infix) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Infix) expression() {}
+func (this Infix) GetLeft() Node {
+	return this.left
+}
+
+func (this Infix) GetRight() Node {
+	return this.right
+}
+
+func (this Infix) GetOperator() string {
+	return this.operator
+}
+
+func (this Infix) Init(line int, operator string, left Node) Infix {
+	this.line = line
+	this.operator = operator
+	this.left = left
+	return this
+}
+
+func (this Infix) Set(line int, left Node, operator string, right Node) Infix {
+	this.line = line
+	this.left = left
+	this.operator = operator
+	this.right = right
+	return this
+}
+
+func (this *Infix) SetRight(right Node) {
+	this.right = right
+}

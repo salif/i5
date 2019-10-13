@@ -4,19 +4,24 @@ package object
 import "bytes"
 
 type Array struct {
-	Elements []Object
+	Value []Object
 }
 
-func (a *Array) Type() TYPE {
+func (this Array) Type() TYPE {
 	return ARRAY
 }
 
-func (a *Array) StringValue() string {
+func (this Array) StringValue() string {
 	var out bytes.Buffer
 	out.WriteString("[")
-	for _, v := range a.Elements {
+	for _, v := range this.Value {
 		out.WriteString(v.StringValue())
+		out.WriteString(", ")
 	}
 	out.WriteString("]")
 	return out.String()
+}
+
+func (this *Array) Push(obj Object) []Object {
+	return append(this.Value, obj)
 }

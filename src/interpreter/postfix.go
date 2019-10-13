@@ -7,9 +7,9 @@ import (
 	"github.com/i5/i5/src/object"
 )
 
-func evalSuffix(operator string, right object.Object, env *object.Env, line int) object.Object {
+func evalPostfix(operator string, right object.Object, env *object.Env, line int) object.Object {
 	switch operator {
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_SUFFIX, right.Type(), operator), Line: line}
+		return &object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, right.Type(), operator), Line: line}
 	}
 }

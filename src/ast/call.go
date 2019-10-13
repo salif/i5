@@ -2,31 +2,50 @@
 package ast
 
 import (
-	"bytes"
-	"strings"
+	"github.com/i5/i5/src/io/console"
 )
 
 type Call struct {
-	Line      int
-	Caller    Expression
-	Arguments []Expression
+	line      int
+	caller    Node
+	arguments []Node
 }
 
-func (this Call) StringValue() string {
-	var out bytes.Buffer
-	args := []string{}
-	for _, a := range this.Arguments {
-		args = append(args, a.StringValue())
+func (this Call) GetType() int {
+	return CALL
+}
+
+func (this Call) Print() {
+	this.caller.Print()
+	console.Print("(")
+	for _, a := range this.arguments {
+		a.Print()
+		console.Print(", ")
 	}
-	out.WriteString(this.Caller.StringValue())
-	out.WriteString("(")
-	out.WriteString(strings.Join(args, ", "))
-	out.WriteString(")")
-	return out.String()
+	if len(this.arguments) > 0 {
+		console.Print("\u0008\u0008")
+	}
+	console.Print(")")
 }
 
 func (this Call) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Call) expression() {}
+func (this Call) Init(line int, caller Node) Call {
+	this.line = line
+	this.caller = caller
+	return this
+}
+
+func (this Call) GetCaller() Node {
+	return this.caller
+}
+
+func (this Call) GetArguments() []Node {
+	return this.arguments
+}
+
+func (this *Call) SetArguments(arguments []Node) {
+	this.arguments = arguments
+}

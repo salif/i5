@@ -63,7 +63,7 @@ var precedences = map[string]int{
 	types.DOT:        DOT,
 }
 
-func Run(tokens types.TokenList) *ast.Program {
+func Run(tokens types.TokenList) ast.Node {
 	parser := Parser{
 		tokenlist:       types.TokenList{},
 		position:        0,
@@ -83,8 +83,8 @@ type Parser struct {
 }
 
 type (
-	prefixFunction func() ast.Expression
-	infixFunction  func(ast.Expression) ast.Expression
+	prefixFunction func() ast.Node
+	infixFunction  func(ast.Node) ast.Node
 )
 
 func (p *Parser) Init(tokens types.TokenList) {
@@ -133,8 +133,8 @@ func (p *Parser) Init(tokens types.TokenList) {
 	p.infixFunctions[types.XOR] = p.parseInfix
 	p.infixFunctions[types.LTLT] = p.parseInfix
 	p.infixFunctions[types.GTGT] = p.parseInfix
-	p.infixFunctions[types.DOT] = p.parseAlienFn
-	p.infixFunctions[types.QM] = p.parseSuffix
+	p.infixFunctions[types.DOT] = p.parseIndex
+	p.infixFunctions[types.QM] = p.parsePostfix
 
 	p.next()
 }
@@ -163,9 +163,8 @@ func (p *Parser) expect(b bool) {
 	}
 }
 
-func (p *Parser) parseProgram() *ast.Program {
-	program := &ast.Program{Line: p.peek.Line}
-	program.Body = []ast.Expression{}
+func (p *Parser) parseProgram() ast.Node {
+	program := ast.Program{}.Init(p.peek.Line, []ast.Node{})
 
 	for p.peek.Type != types.EOF {
 		if p.peek.Type == types.EOL {
@@ -173,17 +172,17 @@ func (p *Parser) parseProgram() *ast.Program {
 			continue
 		}
 		expr := p.parseExpression(LOWEST)
-		if _, ok := expr.(*ast.Assign); !ok {
+		if expr.GetType() != ast.ASSIGN {
 			console.ThrowParsingError(1, constants.PARSER_EXPECTED, expr.GetLine(), "declaration")
 		}
-		program.Body = append(program.Body, expr)
+		program.Append(expr)
 	}
 
 	return program
 }
 
-func (p *Parser) parseParams() []*ast.Identifier {
-	identifiers := []*ast.Identifier{}
+func (p *Parser) parseParams() []ast.Identifier {
+	var identifiers []ast.Identifier
 	p.require(types.LPAREN)
 	p.next() // skip '('
 
@@ -194,7 +193,7 @@ func (p *Parser) parseParams() []*ast.Identifier {
 
 	for p.peek.Type != types.RPAREN {
 		p.require(types.IDENT)
-		ident := &ast.Identifier{Line: p.peek.Line, Value: p.peek.Value}
+		ident := ast.Identifier{}.Init(p.peek.Line, p.peek.Value)
 		p.next()
 		identifiers = append(identifiers, ident)
 	}
@@ -204,8 +203,8 @@ func (p *Parser) parseParams() []*ast.Identifier {
 	return identifiers
 }
 
-func (p *Parser) parseBlock() *ast.Block {
-	block := &ast.Block{Line: p.peek.Line}
+func (p *Parser) parseBlock() ast.Block {
+	block := ast.Block{}.Init(p.peek.Line)
 	p.require(types.LBRACE)
 	p.next() // skip '{'
 	p.require(types.EOL)
@@ -217,7 +216,7 @@ func (p *Parser) parseBlock() *ast.Block {
 			continue
 		}
 		stmt := p.parseStatement()
-		block.Body = append(block.Body, stmt)
+		block.Append(stmt)
 	}
 
 	p.require(types.RBRACE)

@@ -2,6 +2,8 @@
 package interpreter
 
 import (
+	"path/filepath"
+
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/io/console"
@@ -17,15 +19,19 @@ var (
 )
 
 func RunPackage(dir string, arguments []string) {
+	dir = filepath.Base(dir)
 	filesToRun := file.GetFilesToRun(dir)
 	env := object.InitEnv()
+
 	for _, f := range filesToRun {
-		err := Eval(parser.Run(lexer.Run(file.Read(dir+f))), env)
+		fullPath := console.Format("%v/%v", dir, f)
+		err := Eval(parser.Run(lexer.Run(file.Read(fullPath))), env)
 		if err.Type() == object.ERROR {
 			console.ThrowError(1, err.StringValue())
 			return
 		}
 	}
+
 	if mainFunction, ok := env.Get(constants.MAIN_FUNCTION_NAME); ok {
 		result := callFunction(mainFunction, []object.Object{}, 0)
 		if result.Type() == object.ERROR {
@@ -60,19 +66,19 @@ func RunFile(program ast.Node, arguments []string) {
 	}
 }
 
-func nativeToBool(input bool) *object.Bool {
-	if input {
-		return TRUE
-	}
-	return FALSE
-}
-
 func isError(obj object.Object) bool {
 	return obj.Type() == object.ERROR
 }
 
 func isVoid(obj object.Object) bool {
 	return obj.Type() == object.VOID
+}
+
+func nativeToBool(input bool) *object.Bool {
+	if input {
+		return TRUE
+	}
+	return FALSE
 }
 
 func isTrue(obj object.Object) bool {

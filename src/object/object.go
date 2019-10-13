@@ -8,10 +8,6 @@ type Object interface {
 	StringValue() string
 }
 
-type Hashable interface {
-	Hash() string
-}
-
 type Immutable interface {
 	Clone() Object
 }

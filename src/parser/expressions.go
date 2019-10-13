@@ -10,7 +10,7 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseExpression(precedence int) ast.Expression {
+func (p *Parser) parseExpression(precedence int) ast.Node {
 	prefix := p.prefixFunctions[p.peek.Type]
 	if prefix == nil {
 		console.ThrowParsingError(1, constants.PARSER_UNEXPECTED, p.peek.Line, p.peek.Value)
@@ -28,14 +28,14 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	return leftExpression
 }
 
-func (p *Parser) parseIdentifier() ast.Expression {
+func (p *Parser) parseIdentifier() ast.Node {
 	p.require(types.IDENT)
-	expr := &ast.Identifier{Line: p.peek.Line, Value: p.peek.Value}
+	expr := ast.Identifier{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
 	return expr
 }
 
-func (p *Parser) parseInteger() ast.Expression {
+func (p *Parser) parseInteger() ast.Node {
 	p.require(types.INT)
 	value, err := strconv.ParseInt(p.peek.Value, 0, 64)
 
@@ -43,12 +43,12 @@ func (p *Parser) parseInteger() ast.Expression {
 		console.ThrowParsingError(1, constants.PARSER_NOT_INT, p.peek.Line, p.peek.Value)
 	}
 
-	expr := &ast.Integer{Line: p.peek.Line, Value: value}
+	expr := ast.Integer{}.Init(p.peek.Line, value)
 	p.next()
 	return expr
 }
 
-func (p *Parser) parseFloat() ast.Expression {
+func (p *Parser) parseFloat() ast.Node {
 	p.require(types.FLOAT)
 	value, err := strconv.ParseFloat(p.peek.Value, 64)
 
@@ -56,32 +56,32 @@ func (p *Parser) parseFloat() ast.Expression {
 		console.ThrowParsingError(1, constants.PARSER_NOT_FLOAT, p.peek.Line, p.peek.Value)
 	}
 
-	expr := &ast.Float{Line: p.peek.Line, Value: value}
+	expr := ast.Float{}.Init(p.peek.Line, value)
 	p.next()
 	return expr
 }
 
-func (p *Parser) parseString() ast.Expression {
+func (p *Parser) parseString() ast.Node {
 	p.require(types.STRING)
-	expr := &ast.String{Line: p.peek.Line, Value: p.peek.Value}
+	expr := ast.String{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
 	return expr
 }
 
-func (p *Parser) parseBuiltin() ast.Expression {
+func (p *Parser) parseBuiltin() ast.Node {
 	p.require(types.BUILTIN)
-	expr := &ast.Builtin{Line: p.peek.Line, Value: p.peek.Value}
+	expr := ast.Builtin{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
 	return expr
 }
 
-func (p *Parser) parseBool() ast.Expression {
-	expr := &ast.Bool{Line: p.peek.Line, Value: p.peek.Type == types.TRUE}
+func (p *Parser) parseBool() ast.Node {
+	expr := ast.Bool{}.Init(p.peek.Line, p.peek.Type == types.TRUE)
 	p.next()
 	return expr
 }
 
-func (p *Parser) parseGroup() ast.Expression {
+func (p *Parser) parseGroup() ast.Node {
 	p.require(types.LPAREN)
 	p.next() // skip '('
 	expr := p.parseExpression(LOWEST)
@@ -90,19 +90,19 @@ func (p *Parser) parseGroup() ast.Expression {
 	return expr
 }
 
-func (p *Parser) parseCall(fn ast.Expression) ast.Expression {
+func (p *Parser) parseCall(fn ast.Node) ast.Node {
 	p.require(types.LPAREN)
 	p.next() // skip '('
-	expr := &ast.Call{Line: p.peek.Line, Caller: fn}
-	expr.Arguments = p.parseList(types.RPAREN)
+	expr := ast.Call{}.Init(p.peek.Line, fn)
+	expr.SetArguments(p.parseList(types.RPAREN))
 	//console.ThrowParsingError(1, console.PARSER_EXPECTED_ARG, p.peek.Value, p.peek.Line)
 	p.require(types.RPAREN)
 	p.next() // skip ')'
 	return expr
 }
 
-func (p *Parser) parseList(end string) []ast.Expression {
-	list := []ast.Expression{}
+func (p *Parser) parseList(end string) []ast.Node {
+	var list []ast.Node
 
 	if p.peek.Type == end {
 		return list
@@ -118,89 +118,88 @@ func (p *Parser) parseList(end string) []ast.Expression {
 	return list
 }
 
-func (p *Parser) parseAssign(left ast.Expression) ast.Expression {
-	expr := &ast.Assign{Line: p.peek.Line, Value: types.EQ, Left: left}
+func (p *Parser) parseAssign(left ast.Node) ast.Node {
+	expr := ast.Assign{}.Init(p.peek.Line, types.EQ, left)
 	switch p.peek.Type {
 	case types.EQ:
 		p.next()
-		expr.Right = p.parseExpression(LOWEST)
+		expr.SetRight(p.parseExpression(LOWEST))
 	case types.COLONEQ:
 		p.next()
-		expr.Right = &ast.Infix{Line: p.peek.Line, Left: left, Operator: types.COLON, Right: p.parseExpression(LOWEST)}
+		expr.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.COLON, p.parseExpression(LOWEST)))
 	case types.PLUSEQ:
 		p.next()
-		expr.Right = &ast.Infix{Line: p.peek.Line, Left: left, Operator: types.PLUS, Right: p.parseExpression(LOWEST)}
+		expr.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.PLUS, p.parseExpression(LOWEST)))
 	case types.MINUSEQ:
 		p.next()
-		expr.Right = &ast.Infix{Line: p.peek.Line, Left: left, Operator: types.MINUS, Right: p.parseExpression(LOWEST)}
+		expr.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.MINUS, p.parseExpression(LOWEST)))
 	case types.MULTIPLYEQ:
 		p.next()
-		expr.Right = &ast.Infix{Line: p.peek.Line, Left: left, Operator: types.MULTIPLY, Right: p.parseExpression(LOWEST)}
+		expr.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.MULTIPLY, p.parseExpression(LOWEST)))
 	case types.DIVIDEEQ:
 		p.next()
-		expr.Right = &ast.Infix{Line: p.peek.Line, Left: left, Operator: types.DIVIDE, Right: p.parseExpression(LOWEST)}
+		expr.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.DIVIDE, p.parseExpression(LOWEST)))
 	case types.MODULOEQ:
 		p.next()
-		expr.Right = &ast.Infix{Line: p.peek.Line, Left: left, Operator: types.MODULO, Right: p.parseExpression(LOWEST)}
+		expr.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.MODULO, p.parseExpression(LOWEST)))
 	default:
 		console.ThrowParsingError(1, constants.PARSER_UNEXPECTED, p.peek.Line, p.peek.Type)
 	}
 	return expr
 }
 
-func (p *Parser) parseFn() ast.Expression {
+func (p *Parser) parseFn() ast.Node {
 	p.require(types.FN)
-	fn := &ast.Function{Line: p.peek.Line, Value: p.peek.Type}
-	var expr *ast.Assign
+	fn := ast.Function{}.Init(p.peek.Line, p.peek.Type)
+	var expr ast.Assign
 	p.next() // skip 'fn'
 	if p.peek.Type != types.IDENT {
-		fn.Anonymous = true
+		fn.SetAnonymous(true)
 	} else {
-		fn.Anonymous = false
-		expr = &ast.Assign{Line: p.peek.Line, Value: types.EQ}
-		expr.Left = p.parseIdentifier()
+		fn.SetAnonymous(false)
+		expr = ast.Assign{}.Init(p.peek.Line, types.EQ, p.parseIdentifier())
 	}
 
-	fn.Params = p.parseParams()
-	fn.Body = p.parseBlock()
-	if fn.Anonymous {
+	fn.SetParams(p.parseParams())
+	fn.SetBody(p.parseBlock())
+	if fn.GetAnonymous() {
 		return fn
 	}
-	expr.Right = fn
+	expr.SetRight(fn)
 	return expr
 }
 
-func (p *Parser) parseAlienFn(alien ast.Expression) ast.Expression {
-	expr := &ast.AlienFn{Line: p.peek.Line, Alien: alien}
+func (p *Parser) parseIndex(left ast.Node) ast.Node {
+	expr := ast.Index{}.Init(p.peek.Line, left, p.peek.Value)
 	p.next()
-	expr.Function = p.parseExpression(DOT)
+	expr.SetRight(p.parseExpression(DOT))
 	return expr
 }
 
-func (p *Parser) parseImport() ast.Expression {
-	expr := &ast.Import{Line: p.peek.Line, Value: p.peek.Type}
+func (p *Parser) parseImport() ast.Node {
+	expr := ast.Import{}.Init(p.peek.Line, p.peek.Type)
 	p.next()
-	expr.Body = p.parseExpression(LOWEST)
+	expr.SetBody(p.parseExpression(LOWEST))
 	return expr
 }
 
-func (p *Parser) parsePrefix() ast.Expression {
-	expr := &ast.Prefix{Line: p.peek.Line, Operator: p.peek.Value}
+func (p *Parser) parsePrefix() ast.Node {
+	expr := ast.Prefix{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
-	expr.Right = p.parseExpression(PREFIX)
+	expr.SetRight(p.parseExpression(PREFIX))
 	return expr
 }
 
-func (p *Parser) parseInfix(left ast.Expression) ast.Expression {
-	expr := &ast.Infix{Line: p.peek.Line, Operator: p.peek.Value, Left: left}
+func (p *Parser) parseInfix(left ast.Node) ast.Node {
+	expr := ast.Infix{}.Init(p.peek.Line, p.peek.Value, left)
 	precedence := p.precedence()
 	p.next()
-	expr.Right = p.parseExpression(precedence)
+	expr.SetRight(p.parseExpression(precedence))
 	return expr
 }
 
-func (p *Parser) parseSuffix(left ast.Expression) ast.Expression {
-	expr := &ast.Suffix{Line: p.peek.Line, Operator: p.peek.Value, Left: left}
+func (p *Parser) parsePostfix(left ast.Node) ast.Node {
+	expr := ast.Postfix{}.Init(p.peek.Line, p.peek.Value, left)
 	p.next()
 	return expr
 }

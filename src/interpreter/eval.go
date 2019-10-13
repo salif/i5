@@ -12,17 +12,17 @@ import (
 func Eval(nodei ast.Node, env *object.Env) object.Object {
 	switch node := nodei.(type) {
 
-	case *ast.Program:
+	case ast.Program:
 		return evalProgram(node, env, node.GetLine())
 
-	case *ast.Expr:
-		return Eval(node.Body, env)
+	case ast.Expression:
+		return Eval(node.GetBody(), env)
 
-	case *ast.Block:
+	case ast.Block:
 		return evalBlock(node, env, node.GetLine())
 
-	case *ast.Return:
-		val := Eval(node.Body, env)
+	case ast.Return:
+		val := Eval(node.GetBody(), env)
 		if isError(val) {
 			return val
 		}
@@ -31,29 +31,31 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		}
 		return &object.Return{Value: val}
 
-	case *ast.Assign:
-		right := Eval(node.Right, env)
+	case ast.Assign:
+		right := Eval(node.GetRight(), env)
 		if isError(right) {
 			return right
 		}
-		if ident, ok := node.Left.(*ast.Identifier); ok {
+		left := node.GetLeft()
+		if left.GetType() == ast.IDENTIFIER {
+			ident := node.GetLeft().(ast.Identifier)
 			if isVoid(right) {
-				(right.(*object.Void)).Value = ident.StringValue()
+				right.(*object.Void).Value = ident.GetValue()
 			}
-			env.Set(ident.Value, right)
+			env.Set(ident.GetValue(), right)
 			return right
 		} else {
-			return &object.Error{Message: console.Format(constants.IR_CANNOT_ASSIGN, node.Left.StringValue()), Line: node.GetLine()}
+			return &object.Error{Message: console.Format(constants.IR_CANNOT_ASSIGN, left.GetType()), Line: node.GetLine()}
 		}
-	case *ast.Call:
-		function := Eval(node.Caller, env)
+	case ast.Call:
+		function := Eval(node.GetCaller(), env)
 		if isError(function) {
 			return function
 		}
 		if isVoid(function) {
 			return &object.Error{Message: function.StringValue(), Line: node.GetLine()}
 		}
-		args := evalExpressions(node.Arguments, env, node.GetLine())
+		args := evalExpressions(node.GetArguments(), env, node.GetLine())
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
@@ -61,78 +63,97 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 			return &object.Error{Message: args[0].StringValue(), Line: node.GetLine()}
 		}
 		return callFunction(function, args, node.GetLine())
-	case *ast.Function:
-		return &object.Function{Params: node.Params, Body: node.Body, Env: env}
-	case *ast.Identifier:
+	case ast.Function:
+		return &object.Function{Params: node.GetParams(), Body: node.GetBody(), Env: env}
+	case ast.Identifier:
 		return evalIdentifier(node, env, node.GetLine())
-	case *ast.Builtin:
+	case ast.Builtin:
 		return evalBuiltin(node, env, node.GetLine())
-	case *ast.Integer:
-		return &object.Integer{Value: node.Value}
-	case *ast.Float:
-		return &object.Float{Value: node.Value}
-	case *ast.String:
-		return &object.String{Value: node.Value}
-	case *ast.Bool:
-		return nativeToBool(node.Value)
-	case *ast.Throw:
-		val := Eval(node.Body, env)
+	case ast.Integer:
+		return &object.Integer{Value: node.GetValue()}
+	case ast.Float:
+		return &object.Float{Value: node.GetValue()}
+	case ast.String:
+		return &object.String{Value: node.GetValue()}
+	case ast.Bool:
+		return nativeToBool(node.GetValue())
+	case ast.Throw:
+		val := Eval(node.GetBody(), env)
 		if isError(val) {
 			return val
 		}
 		return &object.Error{Message: val.StringValue()}
-	case *ast.Prefix:
-		right := Eval(node.Right, env)
+	case ast.Prefix:
+		right := Eval(node.GetRight(), env)
 		if isError(right) {
 			return right
 		}
 		if isVoid(right) {
 			return &object.Error{Message: right.StringValue(), Line: node.GetLine()}
 		}
-		return evalPrefix(node.Operator, right, env, node.GetLine())
-	case *ast.Infix:
-		left := Eval(node.Left, env)
+		return evalPrefix(node.GetOperator(), right, env, node.GetLine())
+	case ast.Infix:
+		left := Eval(node.GetLeft(), env)
 		if isError(left) {
 			return left
 		}
 		if isVoid(left) {
 			return &object.Error{Message: left.StringValue(), Line: node.GetLine()}
 		}
-		right := Eval(node.Right, env)
+		right := Eval(node.GetRight(), env)
 		if isError(right) {
 			return right
 		}
 		if isVoid(right) {
 			return &object.Error{Message: right.StringValue(), Line: node.GetLine()}
 		}
-		return evalInfix(node.Operator, left, right, env, node.GetLine())
-	case *ast.Suffix:
-		left := Eval(node.Left, env)
+		return evalInfix(node.GetOperator(), left, right, env, node.GetLine())
+	case ast.Postfix:
+		left := Eval(node.GetLeft(), env)
 		if isError(left) {
 			return left
 		}
-		if node.Operator == types.QM {
+		if node.GetOperator() == types.QM {
 			return nativeToBool(left.Type() != object.VOID)
 		}
 		if isVoid(left) {
 			return &object.Error{Message: left.StringValue(), Line: node.GetLine()}
 		}
-		return evalSuffix(node.Operator, left, env, node.GetLine())
-	case *ast.If:
+		return evalPostfix(node.GetOperator(), left, env, node.GetLine())
+	case ast.Index:
+		left := Eval(node.GetLeft(), env)
+		if isError(left) {
+			return left
+		}
+		if isVoid(left) {
+			return &object.Error{Message: left.StringValue(), Line: node.GetLine()}
+		}
+		if left.Type() == object.MAP {
+			switch rnode := node.GetRight().(type) {
+			case ast.Identifier:
+				_map := left.(*object.Map)
+				return _map.Get(rnode.GetValue())
+			default:
+				return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), node.GetOperator(), rnode.GetType()), Line: node.GetLine()}
+			}
+		} else {
+			return &object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, left.Type(), node.GetOperator()), Line: node.GetLine()}
+		}
+	case ast.If:
 		return evalIf(node, env, node.GetLine())
-	case *ast.Switch:
+	case ast.Switch:
 		return evalSwitch(node, env, node.GetLine())
-	case *ast.While:
+	case ast.While:
 		return evalWhile(node, env, node.GetLine())
-	case *ast.Import:
+	case ast.Import:
 		return evalImport(node, env, node.GetLine())
-	case *ast.Try:
+	case ast.Try:
 		return evalTry(node, env, node.GetLine())
-	case *ast.Break:
+	case ast.Break:
 		return &object.Break{}
-	case *ast.Continue:
+	case ast.Continue:
 		return &object.Continue{}
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_EVAL, node.StringValue()), Line: node.GetLine()}
+		return &object.Error{Message: console.Format(constants.IR_INVALID_EVAL, node.GetType()), Line: node.GetLine()}
 	}
 }

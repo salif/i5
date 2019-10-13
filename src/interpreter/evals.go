@@ -9,9 +9,9 @@ import (
 	"github.com/i5/i5/src/object"
 )
 
-func evalProgram(program *ast.Program, env *object.Env, line int) object.Object {
+func evalProgram(program ast.Program, env *object.Env, line int) object.Object {
 	var result object.Object
-	for _, expr := range program.Body {
+	for _, expr := range program.GetBody() {
 		result = Eval(expr, env)
 		if isVoid(result) {
 			return &object.Error{Message: result.StringValue(), Line: line}
@@ -30,8 +30,8 @@ func evalProgram(program *ast.Program, env *object.Env, line int) object.Object 
 		return result
 	}
 }
-func evalIf(ie *ast.If, env *object.Env, line int) object.Object {
-	condition := Eval(ie.Condition, env)
+func evalIf(ie ast.If, env *object.Env, line int) object.Object {
+	condition := Eval(ie.GetCondition(), env)
 
 	if isError(condition) {
 		return condition
@@ -45,22 +45,22 @@ func evalIf(ie *ast.If, env *object.Env, line int) object.Object {
 		return &object.Error{Message: console.Format(constants.IR_NON_BOOL, condition.Type(), "if"), Line: line}
 	}
 	if isTrue(condition) {
-		return Eval(ie.Consequence, env)
-	} else if ie.Alternative != nil {
-		return Eval(ie.Alternative, env)
+		return Eval(ie.GetConsequence(), env)
+	} else if ie.HaveAlternative() {
+		return Eval(ie.GetAlternative(), env)
 	} else {
 		return &object.Void{}
 	}
 }
 
-func evalSwitch(s *ast.Switch, env *object.Env, line int) object.Object {
+func evalSwitch(s ast.Switch, env *object.Env, line int) object.Object {
 	return &object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "switch"), Line: line}
 	// TODO
 }
 
-func evalWhile(w *ast.While, env *object.Env, line int) object.Object {
+func evalWhile(w ast.While, env *object.Env, line int) object.Object {
 	for {
-		condition := Eval(w.Condition, env)
+		condition := Eval(w.GetCondition(), env)
 		if isError(condition) {
 			return condition
 		}
@@ -70,7 +70,7 @@ func evalWhile(w *ast.While, env *object.Env, line int) object.Object {
 		}
 
 		if isTrue(condition) {
-			result := Eval(w.Body, env)
+			result := Eval(w.GetBody(), env)
 			if result.Type() == object.BREAK {
 				break
 			} else if result.Type() == object.CONTINUE {
@@ -88,23 +88,27 @@ func evalWhile(w *ast.While, env *object.Env, line int) object.Object {
 	return &object.Void{}
 }
 
-func evalImport(i *ast.Import, env *object.Env, line int) object.Object {
+func evalIndex(left object.Object, right string, env *object.Env, line int) object.Object {
+	return &object.Void{}
+}
+
+func evalImport(i ast.Import, env *object.Env, line int) object.Object {
 	return &object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "import"), Line: line}
 	// TODO
 }
 
-func evalTry(t *ast.Try, env *object.Env, line int) object.Object {
-	result := Eval(t.Body, env)
+func evalTry(t ast.Try, env *object.Env, line int) object.Object {
+	result := Eval(t.GetBody(), env)
 	if isError(result) {
-		if t.Catch == nil {
+		if !t.HaveCatch() {
 			return &object.Void{}
 		}
 
-		if t.Err != nil {
-			env.Set(t.Err.Value, result)
+		if t.HaveErr() {
+			env.Set(t.GetErr().GetValue(), result)
 			// TODO make err usable in catch
 		}
-		catchResult := Eval(t.Catch, env)
+		catchResult := Eval(t.GetCatch(), env)
 
 		switch catchResult.Type() {
 		case object.ERROR:
@@ -117,30 +121,30 @@ func evalTry(t *ast.Try, env *object.Env, line int) object.Object {
 			return catchResult
 		}
 
-		if t.Finally == nil {
+		if !t.HaveFinally() {
 			return &object.Void{}
 		}
 
-		return Eval(t.Finally, env)
+		return Eval(t.GetFinally(), env)
 
 	} else {
 		return result
 	}
 }
 
-func evalIdentifier(node *ast.Identifier, env *object.Env, line int) object.Object {
-	if val, ok := env.Get(node.Value); ok {
+func evalIdentifier(node ast.Identifier, env *object.Env, line int) object.Object {
+	if val, ok := env.Get(node.GetValue()); ok {
 		return val
 	} else {
-		return &object.Error{Message: "identifier not found: " + node.Value, Line: line}
+		return &object.Error{Message: "identifier not found: " + node.GetValue(), Line: line}
 	}
 }
 
-func evalBuiltin(node *ast.Builtin, env *object.Env, line int) object.Object {
-	if builtin, ok := builtins.Get(node.Value); ok {
+func evalBuiltin(node ast.Builtin, env *object.Env, line int) object.Object {
+	if builtin, ok := builtins.Get(node.GetValue(), env); ok {
 		return builtin
 	} else {
-		return &object.Error{Message: "buitin not found: " + node.Value, Line: line}
+		return &object.Error{Message: "buitin not found: " + node.GetValue(), Line: line}
 	}
 }
 
@@ -164,7 +168,7 @@ func callFunction(fn object.Object, args []object.Object, line int) object.Objec
 		if result := fn.Function(args...); result != nil {
 			return result
 		} else {
-			return &object.Error{Message: console.Format(constants.IR_BUILTIN_NOT_FOUND, fn.Name), Line: line}
+			return &object.Void{}
 		}
 	default:
 		return &object.Error{Message: console.Format(constants.IR_INVALID_CALL, fn.Type()), Line: line}
@@ -174,7 +178,7 @@ func callFunction(fn object.Object, args []object.Object, line int) object.Objec
 func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Env {
 	env := fn.Env.Clone()
 	for paramIdx, param := range fn.Params {
-		env.Set(param.Value, args[paramIdx])
+		env.Set(param.GetValue(), args[paramIdx])
 	}
 	return env
 }
@@ -187,9 +191,9 @@ func unwrapReturnValue(obj object.Object) object.Object {
 	}
 }
 
-func evalBlock(block *ast.Block, env *object.Env, line int) object.Object {
+func evalBlock(block ast.Block, env *object.Env, line int) object.Object {
 	var result object.Object
-	for _, statement := range block.Body {
+	for _, statement := range block.GetBody() {
 		result = Eval(statement, env)
 		switch result.Type() {
 		case object.RETURN:
@@ -205,7 +209,7 @@ func evalBlock(block *ast.Block, env *object.Env, line int) object.Object {
 	return &object.Void{}
 }
 
-func evalExpressions(exps []ast.Expression, env *object.Env, line int) []object.Object {
+func evalExpressions(exps []ast.Node, env *object.Env, line int) []object.Object {
 	var result []object.Object
 	for _, e := range exps {
 		evaluated := Eval(e, env)

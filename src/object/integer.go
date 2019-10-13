@@ -7,10 +7,10 @@ type Integer struct {
 	Value int64
 }
 
-func (i *Integer) Type() TYPE {
+func (this Integer) Type() TYPE {
 	return INTEGER
 }
 
-func (i *Integer) StringValue() string {
-	return console.Format("%v", i.Value)
+func (this Integer) StringValue() string {
+	return console.Format("%v", this.Value)
 }

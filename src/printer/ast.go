@@ -7,5 +7,6 @@ import (
 )
 
 func printAst(_ast ast.Node) {
-	console.Println(_ast.StringValue())
+	_ast.Print()
+	console.Println()
 }

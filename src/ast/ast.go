@@ -2,16 +2,36 @@
 package ast
 
 type Node interface {
-	StringValue() string
+	GetType() int
+	Print()
 	GetLine() int
 }
 
-type Statement interface {
-	Node
-	statement()
-}
-
-type Expression interface {
-	Node
-	expression()
-}
+const (
+	_ int = iota
+	ASSIGN
+	BLOCK
+	BOOL
+	BREAK
+	BUILTIN
+	CALL
+	CONTINUE
+	EXPRESSION
+	FLOAT
+	FUNCTION
+	IDENTIFIER
+	IF
+	IMPORT
+	INDEX
+	INFIX
+	INTEGER
+	POSTFIX
+	PREFIX
+	PROGRAM
+	RETURN
+	STRING
+	SWITCH
+	THROW
+	TRY
+	WHILE
+)

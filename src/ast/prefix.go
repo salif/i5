@@ -1,27 +1,43 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import (
-	"bytes"
-)
+import "github.com/i5/i5/src/io/console"
 
 type Prefix struct {
-	Line     int
-	Operator string
-	Right    Expression
+	line     int
+	operator string
+	right    Node
 }
 
-func (this Prefix) StringValue() string {
-	var out bytes.Buffer
-	out.WriteString("(")
-	out.WriteString(this.Operator)
-	out.WriteString(this.Right.StringValue())
-	out.WriteString(")")
-	return out.String()
+func (this Prefix) GetType() int {
+	return PREFIX
+}
+
+func (this Prefix) Print() {
+	console.Print("(")
+	console.Print(this.operator)
+	this.right.Print()
+	console.Print(")")
 }
 
 func (this Prefix) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Prefix) expression() {}
+func (this Prefix) GetOperator() string {
+	return this.operator
+}
+
+func (this Prefix) GetRight() Node {
+	return this.right
+}
+
+func (this Prefix) Init(line int, operator string) Prefix {
+	this.line = line
+	this.operator = operator
+	return this
+}
+
+func (this *Prefix) SetRight(right Node) {
+	this.right = right
+}

@@ -1,17 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
+import "github.com/i5/i5/src/io/console"
+
 type Break struct {
-	Line  int
-	Value string
+	line  int
+	token string
 }
 
-func (this Break) StringValue() string {
-	return this.Value
+func (this Break) GetType() int {
+	return BREAK
+}
+
+func (this Break) Print() {
+	console.Print(this.token)
 }
 
 func (this Break) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Break) statement() {}
+func (this Break) Init(line int, token string) Break {
+	this.line = line
+	this.token = token
+	return this
+}

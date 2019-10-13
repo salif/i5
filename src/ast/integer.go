@@ -4,16 +4,28 @@ package ast
 import "github.com/i5/i5/src/io/console"
 
 type Integer struct {
-	Line  int
-	Value int64
+	line  int
+	value int64
 }
 
-func (this Integer) StringValue() string {
-	return console.Format("%v", this.Value)
+func (this Integer) GetType() int {
+	return INTEGER
+}
+
+func (this Integer) Print() {
+	console.Printf("%v", this.value)
 }
 
 func (this Integer) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Integer) expression() {}
+func (this Integer) GetValue() int64 {
+	return this.value
+}
+
+func (this Integer) Init(line int, value int64) Integer {
+	this.line = line
+	this.value = value
+	return this
+}

@@ -4,21 +4,21 @@ package object
 type Break struct {
 }
 
-func (b *Break) Type() TYPE {
+func (this Break) Type() TYPE {
 	return BREAK
 }
 
-func (b *Break) StringValue() string {
+func (this Break) StringValue() string {
 	return "[type: break]"
 }
 
 type Continue struct {
 }
 
-func (c *Continue) Type() TYPE {
+func (this Continue) Type() TYPE {
 	return CONTINUE
 }
 
-func (c *Continue) StringValue() string {
+func (this Continue) StringValue() string {
 	return "[type: continue]"
 }

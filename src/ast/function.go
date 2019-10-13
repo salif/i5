@@ -2,36 +2,65 @@
 package ast
 
 import (
-	"bytes"
-	"strings"
+	"github.com/i5/i5/src/io/console"
 )
 
 type Function struct {
-	Line      int
-	Value     string
-	Anonymous bool
-	Params    []*Identifier
-	Body      *Block
+	line      int
+	token     string
+	anonymous bool
+	params    []Identifier
+	body      Block
 }
 
-func (this Function) StringValue() string {
-	var out bytes.Buffer
-	if this.Anonymous {
-		out.WriteString(this.Value)
+func (this Function) GetType() int {
+	return FUNCTION
+}
+
+func (this Function) Print() {
+	if this.anonymous {
+		console.Print(this.token)
 	}
-	params := []string{}
-	for _, p := range this.Params {
-		params = append(params, p.StringValue())
+	console.Print("(")
+	for _, p := range this.params {
+		p.Print()
+		console.Print(" ")
 	}
-	out.WriteString("(")
-	out.WriteString(strings.Join(params, " "))
-	out.WriteString(") ")
-	out.WriteString(this.Body.StringValue())
-	return out.String()
+
+	console.Print(") ")
+	this.body.Print()
 }
 
 func (this Function) GetLine() int {
-	return this.Line
+	return this.line
 }
 
-func (this Function) expression() {}
+func (this Function) Init(line int, token string) Function {
+	this.line = line
+	this.token = token
+	return this
+}
+
+func (this Function) GetAnonymous() bool {
+	return this.anonymous
+}
+
+func (this *Function) SetAnonymous(anonymous bool) {
+	this.anonymous = anonymous
+}
+
+func (this Function) GetParams() []Identifier {
+	return this.params
+}
+
+func (this *Function) SetParams(params []Identifier) {
+	this.params = params
+}
+
+func (this Function) GetBody() Block {
+	return this.body
+}
+
+func (this *Function) SetBody(body Block) {
+	this.body = body
+}

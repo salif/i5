@@ -6,10 +6,10 @@ import (
 	"github.com/i5/i5/src/object"
 )
 
-func Print(obj ...object.Object) object.Object {
+func _print(obj ...object.Object) object.Object {
 	for _, o := range obj {
 		console.Print(o.StringValue())
 	}
 	console.Println()
-	return &object.Void{}
+	return _Void()
 }
