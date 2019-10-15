@@ -9,7 +9,7 @@ type Import struct {
 	body  Node
 }
 
-func (this Import) GetType() int {
+func (this Import) GetType() string {
 	return IMPORT
 }
 

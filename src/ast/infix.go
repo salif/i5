@@ -10,7 +10,7 @@ type Infix struct {
 	right    Node
 }
 
-func (this Infix) GetType() int {
+func (this Infix) GetType() string {
 	return INFIX
 }
 

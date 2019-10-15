@@ -10,7 +10,7 @@ type Index struct {
 	right    Node
 }
 
-func (this Index) GetType() int {
+func (this Index) GetType() string {
 	return INDEX
 }
 

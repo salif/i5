@@ -6,7 +6,7 @@ type Expression struct {
 	body Node
 }
 
-func (this Expression) GetType() int {
+func (this Expression) GetType() string {
 	return EXPRESSION
 }
 

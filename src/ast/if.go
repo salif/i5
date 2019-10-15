@@ -11,7 +11,7 @@ type If struct {
 	alternative Block
 }
 
-func (this If) GetType() int {
+func (this If) GetType() string {
 	return IF
 }
 

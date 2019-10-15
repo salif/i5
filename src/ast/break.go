@@ -8,7 +8,7 @@ type Break struct {
 	token string
 }
 
-func (this Break) GetType() int {
+func (this Break) GetType() string {
 	return BREAK
 }
 

@@ -8,7 +8,7 @@ type Integer struct {
 	value int64
 }
 
-func (this Integer) GetType() int {
+func (this Integer) GetType() string {
 	return INTEGER
 }
 

@@ -14,18 +14,18 @@ func evalProgram(program ast.Program, env *object.Env, line int) object.Object {
 	for _, expr := range program.GetBody() {
 		result = Eval(expr, env)
 		if isVoid(result) {
-			return &object.Error{Message: result.StringValue(), Line: line}
+			return object.Error{Message: result.StringValue(), Line: line}
 		}
 		switch result := result.(type) {
-		case *object.Return:
+		case object.Return:
 			return result.Value
-		case *object.Error:
+		case object.Error:
 			return result
 		}
 	}
 
 	if result == nil {
-		return &object.Void{}
+		return object.Void{}
 	} else {
 		return result
 	}
@@ -38,23 +38,23 @@ func evalIf(ie ast.If, env *object.Env, line int) object.Object {
 	}
 
 	if isVoid(condition) {
-		return &object.Error{Message: condition.StringValue(), Line: line}
+		return object.Error{Message: condition.StringValue(), Line: line}
 	}
 
 	if condition.Type() != object.BOOL {
-		return &object.Error{Message: console.Format(constants.IR_NON_BOOL, condition.Type(), "if"), Line: line}
+		return object.Error{Message: console.Format(constants.IR_NON_BOOL, condition.Type(), "if"), Line: line}
 	}
 	if isTrue(condition) {
 		return Eval(ie.GetConsequence(), env)
 	} else if ie.HaveAlternative() {
 		return Eval(ie.GetAlternative(), env)
 	} else {
-		return &object.Void{}
+		return object.Void{}
 	}
 }
 
 func evalSwitch(s ast.Switch, env *object.Env, line int) object.Object {
-	return &object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "switch"), Line: line}
+	return object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "switch"), Line: line}
 	// TODO
 }
 
@@ -66,7 +66,7 @@ func evalWhile(w ast.While, env *object.Env, line int) object.Object {
 		}
 
 		if condition.Type() != object.BOOL {
-			return &object.Error{Message: console.Format(constants.IR_NON_BOOL, condition.Type(), "while"), Line: line}
+			return object.Error{Message: console.Format(constants.IR_NON_BOOL, condition.Type(), "while"), Line: line}
 		}
 
 		if isTrue(condition) {
@@ -85,15 +85,15 @@ func evalWhile(w ast.While, env *object.Env, line int) object.Object {
 		}
 	}
 
-	return &object.Void{}
+	return object.Void{}
 }
 
 func evalIndex(left object.Object, right string, env *object.Env, line int) object.Object {
-	return &object.Void{}
+	return object.Void{}
 }
 
 func evalImport(i ast.Import, env *object.Env, line int) object.Object {
-	return &object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "import"), Line: line}
+	return object.Error{Message: console.Format(constants.IR_NOT_IMPLEMENTED, "import"), Line: line}
 	// TODO
 }
 
@@ -101,11 +101,11 @@ func evalTry(t ast.Try, env *object.Env, line int) object.Object {
 	result := Eval(t.GetBody(), env)
 	if isError(result) {
 		if !t.HaveCatch() {
-			return &object.Void{}
+			return object.Void{}
 		}
 
 		if t.HaveErr() {
-			env.Set(t.GetErr().GetValue(), result)
+			env.Set(t.GetErr().GetValue(), result.(object.Error).GetMessage())
 			// TODO make err usable in catch
 		}
 		catchResult := Eval(t.GetCatch(), env)
@@ -122,7 +122,7 @@ func evalTry(t ast.Try, env *object.Env, line int) object.Object {
 		}
 
 		if !t.HaveFinally() {
-			return &object.Void{}
+			return object.Void{}
 		}
 
 		return Eval(t.GetFinally(), env)
@@ -136,7 +136,7 @@ func evalIdentifier(node ast.Identifier, env *object.Env, line int) object.Objec
 	if val, ok := env.Get(node.GetValue()); ok {
 		return val
 	} else {
-		return &object.Error{Message: "identifier not found: " + node.GetValue(), Line: line}
+		return object.Error{Message: "identifier not found: " + node.GetValue(), Line: line}
 	}
 }
 
@@ -144,15 +144,15 @@ func evalBuiltin(node ast.Builtin, env *object.Env, line int) object.Object {
 	if builtin, ok := builtins.Get(node.GetValue(), env); ok {
 		return builtin
 	} else {
-		return &object.Error{Message: "buitin not found: " + node.GetValue(), Line: line}
+		return object.Error{Message: "buitin not found: " + node.GetValue(), Line: line}
 	}
 }
 
 func callFunction(fn object.Object, args []object.Object, line int) object.Object {
 	switch fn := fn.(type) {
-	case *object.Function:
+	case object.Function:
 		if len(args) < len(fn.Params) {
-			return &object.Error{Message: constants.IR_NOT_ENOUGH_ARGS, Line: line}
+			return object.Error{Message: constants.IR_NOT_ENOUGH_ARGS, Line: line}
 		} else {
 			env := extendFunctionEnv(fn, args)
 			result := Eval(fn.Body, env)
@@ -160,22 +160,22 @@ func callFunction(fn object.Object, args []object.Object, line int) object.Objec
 			case object.BREAK:
 				fallthrough
 			case object.CONTINUE:
-				return &object.Void{}
+				return object.Void{}
 			}
 			return unwrapReturnValue(result)
 		}
-	case *object.Builtin:
+	case object.Builtin:
 		if result := fn.Function(args...); result != nil {
 			return result
 		} else {
-			return &object.Void{}
+			return object.Void{}
 		}
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_CALL, fn.Type()), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_CALL, fn.Type()), Line: line}
 	}
 }
 
-func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Env {
+func extendFunctionEnv(fn object.Function, args []object.Object) *object.Env {
 	env := fn.Env.Clone()
 	for paramIdx, param := range fn.Params {
 		env.Set(param.GetValue(), args[paramIdx])
@@ -184,7 +184,7 @@ func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Env {
 }
 
 func unwrapReturnValue(obj object.Object) object.Object {
-	if returnValue, ok := obj.(*object.Return); ok {
+	if returnValue, ok := obj.(object.Return); ok {
 		return returnValue.Value
 	} else {
 		return obj
@@ -206,7 +206,7 @@ func evalBlock(block ast.Block, env *object.Env, line int) object.Object {
 			return result
 		}
 	}
-	return &object.Void{}
+	return object.Void{}
 }
 
 func evalExpressions(exps []ast.Node, env *object.Env, line int) []object.Object {
@@ -216,7 +216,7 @@ func evalExpressions(exps []ast.Node, env *object.Env, line int) []object.Object
 		if isError(evaluated) {
 			return []object.Object{evaluated}
 		} else if isVoid(evaluated) {
-			return []object.Object{&object.Error{Message: evaluated.StringValue(), Line: line}}
+			return []object.Object{object.Error{Message: evaluated.StringValue(), Line: line}}
 		} else {
 			result = append(result, evaluated)
 		}

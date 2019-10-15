@@ -13,7 +13,7 @@ type Function struct {
 	body      Block
 }
 
-func (this Function) GetType() int {
+func (this Function) GetType() string {
 	return FUNCTION
 }
 

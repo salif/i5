@@ -13,7 +13,7 @@ type Immutable interface {
 }
 
 const (
-	VOID     = "undefined"
+	VOID     = "null"
 	INTEGER  = "integer"
 	FLOAT    = "float"
 	STRING   = "string"

@@ -8,7 +8,7 @@ type Builtin struct {
 	value string
 }
 
-func (this Builtin) GetType() int {
+func (this Builtin) GetType() string {
 	return BUILTIN
 }
 

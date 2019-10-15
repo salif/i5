@@ -15,6 +15,6 @@ func (this Void) StringValue() string {
 	if this.Value == "" {
 		return VOID
 	} else {
-		return console.Format("undefined '%v'", this.Value)
+		return console.Format("'%v' is null", this.Value)
 	}
 }

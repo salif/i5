@@ -10,7 +10,7 @@ type While struct {
 	body      Block
 }
 
-func (this While) GetType() int {
+func (this While) GetType() string {
 	return WHILE
 }
 

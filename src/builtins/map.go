@@ -6,5 +6,11 @@ import (
 )
 
 func _map() object.Object {
+	v := _Map()
+	v.Set("new", _Builtin(object.MAP, _map_new))
+	return v
+}
+
+func _map_new(obj ...object.Object) object.Object {
 	return _Map()
 }

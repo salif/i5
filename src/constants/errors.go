@@ -38,4 +38,5 @@ const (
 	IR_CANNOT_ASSIGN     string = "can not assign to %v"
 	IR_NON_BOOL          string = "non-bool '%v' used as %v condition"
 	IR_NOT_ENOUGH_ARGS   string = "not enough arguments to call function"
+	IR_MAP_KEY_NOT_FOUND string = "'%v' not found"
 )

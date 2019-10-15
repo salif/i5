@@ -10,7 +10,7 @@ type Assign struct {
 	right    Node
 }
 
-func (this Assign) GetType() int {
+func (this Assign) GetType() string {
 	return ASSIGN
 }
 

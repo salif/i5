@@ -8,7 +8,7 @@ type Block struct {
 	body []Node
 }
 
-func (this Block) GetType() int {
+func (this Block) GetType() string {
 	return BLOCK
 }
 

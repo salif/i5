@@ -9,7 +9,7 @@ type Prefix struct {
 	right    Node
 }
 
-func (this Prefix) GetType() int {
+func (this Prefix) GetType() string {
 	return PREFIX
 }
 

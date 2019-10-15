@@ -29,7 +29,7 @@ func (this *Map) Get(key string) Object {
 	if value, ok := this.Value[key]; ok {
 		return value
 	} else {
-		return &Void{}
+		return Void{}
 	}
 }
 

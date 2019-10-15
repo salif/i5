@@ -1,0 +1,24 @@
+#!/usr/bin/env i5
+
+fn main() {
+	fizzbuzz()
+}
+
+fn fizzbuzz() {
+	i = 1
+	while i <= 100 {
+		result = ""
+		if i % 3 == 0 {
+			result := "Fizz"
+		}
+		if i % 5 == 0 {
+			result := "Buzz"
+		}
+		if result != "" {
+			$print(result)
+		} else {
+			$print(i)
+		}
+		i += 1
+	}
+}

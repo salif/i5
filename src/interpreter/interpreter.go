@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	TRUE  = &object.Bool{Value: true}
-	FALSE = &object.Bool{Value: false}
+	TRUE  = object.Bool{Value: true}
+	FALSE = object.Bool{Value: false}
 )
 
 func RunPackage(dir string, arguments []string) {
@@ -74,7 +74,7 @@ func isVoid(obj object.Object) bool {
 	return obj.Type() == object.VOID
 }
 
-func nativeToBool(input bool) *object.Bool {
+func nativeToBool(input bool) object.Bool {
 	if input {
 		return TRUE
 	}

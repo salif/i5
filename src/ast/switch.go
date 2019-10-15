@@ -13,7 +13,7 @@ type Switch struct {
 	_else     Block
 }
 
-func (this Switch) GetType() int {
+func (this Switch) GetType() string {
 	return SWITCH
 }
 

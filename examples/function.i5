@@ -18,10 +18,10 @@ fn main() {
 		$print(hello_user3)
 		users = $push.push(hello_user3)
 	} catch err {
-		$print("error!") # output: "error!"
+		$print("there was a problem: " : err) # output: "error!"
 	}
 
-	print_array(users, ", ") # output: "Hello User1!, Hi User2!"
+	print(users) # output: "[Hello User1!, Hi User2!, ]"
 
 	print("end") # output: "end"
 }
@@ -35,8 +35,4 @@ fn get_user(user user_num hello) {
 		throw "Invalid user number!"
 	}
 	return hello:" ":user:user_num:"!"
-}
-
-fn print_array(array separator) {
-	$print("users: ":$array.join(array, separator))
 }

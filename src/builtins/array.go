@@ -20,8 +20,8 @@ func _array_push(obj ...object.Object) object.Object {
 	if len(obj) == 2 {
 		arr := obj[0]
 		if arr.Type() == object.ARRAY {
-			arr := arr.(*object.Array)
-			return &object.Array{Value: arr.Push(obj[1])}
+			arr := arr.(object.Array)
+			return object.Array{Value: arr.Push(obj[1])}
 		} else {
 			return _Void()
 		}

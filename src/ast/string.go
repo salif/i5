@@ -8,7 +8,7 @@ type String struct {
 	value string
 }
 
-func (this String) GetType() int {
+func (this String) GetType() string {
 	return STRING
 }
 

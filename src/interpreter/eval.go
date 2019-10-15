@@ -26,26 +26,50 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		if isError(val) {
 			return val
 		}
-		if isVoid(val) {
-			return &object.Error{Message: val.StringValue(), Line: node.GetLine()}
-		}
-		return &object.Return{Value: val}
+		return object.Return{Value: val}
 
 	case ast.Assign:
-		right := Eval(node.GetRight(), env)
-		if isError(right) {
-			return right
-		}
 		left := node.GetLeft()
-		if left.GetType() == ast.IDENTIFIER {
-			ident := node.GetLeft().(ast.Identifier)
-			if isVoid(right) {
-				right.(*object.Void).Value = ident.GetValue()
+		switch left := left.(type) {
+		case ast.Identifier:
+			right := Eval(node.GetRight(), env)
+			if isError(right) {
+				return right
 			}
-			env.Set(ident.GetValue(), right)
+			if isVoid(right) {
+				right = object.Void{Value: left.GetValue()}
+			}
+			env.Set(left.GetValue(), right)
 			return right
-		} else {
-			return &object.Error{Message: console.Format(constants.IR_CANNOT_ASSIGN, left.GetType()), Line: node.GetLine()}
+		case ast.Index:
+			right := Eval(node.GetRight(), env)
+			if isError(right) {
+				return right
+			}
+			if isVoid(right) {
+				return object.Error{Message: right.StringValue(), Line: node.GetLine()}
+			}
+			leftIndex := Eval(left.GetLeft(), env)
+			if isError(leftIndex) {
+				return leftIndex
+			}
+			if isVoid(leftIndex) {
+				return object.Error{Message: leftIndex.StringValue(), Line: node.GetLine()}
+			}
+			if leftIndex.Type() == object.MAP {
+				switch rightIndex := left.GetRight().(type) {
+				case ast.Identifier:
+					_map := leftIndex.(object.Map)
+					_map.Set(rightIndex.GetValue(), right)
+					return right
+				default:
+					return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, leftIndex.Type(), left.GetOperator(), rightIndex.GetType()), Line: node.GetLine()}
+				}
+			} else {
+				return object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, leftIndex.Type(), left.GetOperator()), Line: node.GetLine()}
+			}
+		default:
+			return object.Error{Message: console.Format(constants.IR_CANNOT_ASSIGN, left.GetType()), Line: node.GetLine()}
 		}
 	case ast.Call:
 		function := Eval(node.GetCaller(), env)
@@ -53,28 +77,28 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 			return function
 		}
 		if isVoid(function) {
-			return &object.Error{Message: function.StringValue(), Line: node.GetLine()}
+			return object.Error{Message: function.StringValue(), Line: node.GetLine()}
 		}
 		args := evalExpressions(node.GetArguments(), env, node.GetLine())
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
 		if len(args) == 1 && isVoid(args[0]) {
-			return &object.Error{Message: args[0].StringValue(), Line: node.GetLine()}
+			return object.Error{Message: args[0].StringValue(), Line: node.GetLine()}
 		}
 		return callFunction(function, args, node.GetLine())
 	case ast.Function:
-		return &object.Function{Params: node.GetParams(), Body: node.GetBody(), Env: env}
+		return object.Function{Params: node.GetParams(), Body: node.GetBody(), Env: env}
 	case ast.Identifier:
 		return evalIdentifier(node, env, node.GetLine())
 	case ast.Builtin:
 		return evalBuiltin(node, env, node.GetLine())
 	case ast.Integer:
-		return &object.Integer{Value: node.GetValue()}
+		return object.Integer{Value: node.GetValue()}
 	case ast.Float:
-		return &object.Float{Value: node.GetValue()}
+		return object.Float{Value: node.GetValue()}
 	case ast.String:
-		return &object.String{Value: node.GetValue()}
+		return object.String{Value: node.GetValue()}
 	case ast.Bool:
 		return nativeToBool(node.GetValue())
 	case ast.Throw:
@@ -82,14 +106,17 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		if isError(val) {
 			return val
 		}
-		return &object.Error{Message: val.StringValue()}
+		if isVoid(val) {
+			return object.Error{Message: val.StringValue(), Line: node.GetLine()}
+		}
+		return object.Error{Message: val.StringValue(), Line: node.GetLine()}
 	case ast.Prefix:
 		right := Eval(node.GetRight(), env)
 		if isError(right) {
 			return right
 		}
 		if isVoid(right) {
-			return &object.Error{Message: right.StringValue(), Line: node.GetLine()}
+			return object.Error{Message: right.StringValue(), Line: node.GetLine()}
 		}
 		return evalPrefix(node.GetOperator(), right, env, node.GetLine())
 	case ast.Infix:
@@ -98,14 +125,14 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 			return left
 		}
 		if isVoid(left) {
-			return &object.Error{Message: left.StringValue(), Line: node.GetLine()}
+			return object.Error{Message: left.StringValue(), Line: node.GetLine()}
 		}
 		right := Eval(node.GetRight(), env)
 		if isError(right) {
 			return right
 		}
 		if isVoid(right) {
-			return &object.Error{Message: right.StringValue(), Line: node.GetLine()}
+			return object.Error{Message: right.StringValue(), Line: node.GetLine()}
 		}
 		return evalInfix(node.GetOperator(), left, right, env, node.GetLine())
 	case ast.Postfix:
@@ -117,7 +144,7 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 			return nativeToBool(left.Type() != object.VOID)
 		}
 		if isVoid(left) {
-			return &object.Error{Message: left.StringValue(), Line: node.GetLine()}
+			return object.Error{Message: left.StringValue(), Line: node.GetLine()}
 		}
 		return evalPostfix(node.GetOperator(), left, env, node.GetLine())
 	case ast.Index:
@@ -126,18 +153,23 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 			return left
 		}
 		if isVoid(left) {
-			return &object.Error{Message: left.StringValue(), Line: node.GetLine()}
+			return object.Error{Message: left.StringValue(), Line: node.GetLine()}
 		}
 		if left.Type() == object.MAP {
 			switch rnode := node.GetRight().(type) {
 			case ast.Identifier:
-				_map := left.(*object.Map)
-				return _map.Get(rnode.GetValue())
+				_map := left.(object.Map)
+				obj := _map.Get(rnode.GetValue())
+				if isVoid(obj) {
+					return object.Error{Message: console.Format(constants.IR_MAP_KEY_NOT_FOUND, rnode.GetValue()), Line: node.GetLine()}
+				} else {
+					return obj
+				}
 			default:
-				return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), node.GetOperator(), rnode.GetType()), Line: node.GetLine()}
+				return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), node.GetOperator(), rnode.GetType()), Line: node.GetLine()}
 			}
 		} else {
-			return &object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, left.Type(), node.GetOperator()), Line: node.GetLine()}
+			return object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, left.Type(), node.GetOperator()), Line: node.GetLine()}
 		}
 	case ast.If:
 		return evalIf(node, env, node.GetLine())
@@ -150,10 +182,10 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 	case ast.Try:
 		return evalTry(node, env, node.GetLine())
 	case ast.Break:
-		return &object.Break{}
+		return object.Break{}
 	case ast.Continue:
-		return &object.Continue{}
+		return object.Continue{}
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_EVAL, node.GetType()), Line: node.GetLine()}
+		return object.Error{Message: console.Format(constants.IR_INVALID_EVAL, node.GetType()), Line: node.GetLine()}
 	}
 }

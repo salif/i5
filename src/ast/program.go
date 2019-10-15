@@ -8,7 +8,7 @@ type Program struct {
 	body []Node
 }
 
-func (this Program) GetType() int {
+func (this Program) GetType() string {
 	return PROGRAM
 }
 

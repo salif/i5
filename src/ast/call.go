@@ -11,7 +11,7 @@ type Call struct {
 	arguments []Node
 }
 
-func (this Call) GetType() int {
+func (this Call) GetType() string {
 	return CALL
 }
 

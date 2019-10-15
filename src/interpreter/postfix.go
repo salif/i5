@@ -10,6 +10,6 @@ import (
 func evalPostfix(operator string, right object.Object, env *object.Env, line int) object.Object {
 	switch operator {
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, right.Type(), operator), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, right.Type(), operator), Line: line}
 	}
 }

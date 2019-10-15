@@ -9,7 +9,7 @@ type Postfix struct {
 	operator string
 }
 
-func (this Postfix) GetType() int {
+func (this Postfix) GetType() string {
 	return POSTFIX
 }
 

@@ -21,26 +21,26 @@ func evalPrefix(operator string, right object.Object, env *object.Env, line int)
 				return FALSE
 			}
 		} else {
-			return &object.Error{Message: console.Format(constants.IR_INVALID_PREFIX, operator, right.Type()), Line: line}
+			return object.Error{Message: console.Format(constants.IR_INVALID_PREFIX, operator, right.Type()), Line: line}
 		}
 	case types.BNOT:
 		if right.Type() == object.INTEGER {
-			value := right.(*object.Integer).Value
-			return &object.Integer{Value: ^value}
+			value := right.(object.Integer).Value
+			return object.Integer{Value: ^value}
 		} else {
-			return &object.Error{Message: console.Format(constants.IR_INVALID_PREFIX, operator, right.Type()), Line: line}
+			return object.Error{Message: console.Format(constants.IR_INVALID_PREFIX, operator, right.Type()), Line: line}
 		}
 	case types.MINUS:
 		if right.Type() == object.INTEGER {
-			value := right.(*object.Integer).Value
-			return &object.Integer{Value: -value}
+			value := right.(object.Integer).Value
+			return object.Integer{Value: -value}
 		} else if right.Type() == object.FLOAT {
-			value := right.(*object.Float).Value
-			return &object.Float{Value: -value}
+			value := right.(object.Float).Value
+			return object.Float{Value: -value}
 		} else {
-			return &object.Error{Message: console.Format(constants.IR_INVALID_PREFIX, operator, right.Type()), Line: line}
+			return object.Error{Message: console.Format(constants.IR_INVALID_PREFIX, operator, right.Type()), Line: line}
 		}
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_PREFIX, operator, right.Type()), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_PREFIX, operator, right.Type()), Line: line}
 	}
 }

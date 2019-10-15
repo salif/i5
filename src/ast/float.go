@@ -8,7 +8,7 @@ type Float struct {
 	value float64
 }
 
-func (this Float) GetType() int {
+func (this Float) GetType() string {
 	return FLOAT
 }
 

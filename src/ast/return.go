@@ -9,7 +9,7 @@ type Return struct {
 	body  Node
 }
 
-func (this Return) GetType() int {
+func (this Return) GetType() string {
 	return RETURN
 }
 

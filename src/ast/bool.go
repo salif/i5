@@ -8,7 +8,7 @@ type Bool struct {
 	value bool
 }
 
-func (this Bool) GetType() int {
+func (this Bool) GetType() string {
 	return BOOL
 }
 

@@ -9,7 +9,7 @@ type Throw struct {
 	body  Node
 }
 
-func (this Throw) GetType() int {
+func (this Throw) GetType() string {
 	return THROW
 }
 

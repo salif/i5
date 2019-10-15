@@ -8,7 +8,7 @@ type Continue struct {
 	token string
 }
 
-func (this Continue) GetType() int {
+func (this Continue) GetType() string {
 	return CONTINUE
 }
 

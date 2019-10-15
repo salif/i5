@@ -13,7 +13,7 @@ type Try struct {
 	finally Block
 }
 
-func (this Try) GetType() int {
+func (this Try) GetType() string {
 	return TRY
 }
 

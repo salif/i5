@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package object
 
-import "github.com/i5/i5/src/io/console"
+import (
+	"github.com/i5/i5/src/io/console"
+)
 
 type Error struct {
 	Line    int
@@ -20,6 +22,10 @@ func (this Error) StringValue() string {
 	}
 }
 
+func (this Error) GetMessage() Object {
+	return String{Value: this.Message}
+}
+
 func (this Error) Clone() Object {
-	return &Error{Message: this.Message, Line: this.Line}
+	return Error{Message: this.Message, Line: this.Line}
 }

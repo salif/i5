@@ -8,7 +8,7 @@ type Identifier struct {
 	token string
 }
 
-func (this Identifier) GetType() int {
+func (this Identifier) GetType() string {
 	return IDENTIFIER
 }
 

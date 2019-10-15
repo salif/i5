@@ -10,7 +10,7 @@ import (
 
 func evalInfix(operator string, left, right object.Object, env *object.Env, line int) object.Object {
 	if operator == types.COLON {
-		return &object.String{Value: left.StringValue() + right.StringValue()}
+		return object.String{Value: left.StringValue() + right.StringValue()}
 	} else if left.Type() == right.Type() && left.Type() == object.INTEGER {
 		return evalIntegerWithIntegerInfix(operator, left, right, line)
 	} else if left.Type() == right.Type() && left.Type() == object.FLOAT {
@@ -24,34 +24,34 @@ func evalInfix(operator string, left, right object.Object, env *object.Env, line
 	} else if left.Type() == right.Type() && left.Type() == object.BOOL {
 		return evalBooleanInfix(operator, left, right, line)
 	}
-	return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
+	return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 }
 
 func evalIntegerWithIntegerInfix(operator string, left, right object.Object, line int) object.Object {
-	leftVal := left.(*object.Integer).Value
-	rightVal := right.(*object.Integer).Value
+	leftVal := left.(object.Integer).Value
+	rightVal := right.(object.Integer).Value
 
 	switch operator {
 	case types.PLUS:
-		return &object.Integer{Value: leftVal + rightVal}
+		return object.Integer{Value: leftVal + rightVal}
 	case types.MINUS:
-		return &object.Integer{Value: leftVal - rightVal}
+		return object.Integer{Value: leftVal - rightVal}
 	case types.MULTIPLY:
-		return &object.Integer{Value: leftVal * rightVal}
+		return object.Integer{Value: leftVal * rightVal}
 	case types.DIVIDE:
-		return &object.Integer{Value: leftVal / rightVal}
+		return object.Integer{Value: leftVal / rightVal}
 	case types.MODULO:
-		return &object.Integer{Value: leftVal % rightVal}
+		return object.Integer{Value: leftVal % rightVal}
 	case types.OR:
-		return &object.Integer{Value: leftVal | rightVal}
+		return object.Integer{Value: leftVal | rightVal}
 	case types.XOR:
-		return &object.Integer{Value: leftVal ^ rightVal}
+		return object.Integer{Value: leftVal ^ rightVal}
 	case types.AND:
-		return &object.Integer{Value: leftVal & rightVal}
+		return object.Integer{Value: leftVal & rightVal}
 	case types.LTLT:
-		return &object.Integer{Value: leftVal << uint64(rightVal)}
+		return object.Integer{Value: leftVal << uint64(rightVal)}
 	case types.GTGT:
-		return &object.Integer{Value: leftVal >> uint64(rightVal)}
+		return object.Integer{Value: leftVal >> uint64(rightVal)}
 	case types.LT:
 		return nativeToBool(leftVal < rightVal)
 	case types.LTEQ:
@@ -65,23 +65,23 @@ func evalIntegerWithIntegerInfix(operator string, left, right object.Object, lin
 	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
 func evalFloatWithFloatInfix(operator string, left, right object.Object, line int) object.Object {
-	leftVal := left.(*object.Float).Value
-	rightVal := right.(*object.Float).Value
+	leftVal := left.(object.Float).Value
+	rightVal := right.(object.Float).Value
 
 	switch operator {
 	case types.PLUS:
-		return &object.Float{Value: leftVal + rightVal}
+		return object.Float{Value: leftVal + rightVal}
 	case types.MINUS:
-		return &object.Float{Value: leftVal - rightVal}
+		return object.Float{Value: leftVal - rightVal}
 	case types.MULTIPLY:
-		return &object.Float{Value: leftVal * rightVal}
+		return object.Float{Value: leftVal * rightVal}
 	case types.DIVIDE:
-		return &object.Float{Value: leftVal / rightVal}
+		return object.Float{Value: leftVal / rightVal}
 	case types.LT:
 		return nativeToBool(leftVal < rightVal)
 	case types.LTEQ:
@@ -95,23 +95,23 @@ func evalFloatWithFloatInfix(operator string, left, right object.Object, line in
 	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
 func evalIntegerWithFloatInfix(operator string, left, right object.Object, line int) object.Object {
-	leftVal := left.(*object.Integer).Value
-	rightVal := right.(*object.Float).Value
+	leftVal := left.(object.Integer).Value
+	rightVal := right.(object.Float).Value
 
 	switch operator {
 	case types.PLUS:
-		return &object.Float{Value: float64(leftVal) + rightVal}
+		return object.Float{Value: float64(leftVal) + rightVal}
 	case types.MINUS:
-		return &object.Float{Value: float64(leftVal) - rightVal}
+		return object.Float{Value: float64(leftVal) - rightVal}
 	case types.MULTIPLY:
-		return &object.Float{Value: float64(leftVal) * rightVal}
+		return object.Float{Value: float64(leftVal) * rightVal}
 	case types.DIVIDE:
-		return &object.Float{Value: float64(leftVal) / rightVal}
+		return object.Float{Value: float64(leftVal) / rightVal}
 	case types.LT:
 		return nativeToBool(float64(leftVal) < rightVal)
 	case types.LTEQ:
@@ -125,23 +125,23 @@ func evalIntegerWithFloatInfix(operator string, left, right object.Object, line 
 	case types.NOTEQ:
 		return nativeToBool(float64(leftVal) != rightVal)
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
 func evalFloatWithIntegerInfix(operator string, left, right object.Object, line int) object.Object {
-	leftVal := left.(*object.Float).Value
-	rightVal := right.(*object.Integer).Value
+	leftVal := left.(object.Float).Value
+	rightVal := right.(object.Integer).Value
 
 	switch operator {
 	case types.PLUS:
-		return &object.Float{Value: leftVal + float64(rightVal)}
+		return object.Float{Value: leftVal + float64(rightVal)}
 	case types.MINUS:
-		return &object.Float{Value: leftVal - float64(rightVal)}
+		return object.Float{Value: leftVal - float64(rightVal)}
 	case types.MULTIPLY:
-		return &object.Float{Value: leftVal * float64(rightVal)}
+		return object.Float{Value: leftVal * float64(rightVal)}
 	case types.DIVIDE:
-		return &object.Float{Value: leftVal / float64(rightVal)}
+		return object.Float{Value: leftVal / float64(rightVal)}
 	case types.LT:
 		return nativeToBool(leftVal < float64(rightVal))
 	case types.LTEQ:
@@ -155,13 +155,13 @@ func evalFloatWithIntegerInfix(operator string, left, right object.Object, line 
 	case types.NOTEQ:
 		return nativeToBool(leftVal != float64(rightVal))
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
 func evalStringInfix(operator string, left, right object.Object, line int) object.Object {
-	leftVal := left.(*object.String).Value
-	rightVal := right.(*object.String).Value
+	leftVal := left.(object.String).Value
+	rightVal := right.(object.String).Value
 
 	switch operator {
 	case types.EQEQ:
@@ -169,13 +169,13 @@ func evalStringInfix(operator string, left, right object.Object, line int) objec
 	case types.NOTEQ:
 		return nativeToBool(leftVal != rightVal)
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
 
 func evalBooleanInfix(operator string, left, right object.Object, line int) object.Object {
-	leftVal := left.(*object.Bool).Value
-	rightVal := right.(*object.Bool).Value
+	leftVal := left.(object.Bool).Value
+	rightVal := right.(object.Bool).Value
 
 	switch operator {
 	case types.EQEQ:
@@ -187,6 +187,6 @@ func evalBooleanInfix(operator string, left, right object.Object, line int) obje
 	case types.OROR:
 		return nativeToBool(leftVal || rightVal)
 	default:
-		return &object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
+		return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type()), Line: line}
 	}
 }
