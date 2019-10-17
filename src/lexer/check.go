@@ -37,12 +37,6 @@ func IsKeyword(char string) (string, bool) {
 		return types.ELIF, true
 	case types.ELSE:
 		return types.ELSE, true
-	case types.WHILE:
-		return types.WHILE, true
-	case types.BREAK:
-		return types.BREAK, true
-	case types.CONTINUE:
-		return types.CONTINUE, true
 	case types.SWITCH:
 		return types.SWITCH, true
 	case types.CASE:

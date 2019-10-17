@@ -88,36 +88,6 @@ func evalSwitch(s ast.Switch, env *object.Env, line int) object.Object {
 	// TODO
 }
 
-func evalWhile(w ast.While, env *object.Env, line int) object.Object {
-	for {
-		condition := Eval(w.GetCondition(), env)
-		if isError(condition) {
-			return condition
-		}
-
-		if condition.Type() != object.BOOL {
-			return object.Error{Message: console.Format(constants.IR_NON_BOOL, condition.Type(), "while"), Line: line}
-		}
-
-		if isTrue(condition) {
-			result := Eval(w.GetBody(), env)
-			if result.Type() == object.BREAK {
-				break
-			} else if result.Type() == object.CONTINUE {
-				continue
-			} else if result.Type() == object.ERROR {
-				return result
-			} else if result.Type() == object.RETURN {
-				return result
-			}
-		} else {
-			break
-		}
-	}
-
-	return object.Void{}
-}
-
 func evalIndex(left object.Object, right string, env *object.Env, line int) object.Object {
 	return object.Void{}
 }
@@ -143,10 +113,6 @@ func evalTry(t ast.Try, env *object.Env, line int) object.Object {
 		case object.ERROR:
 			fallthrough
 		case object.RETURN:
-			fallthrough
-		case object.BREAK:
-			fallthrough
-		case object.CONTINUE:
 			return catchResult
 		}
 
@@ -185,12 +151,6 @@ func callFunction(fn object.Object, args []object.Object, line int) object.Objec
 		}
 		env := extendFunctionEnv(fn, args)
 		result := Eval(fn.Body, env)
-		switch result.Type() {
-		case object.BREAK:
-			fallthrough
-		case object.CONTINUE:
-			return object.Void{}
-		}
 		return unwrapReturnValue(result)
 
 	case object.Builtin:
@@ -224,7 +184,6 @@ func unwrapReturnValue(obj object.Object) object.Object {
 }
 
 func evalBlock(block ast.Block, env *object.Env, line int) object.Object {
-	env = env.Clone()
 	var result object.Object
 	for _, statement := range block.GetBody() {
 		result = Eval(statement, env)
@@ -232,10 +191,6 @@ func evalBlock(block ast.Block, env *object.Env, line int) object.Object {
 		case object.RETURN:
 			fallthrough
 		case object.ERROR:
-			fallthrough
-		case object.BREAK:
-			fallthrough
-		case object.CONTINUE:
 			return result
 		}
 	}

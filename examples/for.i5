@@ -1,11 +1,13 @@
 #!/usr/bin/env i5
 
 fn main() {
-	i = 0
-	while i < 10 {
-		$print(i)
-		i += 1
+	fn for(i end) {
+		if i < end {
+			$print(i)
+			for(i + 1, end)
+		}
 	}
+	for(0, 10)
 
 	`
 	output:

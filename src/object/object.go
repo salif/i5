@@ -19,8 +19,6 @@ const (
 	STRING   = "string"
 	BOOL     = "bool"
 	RETURN   = "return"
-	BREAK    = "break"
-	CONTINUE = "continue"
 	THROW    = "throw"
 	ERROR    = "error"
 	FUNCTION = "function"

@@ -185,16 +185,10 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return evalIf(node, env, node.GetLine())
 	case ast.Switch:
 		return evalSwitch(node, env, node.GetLine())
-	case ast.While:
-		return evalWhile(node, env, node.GetLine())
 	case ast.Import:
 		return evalImport(node, env, node.GetLine())
 	case ast.Try:
 		return evalTry(node, env, node.GetLine())
-	case ast.Break:
-		return object.Break{}
-	case ast.Continue:
-		return object.Continue{}
 	default:
 		return object.Error{Message: console.Format(constants.IR_INVALID_EVAL, node.GetType()), Line: node.GetLine()}
 	}
