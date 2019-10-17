@@ -12,6 +12,8 @@ var localPrint func(...interface{}) = defaultPrint
 var localPrintln func(...interface{}) = defaultPrintln
 var localPrintf func(string, ...interface{}) = defaultPrintf
 
+var arguments []string
+
 var (
 	HTML    = output{htmlColor, defaultPrint, defaultPrintln, defaultPrintf}
 	Default = output{defaultColor, defaultPrint, defaultPrintln, defaultPrintf}
@@ -23,4 +25,12 @@ func SetOutput(p output) {
 	localPrint = p.print
 	localPrintln = p.println
 	localPrintf = p.printf
+}
+
+func GetArguments() []string {
+	return arguments
+}
+
+func SetArguments(args []string) {
+	arguments = args
 }

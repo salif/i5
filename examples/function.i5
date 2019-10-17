@@ -7,21 +7,22 @@ fn main() {
 
 	hello_user1 = get_user("User", 1, "Hello")
 	$print(hello_user1) # output: "Hello User1!"
-	users = $array.push(users, hello_user1)
+	users = $array.add(users, hello_user1)
 
 	hello_user2 = get_user("User", 2, "Hi")
 	$print(hello_user2) # output: "Hi User2!"
-	users = $array.push(users, hello_user2)
+	users = $array.add(users, hello_user2)
 
 	try {
 		hello_user3 = get_user("Invalid User", -1, "Hello")
 		$print(hello_user3)
-		users = $push.push(hello_user3)
+		users = $array.add(users, hello_user3)
 	} catch err {
-		$print("there was a problem: " : err) # output: "error!"
+		$print("there was a problem: \"" : err : "\"")
+		# output: "there was a problem: "Invalid user number!""
 	}
 
-	print(users) # output: "[Hello User1!, Hi User2!, ]"
+	print(users) # output: "["Hello User1!", "Hi User2!"]"
 
 	print("end") # output: "end"
 }

@@ -27,6 +27,7 @@ const (
 	FILE_DIR_EXISTS       string = "%v: directory already exists"
 	FILE_CANNOT_WRITE     string = "%v: can not write file"
 
+	IR_INVALID_MOD_FILE  string = "mod file is invalid"
 	IR_MAIN_FN_NOT_FOUND string = "main function not found"
 	IR_INVALID_EVAL      string = "invalid expression: '%v'"
 	IR_INVALID_INFIX     string = "invalid expression: '%v%v%v'"

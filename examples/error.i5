@@ -2,22 +2,21 @@
 
 fn main() {
 	try {
-		file = $file.open("file.txt")
+		file = $file.read("file.txt")
 	} catch err {
-		if err.name == "not found" {
+		if err == "not found" {
 			$print("file not found!")
 			# output: "file not found!"
 		} else {
 			$print("unknown error")
 		}
 	} finally {
-		file.close()
 	}
 
 	try {
 		divide(2, 0)
 	} catch err {
-		$print("error: ":err.message)
+		$print("error: ":err)
 		# output: "error: can not divide by zero!"
 	}
 }

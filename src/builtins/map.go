@@ -7,7 +7,7 @@ import (
 
 func _map() object.Object {
 	v := _Map()
-	v.Set("new", _Builtin(object.MAP, _map_new))
+	v.Set(_String("new"), _Builtin(object.MAP, 0, _map_new))
 	return v
 }
 

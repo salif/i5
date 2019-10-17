@@ -10,18 +10,18 @@ import (
 	"github.com/i5/i5/src/io/console"
 )
 
-type ArgsParser struct {
+type ArgumentsParser struct {
 	arguments      []string
 	bools          map[string]*bool
 	strings        map[string]*string
 	defaultR       *[]string
 	defaultStrings []string
 	help           bytes.Buffer
-	help_message   string
+	helpMessage    string
 }
 
-func InitArgsParser(usage string, options string) ArgsParser {
-	ap := ArgsParser{
+func InitArgumentsParser(usage string, options string) ArgumentsParser {
+	ap := ArgumentsParser{
 		os.Args[1:],
 		make(map[string]*bool),
 		make(map[string]*string),
@@ -34,31 +34,31 @@ func InitArgsParser(usage string, options string) ArgsParser {
 	return ap
 }
 
-func (s *ArgsParser) Empty() bool {
+func (s *ArgumentsParser) Empty() bool {
 	return len(s.arguments) == 0
 }
 
-func (s *ArgsParser) Bool(arg string, description string) (ret *bool) {
+func (s *ArgumentsParser) Bool(arg string, description string) (ret *bool) {
 	ret = new(bool)
 	s.bools["--"+arg] = ret
 	s.help.WriteString(console.Format("    --%-26s%v\n", arg, description))
 	return
 }
 
-func (s *ArgsParser) String(arg string, description string, value string) (ret *string) {
+func (s *ArgumentsParser) String(arg string, description string, value string) (ret *string) {
 	ret = new(string)
 	s.strings["--"+arg] = ret
 	s.help.WriteString(console.Format("    --%-26s%v\n", console.Format("%v='%v'", arg, value), description))
 	return ret
 }
 
-func (s *ArgsParser) Default() (ret *[]string) {
+func (s *ArgumentsParser) Default() (ret *[]string) {
 	ret = new([]string)
 	s.defaultR = ret
 	return
 }
 
-func (s *ArgsParser) Parse() {
+func (s *ArgumentsParser) Parse() {
 	var options = true
 	for _, arg := range s.arguments {
 		if options && strings.HasPrefix(arg, "--") {
@@ -84,9 +84,9 @@ func (s *ArgsParser) Parse() {
 		}
 	}
 	*s.defaultR = s.defaultStrings
-	s.help_message = s.help.String()
+	s.helpMessage = s.help.String()
 }
 
-func (s *ArgsParser) PrintHelp() {
-	console.Println(s.help_message)
+func (s *ArgumentsParser) PrintHelp() {
+	console.Println(s.helpMessage)
 }

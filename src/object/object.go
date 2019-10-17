@@ -8,8 +8,8 @@ type Object interface {
 	StringValue() string
 }
 
-type Immutable interface {
-	Clone() Object
+type Mappable interface {
+	GenKey() Key
 }
 
 const (

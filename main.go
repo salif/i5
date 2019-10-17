@@ -20,5 +20,5 @@ import (
 )
 
 func main() {
-	i5.ParseArgs()
+	i5.ParseArguments()
 }

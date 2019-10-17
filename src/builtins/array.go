@@ -7,25 +7,29 @@ import (
 
 func _array() object.Object {
 	v := _Map()
-	v.Set("new", _Builtin(object.ARRAY, _array_new))
-	v.Set("push", _Builtin(object.BOOL, _array_push))
+	v.Set(_String("new"), _Builtin(object.ARRAY, 0, _array_new))
+	v.Set(_String("add"), _Builtin(object.ARRAY, 2, _array_add))
+	// v.Set(_String("remove"), _Builtin(object.ARRAY, 2, _array_remove))
+	// v.Set(_String("get"), _Builtin(object.VOID, 2, _array_get))
+	// v.Set(_String("set"), _Builtin(object.ARRAY, 3, _array_set))
+	// v.Set(_String("join"), _Builtin(object.STRING, 2, _array_join))
 	return v
 }
 
-func _array_new(obj ...object.Object) object.Object {
+func _array_new(args ...object.Object) object.Object {
+	if len(args) > 0 {
+	}
 	return _Array()
 }
 
-func _array_push(obj ...object.Object) object.Object {
-	if len(obj) == 2 {
-		arr := obj[0]
-		if arr.Type() == object.ARRAY {
-			arr := arr.(object.Array)
-			return object.Array{Value: arr.Push(obj[1])}
-		} else {
-			return _Void()
-		}
+func _array_add(args ...object.Object) object.Object {
+	arr := args[0]
+	elem := args[1]
+	if arr.Type() == object.ARRAY {
+		arr := arr.(object.Array)
+		return object.Array{Value: arr.Push(elem)}
 	} else {
 		return _Void()
 	}
+
 }

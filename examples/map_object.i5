@@ -1,16 +1,16 @@
 #!/usr/bin/env i5
 
 fn main() {
-	object = newObj()
+	object = newObject()
 	object.setName("My Name")
-	object.setAge(0)
+	object.setAge(1)
 	$print("name: " : object.getName())
 	# output: "name: My Name"
 	$print("age: " : object.getAge())
-	# output: "age: 0"
+	# output: "age: 1"
 }
 
-fn newObj() {
+fn newObject() {
 	map = $map.new()
 	map.name = ""
 	map.age = 0

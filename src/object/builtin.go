@@ -2,9 +2,10 @@
 package object
 
 type Builtin struct {
-	RealType TYPE
-	Function func(args ...Object) Object
-	Value    Object
+	RealType  TYPE
+	Function  func(args ...Object) Object
+	MinParams int
+	Value     Object
 }
 
 func (this Builtin) Type() TYPE {

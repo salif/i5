@@ -6,7 +6,7 @@ import (
 )
 
 func Get(str string, env *object.Env) (object.Object, bool) {
-	builtin, ok := Builtins[str]
+	builtin, ok := builtins[str]
 	if ok {
 		if builtin.RealType == object.FUNCTION {
 			return builtin, ok
@@ -18,18 +18,20 @@ func Get(str string, env *object.Env) (object.Object, bool) {
 	}
 }
 
-var Builtins = map[string]object.Builtin{
+var builtins = map[string]object.Builtin{
+	"null": object.Builtin{RealType: object.VOID, Value: _Void()},
+	// Bools
 	// Strings
-	"version": object.Builtin{RealType: object.STRING, Value: _version()},
-
+	// Arrays
 	// Maps
-	"array": object.Builtin{RealType: object.MAP, Value: _array()},
-	"i5":    object.Builtin{RealType: object.MAP, Value: _i5()},
-	"map":   object.Builtin{RealType: object.MAP, Value: _map()},
-
+	"array":   object.Builtin{RealType: object.MAP, Value: _array()},
+	"i5":      object.Builtin{RealType: object.MAP, Value: _i5()},
+	"map":     object.Builtin{RealType: object.MAP, Value: _map()},
+	"my":      object.Builtin{RealType: object.MAP, Value: _my()},
+	"console": object.Builtin{RealType: object.MAP, Value: _console()},
 	// Functions
-	"print":  object.Builtin{RealType: object.FUNCTION, Function: _print},
-	"typeof": object.Builtin{RealType: object.FUNCTION, Function: _typeof},
+	"print":  object.Builtin{RealType: object.FUNCTION, Function: _console_println, MinParams: 0},
+	"typeof": object.Builtin{RealType: object.FUNCTION, Function: _typeof, MinParams: 1},
 }
 
 func _Void() object.Object {
@@ -44,8 +46,8 @@ func _String(str string) object.String {
 	return object.String{Value: str}
 }
 
-func _Builtin(t object.TYPE, f func(args ...object.Object) object.Object) object.Builtin {
-	return object.Builtin{RealType: t, Function: f}
+func _Builtin(t object.TYPE, minParams int, function func(args ...object.Object) object.Object) object.Builtin {
+	return object.Builtin{RealType: t, Function: function, MinParams: minParams}
 }
 
 func _Array() object.Array {
@@ -53,5 +55,9 @@ func _Array() object.Array {
 }
 
 func _Map() object.Map {
-	return object.Map{Value: make(map[string]object.Object, 0)}
+	return object.Map{Value: make(map[object.Key]object.Object, 0)}
+}
+
+func _Error(e string) object.Error {
+	return object.Error{Message: e}
 }

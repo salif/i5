@@ -2,5 +2,5 @@
 # first line is main package
 # second line is folder which contain i5 modules
 
-./src/
-./i5_modules/
+src/
+i5_modules/

@@ -7,9 +7,6 @@ import (
 )
 
 func _typeof(obj ...object.Object) object.Object {
-	if len(obj) == 1 {
-		return _String(console.Format("%v", obj[0].Type()))
-	} else {
-		return _Void()
-	}
+	elem := obj[0]
+	return _String(console.Format("%v", elem.Type()))
 }

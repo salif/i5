@@ -60,8 +60,10 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 				switch rightIndex := left.GetRight().(type) {
 				case ast.Identifier:
 					_map := leftIndex.(object.Map)
-					_map.Set(rightIndex.GetValue(), right)
-					return right
+					return nativeToBool(_map.Set(object.String{Value: rightIndex.GetValue()}, right))
+				case ast.Integer:
+					_map := leftIndex.(object.Map)
+					return nativeToBool(_map.Set(object.Integer{Value: rightIndex.GetValue()}, right))
 				default:
 					return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, leftIndex.Type(), left.GetOperator(), rightIndex.GetType()), Line: node.GetLine()}
 				}
@@ -159,7 +161,15 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 			switch rnode := node.GetRight().(type) {
 			case ast.Identifier:
 				_map := left.(object.Map)
-				obj := _map.Get(rnode.GetValue())
+				obj := _map.Get(object.String{Value: rnode.GetValue()})
+				if isVoid(obj) {
+					return object.Error{Message: console.Format(constants.IR_MAP_KEY_NOT_FOUND, rnode.GetValue()), Line: node.GetLine()}
+				} else {
+					return obj
+				}
+			case ast.Integer:
+				_map := left.(object.Map)
+				obj := _map.Get(object.Integer{Value: rnode.GetValue()})
 				if isVoid(obj) {
 					return object.Error{Message: console.Format(constants.IR_MAP_KEY_NOT_FOUND, rnode.GetValue()), Line: node.GetLine()}
 				} else {

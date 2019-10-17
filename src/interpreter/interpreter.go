@@ -13,48 +13,54 @@ import (
 	"github.com/i5/i5/src/parser"
 )
 
-var (
-	TRUE  = object.Bool{Value: true}
-	FALSE = object.Bool{Value: false}
-)
-
-func RunPackage(dir string, arguments []string) {
-	dir = filepath.Base(dir)
-	filesToRun := file.GetFilesToRun(dir)
-	env := object.InitEnv()
-
-	for _, f := range filesToRun {
-		fullPath := console.Format("%v/%v", dir, f)
-		err := Eval(parser.Run(lexer.Run(file.Read(fullPath))), env)
-		if err.Type() == object.ERROR {
-			console.ThrowError(1, err.StringValue())
-			return
-		}
-	}
-
-	if mainFunction, ok := env.Get(constants.MAIN_FUNCTION_NAME); ok {
-		result := callFunction(mainFunction, []object.Object{}, 0)
-		if result.Type() == object.ERROR {
-			console.ThrowError(1, result.StringValue())
-			return
-		}
+func RunDirectory(directoryName string) {
+	absoluteDirectoryName, _ := filepath.Abs(directoryName)
+	modFile := console.Format("%s/%s", absoluteDirectoryName, constants.I5_MOD_FILE_NAME)
+	if file.Exists(modFile) {
+		RunModule(modFile, absoluteDirectoryName)
 	} else {
-		console.ThrowError(1, constants.IR_MAIN_FN_NOT_FOUND)
+		RunPackage(absoluteDirectoryName)
 	}
 }
 
-func RunModule(module string, arguments []string) {
-	console.ThrowError(1, "not implemented yet")
-	// TODO
+func RunPackage(absoluteDirectoryName string) {
+	env := object.InitEnv()
+	EvalPackage(absoluteDirectoryName, env)
+	EvalMainFunction(env)
 }
 
-func RunFile(program ast.Node, arguments []string) {
+func RunModule(moduleFileName, module string) {
+	f := file.Read(moduleFileName)
+	moduleInfoArray := lexer.ParseModuleFile(f)
+	if len(moduleInfoArray) < 2 {
+		console.ThrowError(1, constants.IR_INVALID_MOD_FILE)
+	}
+}
+
+func RunFile(code []byte) {
+	program := parser.Run(lexer.Run(code))
 	env := object.InitEnv()
+	EvalFile(program, env)
+	EvalMainFunction(env)
+}
+
+func EvalPackage(absoluteDirectoryName string, env *object.Env) {
+	filesToRun := file.GetFilesToRun(absoluteDirectoryName)
+	for _, fileToRun := range filesToRun {
+		fileToRunPath := console.Format("%v/%v", absoluteDirectoryName, fileToRun)
+		EvalFile(parser.Run(lexer.Run(file.Read(fileToRunPath))), env)
+	}
+}
+
+func EvalFile(program ast.Node, env *object.Env) {
 	err := Eval(program, env)
 	if err.Type() == object.ERROR {
 		console.ThrowError(1, err.StringValue())
 		return
 	}
+}
+
+func EvalMainFunction(env *object.Env) {
 	if mainFunction, ok := env.Get(constants.MAIN_FUNCTION_NAME); ok {
 		result := callFunction(mainFunction, []object.Object{}, 0)
 		if result.Type() == object.ERROR {
@@ -63,30 +69,5 @@ func RunFile(program ast.Node, arguments []string) {
 		}
 	} else {
 		console.ThrowError(1, constants.IR_MAIN_FN_NOT_FOUND)
-	}
-}
-
-func isError(obj object.Object) bool {
-	return obj.Type() == object.ERROR
-}
-
-func isVoid(obj object.Object) bool {
-	return obj.Type() == object.VOID
-}
-
-func nativeToBool(input bool) object.Bool {
-	if input {
-		return TRUE
-	}
-	return FALSE
-}
-
-func isTrue(obj object.Object) bool {
-	if obj == TRUE {
-		return true
-	} else if obj == FALSE {
-		return false
-	} else {
-		return false
 	}
 }

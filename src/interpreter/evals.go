@@ -9,6 +9,36 @@ import (
 	"github.com/i5/i5/src/object"
 )
 
+var (
+	TRUE  = object.Bool{Value: true}
+	FALSE = object.Bool{Value: false}
+)
+
+func isError(obj object.Object) bool {
+	return obj.Type() == object.ERROR
+}
+
+func isVoid(obj object.Object) bool {
+	return obj.Type() == object.VOID
+}
+
+func nativeToBool(input bool) object.Bool {
+	if input {
+		return TRUE
+	}
+	return FALSE
+}
+
+func isTrue(obj object.Object) bool {
+	if obj == TRUE {
+		return true
+	} else if obj == FALSE {
+		return false
+	} else {
+		return false
+	}
+}
+
 func evalProgram(program ast.Program, env *object.Env, line int) object.Object {
 	var result object.Object
 	for _, expr := range program.GetBody() {
@@ -106,7 +136,6 @@ func evalTry(t ast.Try, env *object.Env, line int) object.Object {
 
 		if t.HaveErr() {
 			env.Set(t.GetErr().GetValue(), result.(object.Error).GetMessage())
-			// TODO make err usable in catch
 		}
 		catchResult := Eval(t.GetCatch(), env)
 
@@ -153,18 +182,21 @@ func callFunction(fn object.Object, args []object.Object, line int) object.Objec
 	case object.Function:
 		if len(args) < len(fn.Params) {
 			return object.Error{Message: constants.IR_NOT_ENOUGH_ARGS, Line: line}
-		} else {
-			env := extendFunctionEnv(fn, args)
-			result := Eval(fn.Body, env)
-			switch result.Type() {
-			case object.BREAK:
-				fallthrough
-			case object.CONTINUE:
-				return object.Void{}
-			}
-			return unwrapReturnValue(result)
 		}
+		env := extendFunctionEnv(fn, args)
+		result := Eval(fn.Body, env)
+		switch result.Type() {
+		case object.BREAK:
+			fallthrough
+		case object.CONTINUE:
+			return object.Void{}
+		}
+		return unwrapReturnValue(result)
+
 	case object.Builtin:
+		if len(args) < fn.MinParams {
+			return object.Error{Message: constants.IR_NOT_ENOUGH_ARGS, Line: line}
+		}
 		if result := fn.Function(args...); result != nil {
 			return result
 		} else {
@@ -192,6 +224,7 @@ func unwrapReturnValue(obj object.Object) object.Object {
 }
 
 func evalBlock(block ast.Block, env *object.Env, line int) object.Object {
+	env = env.Clone()
 	var result object.Object
 	for _, statement := range block.GetBody() {
 		result = Eval(statement, env)

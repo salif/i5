@@ -2,8 +2,8 @@
 
 fn main() {
 	array = $array.new()
-	array = $array.push(array, 1)
-	array = $array.push(array, 2)
+	array = $array.add(array, 1)
+	array = $array.add(array, 2)
 	$print(array)
-	# output: "[1, 2, ]"
+	# output: "[1, 2]"
 }

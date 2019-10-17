@@ -6,13 +6,11 @@ import (
 	"github.com/i5/i5/src/interpreter"
 	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/io/file"
-	"github.com/i5/i5/src/lexer"
-	"github.com/i5/i5/src/parser"
 	"github.com/i5/i5/src/printer"
 )
 
 var (
-	ap ArgsParser = InitArgsParser("i5 [options] [file] [arguments]", "Options")
+	ap ArgumentsParser = InitArgumentsParser("i5 [options] [file] [arguments]", "Options")
 
 	_help    = ap.Bool("help", "print help")
 	_code    = ap.Bool("code", "print code")
@@ -26,7 +24,7 @@ var (
 )
 
 // Parse CLI arguments
-func ParseArgs() {
+func ParseArguments() {
 
 	ap.Parse()
 
@@ -59,44 +57,42 @@ func ParseArgs() {
 	}
 
 	if len(*_eval) > 0 {
-		runEval(*_eval, *_args)
+		console.SetArguments(*_args)
+		runEval(*_eval)
 	} else if len(*_args) > 0 {
-		runFileOrPackage((*_args)[0], *_args)
+		console.SetArguments(*_args)
+		runFileOrDirectory((*_args)[0])
 	}
 }
 
-func runEval(content string, arguments []string) {
+func runEval(content string) {
 	if *_code || *_tokens || *_ast {
 		printer.Print(content, false, *_code, *_tokens, *_ast)
 	} else {
-		interpreter.RunFile(parser.Run(lexer.Run([]byte(content))), arguments)
+		interpreter.RunFile([]byte(content))
 	}
 }
 
-func runFile(name string, arguments []string) {
+func runFile(fileName string) {
 	if *_code || *_tokens || *_ast {
-		printer.Print(name, true, *_code, *_tokens, *_ast)
+		printer.Print(fileName, true, *_code, *_tokens, *_ast)
 	} else {
-		interpreter.RunFile(parser.Run(lexer.Run(file.Read(name))), arguments)
+		interpreter.RunFile(file.Read(fileName))
 	}
 }
-func runPackage(name string, arguments []string) {
-	if file.Exists(constants.I5_MOD_FILE_NAME) {
-		interpreter.RunModule(name, arguments)
-	} else {
-		interpreter.RunPackage(name, arguments)
-	}
+func runDirectory(directoryName string) {
+	interpreter.RunDirectory(directoryName)
 }
 
-func runFileOrPackage(name string, arguments []string) {
-	var result int = file.Info(name)
+func runFileOrDirectory(fileOrDirectoryName string) {
+	var result int = file.Info(fileOrDirectoryName)
 	switch result {
 	case 1:
-		console.ThrowError(1, constants.FILE_NOT_FOUND, name)
+		console.ThrowError(1, constants.FILE_NOT_FOUND, fileOrDirectoryName)
 	case 2:
-		runPackage(name, arguments)
+		runDirectory(fileOrDirectoryName)
 	case 3:
-		runFile(name, arguments)
+		runFile(fileOrDirectoryName)
 	}
 }
 

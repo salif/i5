@@ -12,3 +12,7 @@ func (this String) Type() TYPE {
 func (this String) StringValue() string {
 	return this.Value
 }
+
+func (this String) GenKey() Key {
+	return Key{Type: this.Type(), Value: this}
+}

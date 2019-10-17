@@ -14,3 +14,7 @@ func (this Integer) Type() TYPE {
 func (this Integer) StringValue() string {
 	return console.Format("%v", this.Value)
 }
+
+func (this Integer) GenKey() Key {
+	return Key{Type: this.Type(), Value: this}
+}
