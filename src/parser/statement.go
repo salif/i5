@@ -12,6 +12,8 @@ func (p *Parser) parseStatement() ast.Node {
 		return p.parseIf()
 	case types.SWITCH:
 		return p.parseSwitch()
+	case types.LOOP:
+		return p.parseLoop()
 	case types.RETURN:
 		return p.parseReturn()
 	case types.THROW:

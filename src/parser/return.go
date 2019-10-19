@@ -9,7 +9,12 @@ import (
 func (p *Parser) parseReturn() ast.Node {
 	stmt := ast.Return{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // skip 'return'
-	stmt.SetBody(p.parseExpression(LOWEST))
+	if p.peek.Type == ast.RETURN {
+		stmt.SetBody(ast.Return{}.Init(p.peek.Line, p.peek.Type))
+		p.next()
+	} else {
+		stmt.SetBody(p.parseExpression(LOWEST))
+	}
 	p.require(types.EOL)
 	p.next() // skip EOL
 	return stmt

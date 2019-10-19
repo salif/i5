@@ -12,9 +12,10 @@ func (p *Parser) parseSwitch() ast.Node {
 	stmt.SetCondition(p.parseExpression(LOWEST))
 	var cases []ast.Case
 	cs := ast.Case{}.Init(p.peek.Line)
+	p.require(types.LBRACE)
+	p.next()
 	p.require(types.EOL)
 	p.next()
-
 	for p.peek.Type == types.CASE {
 		p.next()
 		expr := p.parseExpression(LOWEST)
@@ -38,7 +39,11 @@ func (p *Parser) parseSwitch() ast.Node {
 	}
 
 	p.require(types.EOL)
-	p.next() // skip EOL
+	p.next()
+	p.require(types.RBRACE)
+	p.next()
+	p.require(types.EOL)
+	p.next()
 
 	return stmt
 }

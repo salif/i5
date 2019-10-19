@@ -1,13 +1,14 @@
 #!/usr/bin/env i5
 
 fn main() {
-	fn for(i end) {
-		if i < end {
-			$print(i)
-			for(i + 1, end)
+	i = 0
+	loop {
+		if i > 9 {
+			return return
 		}
+		$print(i)
+		i += 1
 	}
-	for(0, 10)
 
 	`
 	output:

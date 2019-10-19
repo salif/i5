@@ -22,6 +22,9 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return evalBlock(node, env, node.GetLine())
 
 	case ast.Return:
+		if node.GetBody().GetType() == ast.RETURN {
+			return object.Return{Value: object.Return{}}
+		}
 		val := Eval(node.GetBody(), env)
 		if isError(val) {
 			return val
@@ -189,6 +192,8 @@ func Eval(nodei ast.Node, env *object.Env) object.Object {
 		return evalImport(node, env, node.GetLine())
 	case ast.Try:
 		return evalTry(node, env, node.GetLine())
+	case ast.Loop:
+		return evalLoop(node, env, node.GetLine())
 	default:
 		return object.Error{Message: console.Format(constants.IR_INVALID_EVAL, node.GetType()), Line: node.GetLine()}
 	}

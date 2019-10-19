@@ -41,6 +41,8 @@ func IsKeyword(char string) (string, bool) {
 		return types.SWITCH, true
 	case types.CASE:
 		return types.CASE, true
+	case types.LOOP:
+		return types.LOOP, true
 	case types.FN:
 		return types.FN, true
 	case types.RETURN:
@@ -59,6 +61,10 @@ func IsKeyword(char string) (string, bool) {
 		return types.TRUE, true
 	case types.FALSE:
 		return types.FALSE, true
+	case types.ANDAND:
+		return types.ANDAND, true
+	case types.OROR:
+		return types.OROR, true
 	default:
 		return "", false
 	}

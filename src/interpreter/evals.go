@@ -88,7 +88,18 @@ func evalSwitch(s ast.Switch, env *object.Env, line int) object.Object {
 	// TODO
 }
 
-func evalIndex(left object.Object, right string, env *object.Env, line int) object.Object {
+func evalLoop(l ast.Loop, env *object.Env, line int) object.Object {
+	for {
+		result := Eval(l.GetBody(), env)
+		if result.Type() == object.ERROR {
+			return result
+		} else if result.Type() == object.RETURN {
+			if result.Type() == object.RETURN {
+				break
+			}
+			return result
+		}
+	}
 	return object.Void{}
 }
 
@@ -177,6 +188,9 @@ func extendFunctionEnv(fn object.Function, args []object.Object) *object.Env {
 
 func unwrapReturnValue(obj object.Object) object.Object {
 	if returnValue, ok := obj.(object.Return); ok {
+		if returnValue.Value.Type() == object.RETURN {
+			return object.Void{}
+		}
 		return returnValue.Value
 	} else {
 		return obj

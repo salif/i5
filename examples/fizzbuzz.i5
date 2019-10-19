@@ -5,23 +5,23 @@ fn main() {
 }
 
 fn fizzbuzz() {
-	fn for(i end) {
-		if i <= end {
-			result = ""
-			if i % 3 == 0 {
-				result := "Fizz"
-			}
-			if i % 5 == 0 {
-				result := "Buzz"
-			}
-			if result != "" {
-				$print(result)
-			} else {
-				$print(i)
-			}
-			i += 1
-			for(i, end)
+	i = 0
+	loop {
+		if i > 100 {
+			return return
 		}
+		result = ""
+		if i % 3 == 0 {
+			result := "Fizz"
+		}
+		if i % 5 == 0 {
+			result := "Buzz"
+		}
+		if result != "" {
+			$print(result)
+		} else {
+			$print(i)
+		}
+		i += 1
 	}
-	for(1, 100)
 }

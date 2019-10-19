@@ -236,22 +236,12 @@ func Run(code []byte) (tokens types.TokenList) {
 			}
 		// &
 		case AND:
+			tokens.Add(types.AND, types.AND, scanner.Line())
 			scanner.Next()
-			if scanner.Peek() == AND {
-				tokens.Add(types.ANDAND, types.ANDAND, scanner.Line())
-				scanner.Next()
-			} else {
-				tokens.Add(types.AND, types.AND, scanner.Line())
-			}
 		// |
 		case OR:
+			tokens.Add(types.OR, types.OR, scanner.Line())
 			scanner.Next()
-			if scanner.Peek() == OR {
-				tokens.Add(types.OROR, types.OROR, scanner.Line())
-				scanner.Next()
-			} else {
-				tokens.Add(types.OR, types.OR, scanner.Line())
-			}
 		// ^
 		case XOR:
 			tokens.Add(types.XOR, types.XOR, scanner.Line())
