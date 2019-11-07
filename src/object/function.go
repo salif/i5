@@ -6,8 +6,8 @@ import (
 )
 
 type Function struct {
-	Params []ast.Identifier
-	Body   ast.Block
+	Params ast.Identifiers
+	Body   ast.Node
 	Env    *Env
 }
 
@@ -17,16 +17,4 @@ func (this Function) Type() TYPE {
 
 func (this Function) StringValue() string {
 	return "[type: function]"
-}
-
-type Return struct {
-	Value Object
-}
-
-func (this Return) Type() TYPE {
-	return RETURN
-}
-
-func (this Return) StringValue() string {
-	return this.Value.StringValue()
 }

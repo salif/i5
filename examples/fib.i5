@@ -1,11 +1,11 @@
 #!/usr/bin/env i5
 
-fn main() {
+main = () => {
 	$print(fib(13))
 	# output: "233"
 }
 
-fn fib(n) {
+fib = (n) => {
 	if n < 2 {
 		return n
 	}

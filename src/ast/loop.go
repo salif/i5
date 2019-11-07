@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/io/console"
+import "strings"
 
 type Loop struct {
-	line  int
+	line  uint32
 	token string
 	body  Block
 }
@@ -13,13 +13,15 @@ func (this Loop) GetType() string {
 	return LOOP
 }
 
-func (this Loop) Print() {
-	console.Print(this.token)
-	console.Print(" ")
-	this.body.Print()
+func (this Loop) Debug() string {
+	var result strings.Builder
+	result.WriteString(this.token)
+	result.WriteString(" ")
+	result.WriteString(this.body.Debug())
+	return result.String()
 }
 
-func (this Loop) GetLine() int {
+func (this Loop) GetLine() uint32 {
 	return this.line
 }
 
@@ -27,7 +29,7 @@ func (this Loop) GetBody() Block {
 	return this.body
 }
 
-func (this Loop) Init(line int, token string) Loop {
+func (this Loop) Init(line uint32, token string) Loop {
 	this.line = line
 	this.token = token
 	return this

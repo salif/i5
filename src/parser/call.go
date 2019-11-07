@@ -6,14 +6,28 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseCall(fn ast.Node) ast.Node {
-	p.require(types.LPAREN)
-	p.next() // skip '('
-	p.expect(p.peek.Type == types.EOL)
-	expr := ast.Call{}.Init(p.peek.Line, fn)
-	expr.SetArguments(p.parseList(types.RPAREN))
-	p.expect(p.peek.Type == types.EOL)
-	p.require(types.RPAREN)
-	p.next() // skip ')'
-	return expr
+func (p *Parser) parseCall(fn ast.Node) (ast.Node, error) {
+	err := p.require(p.peek.Type, types.LPAREN)
+	if err != nil {
+		return nil, err
+	}
+	p.next() // '('
+	if p.peek.Type == types.EOL {
+		p.next()
+	}
+	node := ast.Call{}.Init(p.peek.Line, fn)
+	args, err := p.parseList(types.RPAREN)
+	if err != nil {
+		return nil, err
+	}
+	node.SetArguments(args)
+	if p.peek.Type == types.EOL {
+		p.next()
+	}
+	err = p.require(p.peek.Type, types.RPAREN)
+	if err != nil {
+		return nil, err
+	}
+	p.next() // ')'
+	return node, nil
 }

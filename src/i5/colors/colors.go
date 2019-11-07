@@ -1,9 +1,28 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package console
+package colors
 
-import "html"
+import (
+	"fmt"
+	"html"
+
+	"github.com/i5/i5/src/constants"
+)
 
 var colorize func(string, string) string = defaultColor
+
+func SetColorFormat(format string) error {
+	switch format {
+	case "no-color":
+		colorize = noColor
+	case "html":
+		colorize = htmlColor
+	case "default":
+		colorize = defaultColor
+	default:
+		return fmt.Errorf(constants.ARGS_UNKNOWN_CLR, format)
+	}
+	return nil
+}
 
 func Color(text string, color string) string {
 	return colorize(text, color)

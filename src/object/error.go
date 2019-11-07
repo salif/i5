@@ -2,30 +2,46 @@
 package object
 
 import (
-	"github.com/i5/i5/src/io/console"
+	"fmt"
+
+	"github.com/i5/i5/src/i5/colors"
 )
 
 type Error struct {
-	Line    int
-	Message string
+	isFatal bool
+	line    uint32
+	number  Integer
+	message String
 }
 
 func (this Error) Type() TYPE {
 	return ERROR
 }
 
+func (this Error) Init(isFatal bool, line uint32, number Integer, message String) Error {
+	return Error{isFatal: isFatal, line: line, number: number, message: message}
+}
+
+func (this Error) GetIsFatal() bool {
+	return this.isFatal
+}
+
+func (this Error) GetNumber() Integer {
+	return this.number
+}
+
+func (this Error) GetMessage() String {
+	return this.message
+}
+
+func (this *Error) SetIsFatal(isFatal bool) {
+	this.isFatal = isFatal
+}
+
 func (this Error) StringValue() string {
-	if this.Line > 0 {
-		return console.Format("line %d: %v", this.Line, this.Message)
-	} else {
-		return console.Format("%v", this.Message)
-	}
+	return fmt.Sprintf("%s", this.message.StringValue())
 }
 
-func (this Error) GetMessage() Object {
-	return String{Value: this.Message}
-}
-
-func (this Error) Clone() Object {
-	return Error{Message: this.Message, Line: this.Line}
+func (this Error) NativeError(fileName string) error {
+	return fmt.Errorf("%s%s\n%s%s:%v\n", colors.Red("error: "), this.StringValue(), colors.Red("in: "), fileName, this.line)
 }

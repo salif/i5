@@ -2,18 +2,18 @@
 package lexer
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/types"
 )
 
-// Scan code and return TokenList or throw error
-func Run(code []byte) (tokens types.TokenList) {
-	tokens.Init()
+// Scan code and return TokenList or return error
+func Run(fileName string, code []byte) (types.TokenList, error) {
+	var tokens types.TokenList
 	var scanner Scanner
-	scanner.Init(code, func(length int, position int, line int) {
-		console.ThrowSyntaxError(1, constants.LEXER_OUT_OF_RANGE, line, "")
-	})
+	tokens.Init()
+	scanner.Init(code)
 
 	for scanner.HasNext() {
 
@@ -43,7 +43,7 @@ func Run(code []byte) (tokens types.TokenList) {
 				scanner.Next()
 				scanner.NextLine()
 			} else {
-				console.ThrowSyntaxError(1, constants.LEXER_UNEXPECTED_TOKEN, scanner.Line(), string(92))
+				return tokens, newError(fmt.Sprintf("%v:%d", fileName, scanner.Line()), constants.LEXER_UNEXPECTED_TOKEN, string(92), 92)
 			}
 			continue
 		}
@@ -177,6 +177,9 @@ func Run(code []byte) (tokens types.TokenList) {
 			if scanner.Peek() == EQ {
 				tokens.Add(types.EQEQ, types.EQEQ, scanner.Line())
 				scanner.Next()
+			} else if scanner.Peek() == GT {
+				tokens.Add(types.EQGT, types.EQGT, scanner.Line())
+				scanner.Next()
 			} else {
 				tokens.Add(types.EQ, types.EQ, scanner.Line())
 			}
@@ -286,6 +289,15 @@ func Run(code []byte) (tokens types.TokenList) {
 			} else {
 				tokens.Add(types.COLON, types.COLON, scanner.Line())
 			}
+		// ?
+		case QM:
+			scanner.Next()
+			if scanner.Peek() == QM {
+				tokens.Add(types.QMQM, types.QMQM, scanner.Line())
+				scanner.Next()
+			} else {
+				tokens.Add(types.QM, types.QM, scanner.Line())
+			}
 		// .
 		case DOT:
 			tokens.Add(types.DOT, types.DOT, scanner.Line())
@@ -310,22 +322,10 @@ func Run(code []byte) (tokens types.TokenList) {
 		case RBRACE:
 			tokens.Add(types.RBRACE, types.RBRACE, scanner.Line())
 			scanner.Next()
-		// [
-		case LBRACKET:
-			tokens.Add(types.LBRACKET, types.LBRACKET, scanner.Line())
-			scanner.Next()
-		// ]
-		case RBRACKET:
-			tokens.Add(types.RBRACKET, types.RBRACKET, scanner.Line())
-			scanner.Next()
-		// ?
-		case QM:
-			tokens.Add(types.QM, types.QM, scanner.Line())
-			scanner.Next()
 		default:
-			console.ThrowSyntaxError(1, constants.LEXER_UNEXPECTED_TOKEN, scanner.Line(), console.Format("%v", scanner.Peek()))
+			return tokens, newError(fmt.Sprintf("%v:%d", fileName, scanner.Line()), constants.LEXER_UNEXPECTED_TOKEN, string(scanner.Peek()), scanner.Peek())
 		}
 	}
 	tokens.Add(types.EOF, types.EOF, scanner.Line())
-	return tokens
+	return tokens, nil
 }

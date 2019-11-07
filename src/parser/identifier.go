@@ -6,9 +6,22 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseIdentifier() ast.Node {
-	p.require(types.IDENT)
-	expr := ast.Identifier{}.Init(p.peek.Line, p.peek.Value)
+func (p *Parser) parseIdentifier() (ast.Node, error) {
+	err := p.require(p.peek.Type, types.IDENT)
+	if err != nil {
+		return nil, err
+	}
+	node := ast.Identifier{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
-	return expr
+	if p.peek.Type == types.IDENT {
+		result := ast.Identifiers{}.Init(node.GetLine())
+		result.Append(node)
+		for p.peek.Type == types.IDENT {
+			result.Append(ast.Identifier{}.Init(p.peek.Line, p.peek.Value))
+			p.next()
+		}
+		return result, nil
+	} else {
+		return node, nil
+	}
 }

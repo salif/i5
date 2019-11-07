@@ -1,39 +1,38 @@
 #!/usr/bin/env i5
 
-fn main() {
-	print("begin") # output: "begin"
+log = $print
+user_types = $array.new("admin", "moderator")
 
-	users = $array.new()
+main = () => {
+	log("begin") # output: "begin"
 
-	hello_user1 = get_user("User", 1, "Hello")
-	$print(hello_user1) # output: "Hello User1!"
-	users = $array.add(users, hello_user1)
+	hi_array = $array.new()
 
-	hello_user2 = get_user("User", 2, "Hi")
-	$print(hello_user2) # output: "Hi User2!"
-	users = $array.add(users, hello_user2)
+	hi_lorem = say_hi_to_user("moderator", "Lorem")
+	log(hi_lorem) # output: "Hi moderator Lorem!"
+	hi_array = $array.add(hi_array, hi_lorem)
 
-	try {
-		hello_user3 = get_user("Invalid User", -1, "Hello")
-		$print(hello_user3)
-		users = $array.add(users, hello_user3)
-	} catch err {
-		$print("there was a problem: \"" : err : "\"")
-		# output: "there was a problem: "Invalid user number!""
+	hi_ipsum = say_hi_to_user("admin", "Ipsum")
+	log(hi_ipsum) # output: "Hi admin Ipsum!"
+	hi_array = $array.add(hi_array, hi_ipsum)
+
+	hi_john = say_hi_to_user("invalid", "John")
+	if err ? hi_john {
+		$printf('there was a problem: "%s"', err.message)
+	} else {
+		log(hi_john)
+		hi_array = $array.add(hi_array, hi_john)
 	}
+	# output: 'there was a problem: "Invalid user type!"'
 
-	print(users) # output: "["Hello User1!", "Hi User2!"]"
+	log(hi_array) # output: '["Hi moderator Lorem!", "Hi admin Ipsum!"]'
 
-	print("end") # output: "end"
+	log("end") # output: "end"
 }
 
-fn print(text) {
-	$print(text)
-}
-
-fn get_user(user user_num hello) {
-	if user_num < 0 {
-		throw "Invalid user number!"
+say_hi_to_user = (user_type user_name) => {
+	if $array.contains(user_types, user_type) {
+		return $error.new("Invalid user type!")
 	}
-	return hello:" ":user:user_num:"!"
+	return "Hi ":user_type:" ":user_name:"!"
 }

@@ -2,11 +2,12 @@
 package printer
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/io/console"
 )
 
-func printAst(_ast ast.Node) {
-	_ast.Print()
-	console.Println()
+func PrintAst(_ast ast.Node) {
+	fmt.Print(_ast.Debug())
+	fmt.Println()
 }

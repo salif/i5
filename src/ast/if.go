@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/io/console"
+import (
+	"strings"
+
+	"github.com/i5/i5/src/types"
+)
 
 type If struct {
-	line        int
+	line        uint32
 	token       string
 	condition   Node
 	consequence Block
@@ -15,19 +19,23 @@ func (this If) GetType() string {
 	return IF
 }
 
-func (this If) Print() {
-	console.Print(this.token)
-	console.Print(" ")
-	this.condition.Print()
-	console.Print(" ")
-	this.consequence.Print()
-	if this.alternative.body != nil {
-		console.Print(" else ")
-		this.alternative.Print()
+func (this If) Debug() string {
+	var result strings.Builder
+	result.WriteString(this.token)
+	result.WriteString(" ")
+	result.WriteString(this.condition.Debug())
+	result.WriteString(" ")
+	result.WriteString(this.consequence.Debug())
+	if this.HaveAlternative() {
+		result.WriteString(" ")
+		result.WriteString(types.ELSE)
+		result.WriteString(" ")
+		result.WriteString(this.alternative.Debug())
 	}
+	return result.String()
 }
 
-func (this If) GetLine() int {
+func (this If) GetLine() uint32 {
 	return this.line
 }
 
@@ -47,7 +55,7 @@ func (this If) HaveAlternative() bool {
 	return this.alternative.body != nil
 }
 
-func (this If) Init(line int, token string) If {
+func (this If) Init(line uint32, token string) If {
 	this.line = line
 	this.token = token
 	return this

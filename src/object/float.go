@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package object
 
-import "github.com/i5/i5/src/io/console"
+import "fmt"
 
 type Float struct {
 	Value float64
@@ -12,7 +12,7 @@ func (this Float) Type() TYPE {
 }
 
 func (this Float) StringValue() string {
-	return console.Format("%v", this.Value)
+	return fmt.Sprint(this.Value)
 }
 
 func (this Float) GenKey() Key {

@@ -13,17 +13,15 @@ type Mappable interface {
 }
 
 const (
-	VOID     = "null"
-	INTEGER  = "integer"
-	FLOAT    = "float"
-	STRING   = "string"
-	BOOL     = "bool"
-	RETURN   = "return"
-	THROW    = "throw"
-	ERROR    = "error"
-	FUNCTION = "function"
-	BUILTIN  = "builtin"
-	ARRAY    = "array"
-	MAP      = "map"
-	MODULE   = "module"
+	INTEGER  TYPE = "integer"
+	FLOAT    TYPE = "float"
+	STRING   TYPE = "string"
+	BOOL     TYPE = "bool"
+	ERROR    TYPE = "error"
+	FUNCTION TYPE = "function"
+	BUILTIN  TYPE = "builtin"
+	ARRAY    TYPE = "array"
+	MAP      TYPE = "map"
+	RETURN   TYPE = "return"
+	THROW    TYPE = "throw"
 )

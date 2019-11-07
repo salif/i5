@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/io/console"
-
 type Identifier struct {
-	line  int
+	line  uint32
 	token string
 }
 
@@ -12,11 +10,11 @@ func (this Identifier) GetType() string {
 	return IDENTIFIER
 }
 
-func (this Identifier) Print() {
-	console.Print(this.token)
+func (this Identifier) Debug() string {
+	return this.token
 }
 
-func (this Identifier) GetLine() int {
+func (this Identifier) GetLine() uint32 {
 	return this.line
 }
 
@@ -24,7 +22,7 @@ func (this Identifier) GetValue() string {
 	return this.token
 }
 
-func (this Identifier) Init(line int, token string) Identifier {
+func (this Identifier) Init(line uint32, token string) Identifier {
 	this.line = line
 	this.token = token
 	return this

@@ -4,197 +4,77 @@ package interpreter
 import (
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/io/console"
 	"github.com/i5/i5/src/object"
-	"github.com/i5/i5/src/types"
 )
 
-func Eval(nodei ast.Node, env *object.Env) object.Object {
-	switch node := nodei.(type) {
+func evalProgramNodes(programs []ast.Node, env *object.Env) object.Error {
+	for _, program := range programs {
+		var result object.Error = evalProgramNode(program, env)
+		if result.GetIsFatal() {
+			return result
+		}
+	}
+	return Nil(0)
+}
 
+func evalProgramNode(program ast.Node, env *object.Env) object.Error {
+	var result object.Object = Eval(program, env)
+	if err, ok := result.(object.Error); ok && err.GetIsFatal() {
+		return err
+	} else {
+		return Nil(program.GetLine())
+	}
+}
+
+func evalMainFunction(env *object.Env) object.Object {
+	if mainFunction, ok := env.Get(constants.MAIN_FUNCTION_NAME); ok {
+		return callFunction(mainFunction, []object.Object{}, 0)
+	} else {
+		return newError(false, 0, constants.ERROR_REFERENCE, constants.IR_MAIN_FN_NOT_FOUND)
+	}
+}
+
+func Eval(node ast.Node, env *object.Env) object.Object {
+	switch node := node.(type) {
 	case ast.Program:
-		return evalProgram(node, env, node.GetLine())
-
-	case ast.Expression:
-		return Eval(node.GetBody(), env)
-
+		return evalProgram(node, env)
 	case ast.Block:
-		return evalBlock(node, env, node.GetLine())
-
+		return evalBlock(node, env)
 	case ast.Return:
-		if node.GetBody().GetType() == ast.RETURN {
-			return object.Return{Value: object.Return{}}
-		}
-		val := Eval(node.GetBody(), env)
-		if isError(val) {
-			return val
-		}
-		return object.Return{Value: val}
-
+		return evalReturn(node, env)
 	case ast.Assign:
-		left := node.GetLeft()
-		switch left := left.(type) {
-		case ast.Identifier:
-			right := Eval(node.GetRight(), env)
-			if isError(right) {
-				return right
-			}
-			if isVoid(right) {
-				right = object.Void{Value: left.GetValue()}
-			}
-			env.Set(left.GetValue(), right)
-			return right
-		case ast.Index:
-			right := Eval(node.GetRight(), env)
-			if isError(right) {
-				return right
-			}
-			if isVoid(right) {
-				return object.Error{Message: right.StringValue(), Line: node.GetLine()}
-			}
-			leftIndex := Eval(left.GetLeft(), env)
-			if isError(leftIndex) {
-				return leftIndex
-			}
-			if isVoid(leftIndex) {
-				return object.Error{Message: leftIndex.StringValue(), Line: node.GetLine()}
-			}
-			if leftIndex.Type() == object.MAP {
-				switch rightIndex := left.GetRight().(type) {
-				case ast.Identifier:
-					_map := leftIndex.(object.Map)
-					return nativeToBool(_map.Set(object.String{Value: rightIndex.GetValue()}, right))
-				case ast.Integer:
-					_map := leftIndex.(object.Map)
-					return nativeToBool(_map.Set(object.Integer{Value: rightIndex.GetValue()}, right))
-				default:
-					return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, leftIndex.Type(), left.GetOperator(), rightIndex.GetType()), Line: node.GetLine()}
-				}
-			} else {
-				return object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, leftIndex.Type(), left.GetOperator()), Line: node.GetLine()}
-			}
-		default:
-			return object.Error{Message: console.Format(constants.IR_CANNOT_ASSIGN, left.GetType()), Line: node.GetLine()}
-		}
+		return evalAssign(node, env)
 	case ast.Call:
-		function := Eval(node.GetCaller(), env)
-		if isError(function) {
-			return function
-		}
-		if isVoid(function) {
-			return object.Error{Message: function.StringValue(), Line: node.GetLine()}
-		}
-		args := evalExpressions(node.GetArguments(), env, node.GetLine())
-		if len(args) == 1 && isError(args[0]) {
-			return args[0]
-		}
-		if len(args) == 1 && isVoid(args[0]) {
-			return object.Error{Message: args[0].StringValue(), Line: node.GetLine()}
-		}
-		return callFunction(function, args, node.GetLine())
+		return evalCall(node, env)
 	case ast.Function:
-		return object.Function{Params: node.GetParams(), Body: node.GetBody(), Env: env}
+		return evalFunction(node, env)
 	case ast.Identifier:
-		return evalIdentifier(node, env, node.GetLine())
+		return evalIdentifier(node, env)
 	case ast.Builtin:
-		return evalBuiltin(node, env, node.GetLine())
+		return evalBuiltin(node, env)
 	case ast.Integer:
-		return object.Integer{Value: node.GetValue()}
+		return evalInteger(node, env)
 	case ast.Float:
-		return object.Float{Value: node.GetValue()}
+		return evalFloat(node, env)
 	case ast.String:
-		return object.String{Value: node.GetValue()}
-	case ast.Bool:
-		return nativeToBool(node.GetValue())
+		return evalString(node, env)
 	case ast.Throw:
-		val := Eval(node.GetBody(), env)
-		if isError(val) {
-			return val
-		}
-		if isVoid(val) {
-			return object.Error{Message: val.StringValue(), Line: node.GetLine()}
-		}
-		return object.Error{Message: val.StringValue(), Line: node.GetLine()}
+		return evalThrow(node, env)
 	case ast.Prefix:
-		right := Eval(node.GetRight(), env)
-		if isError(right) {
-			return right
-		}
-		if isVoid(right) {
-			return object.Error{Message: right.StringValue(), Line: node.GetLine()}
-		}
-		return evalPrefix(node.GetOperator(), right, env, node.GetLine())
+		return evalPrefixNode(node, env)
 	case ast.Infix:
-		left := Eval(node.GetLeft(), env)
-		if isError(left) {
-			return left
-		}
-		if isVoid(left) {
-			return object.Error{Message: left.StringValue(), Line: node.GetLine()}
-		}
-		right := Eval(node.GetRight(), env)
-		if isError(right) {
-			return right
-		}
-		if isVoid(right) {
-			return object.Error{Message: right.StringValue(), Line: node.GetLine()}
-		}
-		return evalInfix(node.GetOperator(), left, right, env, node.GetLine())
+		return evalInfixNode(node, env)
 	case ast.Postfix:
-		left := Eval(node.GetLeft(), env)
-		if isError(left) {
-			return left
-		}
-		if node.GetOperator() == types.QM {
-			return nativeToBool(left.Type() != object.VOID)
-		}
-		if isVoid(left) {
-			return object.Error{Message: left.StringValue(), Line: node.GetLine()}
-		}
-		return evalPostfix(node.GetOperator(), left, env, node.GetLine())
+		return evalPostfixNode(node, env)
 	case ast.Index:
-		left := Eval(node.GetLeft(), env)
-		if isError(left) {
-			return left
-		}
-		if isVoid(left) {
-			return object.Error{Message: left.StringValue(), Line: node.GetLine()}
-		}
-		if left.Type() == object.MAP {
-			switch rnode := node.GetRight().(type) {
-			case ast.Identifier:
-				_map := left.(object.Map)
-				obj := _map.Get(object.String{Value: rnode.GetValue()})
-				if isVoid(obj) {
-					return object.Error{Message: console.Format(constants.IR_MAP_KEY_NOT_FOUND, rnode.GetValue()), Line: node.GetLine()}
-				} else {
-					return obj
-				}
-			case ast.Integer:
-				_map := left.(object.Map)
-				obj := _map.Get(object.Integer{Value: rnode.GetValue()})
-				if isVoid(obj) {
-					return object.Error{Message: console.Format(constants.IR_MAP_KEY_NOT_FOUND, rnode.GetValue()), Line: node.GetLine()}
-				} else {
-					return obj
-				}
-			default:
-				return object.Error{Message: console.Format(constants.IR_INVALID_INFIX, left.Type(), node.GetOperator(), rnode.GetType()), Line: node.GetLine()}
-			}
-		} else {
-			return object.Error{Message: console.Format(constants.IR_INVALID_POSTFIX, left.Type(), node.GetOperator()), Line: node.GetLine()}
-		}
+		return evalIndex(node, env)
 	case ast.If:
-		return evalIf(node, env, node.GetLine())
+		return evalIf(node, env)
 	case ast.Switch:
-		return evalSwitch(node, env, node.GetLine())
-	case ast.Import:
-		return evalImport(node, env, node.GetLine())
-	case ast.Try:
-		return evalTry(node, env, node.GetLine())
+		return evalSwitch(node, env)
 	case ast.Loop:
-		return evalLoop(node, env, node.GetLine())
+		return evalLoop(node, env)
 	default:
-		return object.Error{Message: console.Format(constants.IR_INVALID_EVAL, node.GetType()), Line: node.GetLine()}
+		return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_INVALID_EVAL, node.GetType())
 	}
 }

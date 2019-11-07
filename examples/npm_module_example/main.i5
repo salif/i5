@@ -1,6 +1,6 @@
-sum = import("sum")
+sum = $import("sum")
 
-fn main() {
+main = () => {
 	$print(sum.sum(1, 2))
 	# output: "3"
 }

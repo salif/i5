@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/io/console"
+import (
+	"strings"
+)
 
 type Assign struct {
-	line     int
+	line     uint32
 	operator string
 	left     Node
 	right    Node
@@ -14,19 +16,23 @@ func (this Assign) GetType() string {
 	return ASSIGN
 }
 
-func (this Assign) Print() {
-	this.left.Print()
-	console.Print(" ")
-	console.Print(this.operator)
-	console.Print(" ")
-	this.right.Print()
+func (this Assign) Debug() string {
+	var result strings.Builder
+	result.WriteString("(")
+	result.WriteString(this.left.Debug())
+	result.WriteString(" ")
+	result.WriteString(this.operator)
+	result.WriteString(" ")
+	result.WriteString(this.right.Debug())
+	result.WriteString(")")
+	return result.String()
 }
 
-func (this Assign) GetLine() int {
+func (this Assign) GetLine() uint32 {
 	return this.line
 }
 
-func (this Assign) Init(line int, operator string, left Node) Assign {
+func (this Assign) Init(line uint32, operator string, left Node) Assign {
 	this.line = line
 	this.operator = operator
 	this.left = left

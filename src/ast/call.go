@@ -2,11 +2,11 @@
 package ast
 
 import (
-	"github.com/i5/i5/src/io/console"
+	"strings"
 )
 
 type Call struct {
-	line      int
+	line      uint32
 	caller    Node
 	arguments []Node
 }
@@ -15,24 +15,22 @@ func (this Call) GetType() string {
 	return CALL
 }
 
-func (this Call) Print() {
-	this.caller.Print()
-	console.Print("(")
+func (this Call) Debug() string {
+	var result strings.Builder
+	result.WriteString(this.caller.Debug())
+	result.WriteString("(")
 	for _, a := range this.arguments {
-		a.Print()
-		console.Print(", ")
+		result.WriteString(a.Debug())
 	}
-	if len(this.arguments) > 0 {
-		console.Print("\u0008\u0008")
-	}
-	console.Print(")")
+	result.WriteString(")")
+	return result.String()
 }
 
-func (this Call) GetLine() int {
+func (this Call) GetLine() uint32 {
 	return this.line
 }
 
-func (this Call) Init(line int, caller Node) Call {
+func (this Call) Init(line uint32, caller Node) Call {
 	this.line = line
 	this.caller = caller
 	return this

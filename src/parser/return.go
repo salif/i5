@@ -6,16 +6,18 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseReturn() ast.Node {
-	stmt := ast.Return{}.Init(p.peek.Line, p.peek.Type)
-	p.next() // skip 'return'
-	if p.peek.Type == ast.RETURN {
-		stmt.SetBody(ast.Return{}.Init(p.peek.Line, p.peek.Type))
-		p.next()
-	} else {
-		stmt.SetBody(p.parseExpression(LOWEST))
+func (p *Parser) parseReturn() (ast.Node, error) {
+	node := ast.Return{}.Init(p.peek.Line, p.peek.Type)
+	p.next() // 'return'
+	e, err := p.parseExpression(LOWEST)
+	if err != nil {
+		return nil, err
 	}
-	p.require(types.EOL)
-	p.next() // skip EOL
-	return stmt
+	node.SetBody(e)
+	err = p.require(p.peek.Type, types.EOL)
+	if err != nil {
+		return nil, err
+	}
+	p.next() // 'EOL'
+	return node, nil
 }

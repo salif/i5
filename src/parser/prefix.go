@@ -3,9 +3,13 @@ package parser
 
 import "github.com/i5/i5/src/ast"
 
-func (p *Parser) parsePrefix() ast.Node {
-	expr := ast.Prefix{}.Init(p.peek.Line, p.peek.Value)
+func (p *Parser) parsePrefix() (ast.Node, error) {
+	node := ast.Prefix{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
-	expr.SetRight(p.parseExpression(PREFIX))
-	return expr
+	e, err := p.parseExpression(PREFIX)
+	if err != nil {
+		return nil, err
+	}
+	node.SetRight(e)
+	return node, nil
 }

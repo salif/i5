@@ -1,30 +1,26 @@
 #!/usr/bin/env i5
 
-fn main() {
-	object = newObject()
-	object.setName("My Name")
-	object.setAge(1)
-	$print("name: " : object.getName())
+main = () => {
+	object = new_object()
+	object.set_name("My Name")
+	object.set_age(1)
+	$print("name: " : object.get_name())
 	# output: "name: My Name"
-	$print("age: " : object.getAge())
+	$print("age: " : object.get_age())
 	# output: "age: 1"
 }
 
-fn newObject() {
-	map = $map.new()
-	map.name = ""
-	map.age = 0
-	map.getName = fn() {
-		return map.name
+newObject = () => {
+	this = $map.new()
+	this.name = ""
+	this.age = 0
+	this.get_name = () => this.name
+	this.get_age = () => this.age
+	this.set_name = (name) => {
+		this.name = name
 	}
-	map.getAge = fn() {
-		return map.age
+	this.set_age = (age) => {
+		this.age = age
 	}
-	map.setName = fn(name) {
-		map.name = name
-	}
-	map.setAge = fn(age) {
-		map.age = age
-	}
-	return map
+	return this
 }

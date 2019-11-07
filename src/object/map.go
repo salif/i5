@@ -3,9 +3,10 @@ package object
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 
-	"github.com/i5/i5/src/io/console"
+	"github.com/i5/i5/src/constants"
 )
 
 type Map struct {
@@ -27,9 +28,9 @@ func (this Map) StringValue() string {
 			left = "\"" + left + "\""
 		}
 		if right.Type() == STRING {
-			result = append(result, console.Format("%v: \"%v\"", left, right.StringValue()))
+			result = append(result, fmt.Sprintf("%v: \"%v\"", left, right.StringValue()))
 		} else {
-			result = append(result, console.Format("%v: %v", left, right.StringValue()))
+			result = append(result, fmt.Sprintf("%v: %v", left, right.StringValue()))
 		}
 	}
 	out.WriteString(strings.Join(result, ", "))
@@ -38,14 +39,11 @@ func (this Map) StringValue() string {
 }
 
 func (this *Map) Get(key Object) Object {
-	rkey, ok := key.(Mappable)
-	if !ok {
-		return Void{}
-	}
+	rkey := key.(Mappable)
 	if value, ok := this.Value[rkey.GenKey()]; ok {
 		return value
 	} else {
-		return Void{}
+		return Error{}.Init(false, 0, Integer{Value: constants.ERROR_NIL}, String{Value: "nil"})
 	}
 }
 

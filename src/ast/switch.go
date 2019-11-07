@@ -2,11 +2,14 @@
 package ast
 
 import (
-	"github.com/i5/i5/src/io/console"
+	"fmt"
+	"strings"
+
+	"github.com/i5/i5/src/types"
 )
 
 type Switch struct {
-	line      int
+	line      uint32
 	token     string
 	condition Node
 	cases     []Case
@@ -17,26 +20,30 @@ func (this Switch) GetType() string {
 	return SWITCH
 }
 
-func (this Switch) Print() {
-	console.Print(this.token)
-	console.Print(" ")
-	this.condition.Print()
-	console.Print(" {")
+func (this Switch) Debug() string {
+	var result strings.Builder
+	result.WriteString(this.token)
+	result.WriteString(" ")
+	result.WriteString(this.condition.Debug())
+	result.WriteString(" {")
+	var n []string
 	for _, i := range this.cases {
-		i.Print()
-		console.Print(";")
+		n = append(n, i.Debug())
 	}
+	result.WriteString(strings.Join(n, ";"))
 	if this._else.body != nil {
-		console.Print("else ")
-		this._else.Print()
+		result.WriteString(types.ELSE)
+		result.WriteString(" ")
+		result.WriteString(this._else.Debug())
 	}
+	return result.String()
 }
 
-func (this Switch) GetLine() int {
+func (this Switch) GetLine() uint32 {
 	return this.line
 }
 
-func (this Switch) Init(line int, token string) Switch {
+func (this Switch) Init(line uint32, token string) Switch {
 	this.line = line
 	this.token = token
 	return this
@@ -55,25 +62,28 @@ func (this *Switch) SetElse(_else Block) {
 }
 
 type Case struct {
-	line  int
+	line  uint32
 	cases []Node
 	body  Block
 }
 
-func (this Case) Print() {
+func (this Case) Debug() string {
+	var result strings.Builder
 	for _, i := range this.cases {
-		console.Print("case ")
-		i.Print()
-		console.Print(";")
+		result.WriteString(types.CASE)
+		result.WriteString(" ")
+		result.WriteString(i.Debug())
+		fmt.Print(";")
 	}
-	this.body.Print()
+	result.WriteString(this.body.Debug())
+	return result.String()
 }
 
-func (this Case) GetLine() int {
+func (this Case) GetLine() uint32 {
 	return this.line
 }
 
-func (this Case) Init(line int) Case {
+func (this Case) Init(line uint32) Case {
 	this.line = line
 	return this
 }

@@ -2,65 +2,54 @@
 package ast
 
 import (
-	"github.com/i5/i5/src/io/console"
+	"strings"
 )
 
 type Function struct {
-	line      int
-	token     string
-	anonymous bool
-	params    []Identifier
-	body      Block
+	line   uint32
+	token  string
+	params Identifiers
+	body   Node
 }
 
 func (this Function) GetType() string {
 	return FUNCTION
 }
 
-func (this Function) Print() {
-	if this.anonymous {
-		console.Print(this.token)
-	}
-	console.Print("(")
-	for _, p := range this.params {
-		p.Print()
-		console.Print(" ")
-	}
-
-	console.Print(") ")
-	this.body.Print()
+func (this Function) Debug() string {
+	var result strings.Builder
+	result.WriteString("((")
+	result.WriteString(this.params.Debug())
+	result.WriteString(") ")
+	result.WriteString(this.token)
+	result.WriteString(" ")
+	result.WriteString(this.body.Debug())
+	result.WriteString(")")
+	return result.String()
 }
 
-func (this Function) GetLine() int {
+func (this Function) GetLine() uint32 {
 	return this.line
 }
 
-func (this Function) Init(line int, token string) Function {
+func (this Function) Init(line uint32, token string) Function {
 	this.line = line
 	this.token = token
 	return this
 }
 
-func (this Function) GetAnonymous() bool {
-	return this.anonymous
-}
-
-func (this *Function) SetAnonymous(anonymous bool) {
-	this.anonymous = anonymous
-}
-
-func (this Function) GetParams() []Identifier {
+func (this Function) GetParams() Identifiers {
 	return this.params
 }
 
-func (this *Function) SetParams(params []Identifier) {
+func (this *Function) SetParams(params Identifiers) {
 	this.params = params
 }
 
-func (this Function) GetBody() Block {
+func (this Function) GetBody() Node {
 	return this.body
 }
 
-func (this *Function) SetBody(body Block) {
+func (this *Function) SetBody(body Node) {
 	this.body = body
 }

@@ -1,38 +1,43 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/io/console"
+import (
+	"strings"
+)
 
 type Program struct {
-	line int
-	body []Node
+	line uint32
+	body []Assign
 }
 
 func (this Program) GetType() string {
 	return PROGRAM
 }
 
-func (this Program) Print() {
+func (this Program) Debug() string {
+	var result strings.Builder
+	var n []string
 	for _, s := range this.body {
-		s.Print()
-		console.Print("; ")
+		n = append(n, s.Debug())
 	}
+	result.WriteString(strings.Join(n, "; "))
+	return result.String()
 }
 
-func (this Program) GetLine() int {
+func (this Program) GetLine() uint32 {
 	return this.line
 }
 
-func (this Program) GetBody() []Node {
+func (this Program) GetBody() []Assign {
 	return this.body
 }
 
-func (this Program) Init(line int, body []Node) Program {
+func (this Program) Init(line uint32, body []Assign) Program {
 	this.line = line
 	this.body = body
 	return this
 }
 
-func (this *Program) Append(node Node) {
+func (this *Program) Append(node Assign) {
 	this.body = append(this.body, node)
 }

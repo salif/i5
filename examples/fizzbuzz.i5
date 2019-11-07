@@ -1,14 +1,14 @@
 #!/usr/bin/env i5
 
-fn main() {
+main = () => {
 	fizzbuzz()
 }
 
-fn fizzbuzz() {
+fizzbuzz = () => {
 	i = 0
 	loop {
 		if i > 100 {
-			return return
+			return $break
 		}
 		result = ""
 		if i % 3 == 0 {

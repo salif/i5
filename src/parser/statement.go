@@ -6,7 +6,8 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseStatement() ast.Node {
+// All statements ends with EOL
+func (p *Parser) parseStatement() (ast.Node, error) {
 	switch p.peek.Type {
 	case types.IF:
 		return p.parseIf()
@@ -18,9 +19,16 @@ func (p *Parser) parseStatement() ast.Node {
 		return p.parseReturn()
 	case types.THROW:
 		return p.parseThrow()
-	case types.TRY:
-		return p.parseTry()
 	default:
-		return p.parseExprStatement()
+		node, err := p.parseExpression(LOWEST)
+		if err != nil {
+			return nil, err
+		}
+		err = p.require(p.peek.Type, types.EOL)
+		if err != nil {
+			return nil, err
+		}
+		p.next() // 'EOL'
+		return node, nil
 	}
 }

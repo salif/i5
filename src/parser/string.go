@@ -6,9 +6,12 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseString() ast.Node {
-	p.require(types.STRING)
-	expr := ast.String{}.Init(p.peek.Line, p.peek.Value)
+func (p *Parser) parseString() (ast.Node, error) {
+	err := p.require(p.peek.Type, types.STRING)
+	if err != nil {
+		return nil, err
+	}
+	node := ast.String{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
-	return expr
+	return node, nil
 }

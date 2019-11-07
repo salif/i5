@@ -1,30 +1,17 @@
 #!/usr/bin/env i5
 
-fn main() {
-	try {
-		file = $file.read("file.txt")
-	} catch err {
-		if err == "not found" {
-			$print("file not found!")
-			# output: "file not found!"
-		} else {
-			$print("unknown error")
-		}
-	} finally {
+main = () => {
+	result = divide(2, 0)
+	if err ? result {
+		throw $error.new("error: " : err.message)
 	}
-
-	try {
-		divide(2, 0)
-	} catch err {
-		$print("error: ":err)
-		# output: "error: can not divide by zero!"
-	}
+	$print(result)
+	# output: "error: can not divide by zero!"
 }
 
-fn divide(a b) {
+divide = (a b) => {
 	if b == 0 {
-		throw "can not divide by zero!"
-	} else {
-		return a / b
+		return $error.new("can not divide by zero!")
 	}
+	return a / b
 }

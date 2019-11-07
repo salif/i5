@@ -6,20 +6,30 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseList(end string) []ast.Node {
+func (p *Parser) parseList(end string) ([]ast.Node, error) {
 	var list []ast.Node
 
 	if p.peek.Type == end {
-		return list
+		return list, nil
 	}
 
-	list = append(list, p.parseExpression(LOWEST))
+	e, err := p.parseExpression(LOWEST)
+	if err != nil {
+		return nil, err
+	}
+	list = append(list, e)
 
 	for p.peek.Type == types.COMMA {
-		p.next() // skip ','
-		p.expect(p.peek.Type == types.EOL)
-		list = append(list, p.parseExpression(LOWEST))
+		p.next() // ','
+		if p.peek.Type == types.EOL {
+			p.next() // 'EOL'
+		}
+		e, err := p.parseExpression(LOWEST)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, e)
 	}
 
-	return list
+	return list, nil
 }

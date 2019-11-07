@@ -1,10 +1,10 @@
 #!/usr/bin/env i5
 
-fn main() {
+main = () => {
 	i = 0
 	loop {
 		if i > 9 {
-			return return
+			return $break
 		}
 		$print(i)
 		i += 1

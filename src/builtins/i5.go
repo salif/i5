@@ -9,7 +9,6 @@ import (
 func _i5() object.Object {
 	v := _Map()
 	v.Set(_String("author"), _String("Salif Mehmed"))
-	v.Set(_String("github"), _String("https://github.com/i5/i5.git"))
 	v.Set(_String("version"), _String(constants.MINOR_VERSION))
 	return v
 }

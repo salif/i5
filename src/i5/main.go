@@ -2,101 +2,89 @@
 package i5
 
 import (
-	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/interpreter"
-	"github.com/i5/i5/src/io/console"
-	"github.com/i5/i5/src/io/file"
+	"fmt"
+	"os"
+
 	"github.com/i5/i5/src/printer"
-)
 
-var (
-	ap ArgumentsParser = InitArgumentsParser("i5 [options] [file] [arguments]", "Options")
-
-	_help    = ap.Bool("help", "print help")
-	_code    = ap.Bool("code", "print code")
-	_tokens  = ap.Bool("tokens", "print tokens")
-	_ast     = ap.Bool("ast", "print abstract syntax tree")
-	_output  = ap.String("output", "set output format", "format")
-	_eval    = ap.String("eval", "evaluate code", "code")
-	_init    = ap.Bool("init", "initialize new module")
-	_version = ap.Bool("version", "print current version")
-	_args    = ap.Default()
+	"github.com/i5/i5/src/constants"
+	"github.com/i5/i5/src/i5/args_parser"
+	"github.com/i5/i5/src/i5/colors"
+	"github.com/i5/i5/src/interpreter"
 )
 
 // Parse CLI arguments
 func ParseArguments() {
+	var argumentsParser args_parser.ArgumentsParser
 
-	ap.Parse()
+	argumentsParser.Init("i5 [options] [file] [arguments]", "Options")
+	argumentsParser.Bool("help", "print help")
+	argumentsParser.Bool("code", "print code")
+	argumentsParser.Bool("tokens", "print tokens")
+	argumentsParser.Bool("ast", "print abstract syntax tree")
+	argumentsParser.String("output", "set output format", "format")
+	argumentsParser.String("eval", "evaluate code", "code")
+	argumentsParser.Bool("init", "initialize new module")
+	argumentsParser.Bool("version", "print current version")
 
-	if ap.Empty() || *_help {
-		ap.PrintHelp()
+	err := argumentsParser.Parse()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v%v\n", colors.Red("error: "), err.Error())
 		return
 	}
 
-	if *_init {
+	if argumentsParser.IsEmpty() || argumentsParser.IsTrue("help") {
+		fmt.Println(argumentsParser.GetHelp())
+		return
+	}
+
+	if argumentsParser.IsTrue("init") {
 		InitModule()
 		return
 	}
 
-	if *_version {
+	if argumentsParser.IsTrue("version") {
 		PrintVersion()
 		return
 	}
 
-	if len(*_output) > 0 {
-		switch *_output {
-		case "html":
-			console.SetOutput(console.HTML)
-		case "no-color":
-			console.SetOutput(console.NoColor)
-		case "default":
-			console.SetOutput(console.Default)
-		default:
-			console.ThrowError(1, constants.ARGS_UNKNOWN_CLR, *_output)
+	if len(argumentsParser.Get("output")) > 0 {
+		format := argumentsParser.Get("output")
+		err := colors.SetColorFormat(format)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v%v\n", colors.Red("error: "), err.Error())
+			return
 		}
 	}
 
-	if len(*_eval) > 0 {
-		console.SetArguments(*_args)
-		runEval(*_eval)
-	} else if len(*_args) > 0 {
-		console.SetArguments(*_args)
-		runFileOrDirectory((*_args)[0])
+	notOptions := argumentsParser.GetNotOptions()
+	if len(notOptions) > 0 {
+		t1 := argumentsParser.IsTrue("tokens")
+		t2 := argumentsParser.IsTrue("code")
+		t3 := argumentsParser.IsTrue("ast")
+		if t1 || t2 || t3 {
+			err := printer.Print(notOptions[0], t1, t2, t3)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v", err.Error())
+			}
+			return
+		}
+		cEval := argumentsParser.Get("eval")
+		if len(cEval) > 0 {
+			err := interpreter.RunEval(cEval, notOptions)
+			if err != nil {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+		} else {
+			err := interpreter.Run(notOptions[0], notOptions)
+			if err != nil {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+		}
 	}
 }
 
-func runEval(content string) {
-	if *_code || *_tokens || *_ast {
-		printer.Print(content, false, *_code, *_tokens, *_ast)
-	} else {
-		interpreter.RunFile([]byte(content))
-	}
-}
-
-func runFile(fileName string) {
-	if *_code || *_tokens || *_ast {
-		printer.Print(fileName, true, *_code, *_tokens, *_ast)
-	} else {
-		interpreter.RunFile(file.Read(fileName))
-	}
-}
-func runDirectory(directoryName string) {
-	interpreter.RunDirectory(directoryName)
-}
-
-func runFileOrDirectory(fileOrDirectoryName string) {
-	var result int = file.Info(fileOrDirectoryName)
-	switch result {
-	case 1:
-		console.ThrowError(1, constants.FILE_NOT_FOUND, fileOrDirectoryName)
-	case 2:
-		runDirectory(fileOrDirectoryName)
-	case 3:
-		runFile(fileOrDirectoryName)
-	}
-}
-
-// Print current minor version
+// Print current version
 func PrintVersion() {
-	console.Printf("i5 version: v%v\n", constants.MINOR_VERSION)
+	fmt.Printf("v%v\n", constants.MINOR_VERSION)
 }

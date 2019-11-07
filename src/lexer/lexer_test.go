@@ -5,22 +5,43 @@ import (
 	"testing"
 
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/types"
 )
 
-var (
-	test_text1 string = `
-	fn main() {
-		$print(1)
-	}
-	`
-	test_s1 int    = 15
-	test1   []byte = []byte(test_text1)
-)
+type mtest struct {
+	T string
+	W int
+}
+
+var tests []mtest = []mtest{
+	mtest{
+		T: "", W: 1,
+	},
+	mtest{
+		T: `
+		`, W: 2,
+	},
+	mtest{
+		T: `
+		main = () => {
+			$print(1)
+		}
+		`, W: 16,
+	},
+	mtest{
+		T: `
+		a = (() => {})()
+		`, W: 14,
+	},
+}
 
 func TestRun(t *testing.T) {
-	var res1 types.TokenList = Run(test1)
-	if res1.Size() != test_s1 {
-		t.Errorf(constants.TEST_GOT_WANT, res1.Size(), test_s1)
+	for _, tt := range tests {
+		result, err := Run("test code", []byte(tt.T))
+		if err != nil {
+			t.Errorf("error: %v\n", err.Error())
+		}
+		if result.Size() != tt.W {
+			t.Errorf(constants.TEST_GOT_WANT, result.Size(), tt.W)
+		}
 	}
 }

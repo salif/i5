@@ -8,15 +8,15 @@ const (
 	ARGS_UNKNOWN_CLR string = "unknown output format: %v"
 	ARGS_NO_FILE     string = "no file specified"
 
-	LEXER_UNEXPECTED_TOKEN string = "line %d: unexpected token '%v'"
-	LEXER_OUT_OF_RANGE     string = "line %d: %v: index out of range"
+	LEXER_UNEXPECTED_TOKEN string = "unexpected token '%v' with ascii code '%v'"
+	LEXER_OUT_OF_RANGE     string = "%v: index out of range"
 
-	PARSER_EXPECTED_FOUND string = "line %d: expected '%v', found '%v'"
-	PARSER_UNEXPECTED     string = "line %d: unexpected '%v'"
-	PARSER_EXPECTED       string = "line %d: expected '%v'"
-	PARSER_NOT_INT        string = "line %d: could not parse %v as integer"
-	PARSER_NOT_FLOAT      string = "line %d: could not parse %v as float"
-	PARSER_EXPECTED_ARG   string = "line %d: expected ',' or ')', found '%v'"
+	PARSER_EXPECTED_FOUND string = "expected '%v', found '%v'"
+	PARSER_UNEXPECTED     string = "unexpected '%v'"
+	PARSER_EXPECTED       string = "expected '%v'"
+	PARSER_NOT_INT        string = "could not parse %v as integer"
+	PARSER_NOT_FLOAT      string = "could not parse %v as float"
+	PARSER_EXPECTED_ARG   string = "expected ',' or ')', found '%v'"
 
 	FILE_NOT_FOUND        string = "%v: no such file or directory"
 	FILE_FOUND_FILE       string = "%v: expected directory, found file"
@@ -40,4 +40,5 @@ const (
 	IR_NON_BOOL          string = "non-bool '%v' used as %v condition"
 	IR_NOT_ENOUGH_ARGS   string = "not enough arguments to call function"
 	IR_MAP_KEY_NOT_FOUND string = "'%v' not found"
+	IR_NOT_THROWABLE     string = "'%v' is not throwable"
 )

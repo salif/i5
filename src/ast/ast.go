@@ -3,32 +3,30 @@ package ast
 
 type Node interface {
 	GetType() string
-	Print()
-	GetLine() int
+	GetLine() uint32
+	Debug() string
 }
 
 const (
-	ASSIGN     = "assign"
-	BLOCK      = "block"
-	BOOL       = "bool"
-	BUILTIN    = "builtin"
-	CALL       = "call"
-	EXPRESSION = "expression"
-	FLOAT      = "float"
-	FUNCTION   = "function"
-	IDENTIFIER = "identifier"
-	IF         = "if"
-	IMPORT     = "import"
-	INDEX      = "index"
-	INFIX      = "infix"
-	INTEGER    = "integer"
-	LOOP       = "loop"
-	POSTFIX    = "postfix"
-	PREFIX     = "prefix"
-	PROGRAM    = "program"
-	RETURN     = "return"
-	STRING     = "string"
-	SWITCH     = "switch"
-	THROW      = "throw"
-	TRY        = "try"
+	ASSIGN      string = "assign"
+	BLOCK       string = "block"
+	BUILTIN     string = "builtin"
+	CALL        string = "call"
+	FLOAT       string = "float"
+	FUNCTION    string = "function"
+	IDENTIFIER  string = "identifier"
+	IDENTIFIERS string = "identifiers"
+	IF          string = "if"
+	INDEX       string = "index"
+	INFIX       string = "infix"
+	INTEGER     string = "integer"
+	LOOP        string = "loop"
+	POSTFIX     string = "postfix"
+	PREFIX      string = "prefix"
+	PROGRAM     string = "program"
+	RETURN      string = "return"
+	STRING      string = "string"
+	SWITCH      string = "switch"
+	TERNARY     string = "ternary"
+	THROW       string = "throw"
 )

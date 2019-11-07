@@ -10,7 +10,7 @@ func _array() object.Object {
 	v.Set(_String("new"), _Builtin(object.ARRAY, 0, _array_new))
 	v.Set(_String("add"), _Builtin(object.ARRAY, 2, _array_add))
 	// v.Set(_String("remove"), _Builtin(object.ARRAY, 2, _array_remove))
-	// v.Set(_String("get"), _Builtin(object.VOID, 2, _array_get))
+	// v.Set(_String("get"), _Builtin(object.OBJECT, 2, _array_get))
 	// v.Set(_String("set"), _Builtin(object.ARRAY, 3, _array_set))
 	// v.Set(_String("join"), _Builtin(object.STRING, 2, _array_join))
 	return v
@@ -29,7 +29,7 @@ func _array_add(args ...object.Object) object.Object {
 		arr := arr.(object.Array)
 		return object.Array{Value: arr.Push(elem)}
 	} else {
-		return _Void()
+		return NIL
 	}
 
 }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package object
 
-import "github.com/i5/i5/src/io/console"
+import "fmt"
 
 type Bool struct {
 	Value bool
@@ -12,5 +12,5 @@ func (this Bool) Type() TYPE {
 }
 
 func (this Bool) StringValue() string {
-	return console.Format("%t", this.Value)
+	return fmt.Sprintf("%t", this.Value)
 }

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package ast
 
-import "github.com/i5/i5/src/io/console"
+import "strings"
 
 type Infix struct {
-	line     int
+	line     uint32
 	left     Node
 	operator string
 	right    Node
@@ -14,17 +14,19 @@ func (this Infix) GetType() string {
 	return INFIX
 }
 
-func (this Infix) Print() {
-	console.Print("(")
-	this.left.Print()
-	console.Print(" ")
-	console.Print(this.operator)
-	console.Print(" ")
-	this.right.Print()
-	console.Print(")")
+func (this Infix) Debug() string {
+	var result strings.Builder
+	result.WriteString("(")
+	result.WriteString(this.left.Debug())
+	result.WriteString(" ")
+	result.WriteString(this.operator)
+	result.WriteString(" ")
+	result.WriteString(this.right.Debug())
+	result.WriteString(")")
+	return result.String()
 }
 
-func (this Infix) GetLine() int {
+func (this Infix) GetLine() uint32 {
 	return this.line
 }
 
@@ -40,14 +42,14 @@ func (this Infix) GetOperator() string {
 	return this.operator
 }
 
-func (this Infix) Init(line int, operator string, left Node) Infix {
+func (this Infix) Init(line uint32, operator string, left Node) Infix {
 	this.line = line
 	this.operator = operator
 	this.left = left
 	return this
 }
 
-func (this Infix) Set(line int, left Node, operator string, right Node) Infix {
+func (this Infix) Set(line uint32, left Node, operator string, right Node) Infix {
 	this.line = line
 	this.left = left
 	this.operator = operator

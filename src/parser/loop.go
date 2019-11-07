@@ -3,14 +3,26 @@ package parser
 
 import (
 	"github.com/i5/i5/src/ast"
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseLoop() ast.Node {
-	stmt := ast.Loop{}.Init(p.peek.Line, p.peek.Type)
+func (p *Parser) parseLoop() (ast.Node, error) {
+	node := ast.Loop{}.Init(p.peek.Line, p.peek.Type)
 	p.next()
-	stmt.SetBody(p.parseBlock())
-	p.require(types.EOL)
+	e, err := p.parseBlock()
+	if err != nil {
+		return nil, err
+	}
+	if e, ok := e.(ast.Block); ok {
+		node.SetBody(e)
+	} else {
+		return nil, p.Throw(e.GetLine(), constants.PARSER_EXPECTED, "block statement")
+	}
+	err = p.require(p.peek.Type, types.EOL)
+	if err != nil {
+		return nil, err
+	}
 	p.next()
-	return stmt
+	return node, nil
 }

@@ -6,23 +6,38 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseBlock() ast.Block {
-	block := ast.Block{}.Init(p.peek.Line)
-	p.require(types.LBRACE)
-	p.next() // skip '{'
-	p.require(types.EOL)
-	p.next() // skip EOL
+func (p *Parser) parseBlock() (ast.Node, error) {
+	node := ast.Block{}.Init(p.peek.Line)
+	p.next() // '{'
 
-	for p.peek.Value != types.RBRACE {
+	if p.peek.Type == types.RBRACE {
+		p.next()
+		return node, nil
+	}
+
+	err := p.require(p.peek.Type, types.EOL)
+	if err != nil {
+		return nil, err
+	}
+
+	p.next() // 'EOL'
+
+	for p.peek.Type != types.RBRACE {
 		if p.peek.Type == types.EOL {
 			p.next() // skip empty line
 			continue
 		}
-		stmt := p.parseStatement()
-		block.Append(stmt)
+		stmt, err := p.parseStatement()
+		if err != nil {
+			return nil, err
+		}
+		node.Append(stmt)
 	}
 
-	p.require(types.RBRACE)
-	p.next() // skip '}'
-	return block
+	err = p.require(p.peek.Type, types.RBRACE)
+	if err != nil {
+		return nil, err
+	}
+	p.next() // '}'
+	return node, nil
 }

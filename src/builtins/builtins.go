@@ -2,6 +2,7 @@
 package builtins
 
 import (
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
 )
 
@@ -14,29 +15,28 @@ func Get(str string, env *object.Env) (object.Object, bool) {
 			return builtin.Value, ok
 		}
 	} else {
-		return object.Void{}, ok
+		return NIL, ok
 	}
 }
 
 var builtins = map[string]object.Builtin{
-	"null": object.Builtin{RealType: object.VOID, Value: _Void()},
+	"nil":   object.Builtin{RealType: object.ERROR, Value: NIL},
+	"break": object.Builtin{RealType: object.ERROR, Value: _Error(false, constants.ERROR_BREAK, "break")},
 	// Bools
-	// Strings
-	// Arrays
+	"true":  object.Builtin{RealType: object.BOOL, Value: _Bool(true)},
+	"false": object.Builtin{RealType: object.BOOL, Value: _Bool(false)},
 	// Maps
 	"array":   object.Builtin{RealType: object.MAP, Value: _array()},
+	"error":   object.Builtin{RealType: object.MAP, Value: _error()},
 	"i5":      object.Builtin{RealType: object.MAP, Value: _i5()},
 	"map":     object.Builtin{RealType: object.MAP, Value: _map()},
-	"my":      object.Builtin{RealType: object.MAP, Value: _my()},
 	"console": object.Builtin{RealType: object.MAP, Value: _console()},
 	// Functions
 	"print":  object.Builtin{RealType: object.FUNCTION, Function: _console_println, MinParams: 0},
 	"typeof": object.Builtin{RealType: object.FUNCTION, Function: _typeof, MinParams: 1},
 }
 
-func _Void() object.Object {
-	return object.Void{}
-}
+var NIL = object.Error{}.Init(false, 0, object.Integer{Value: constants.ERROR_NIL}, object.String{Value: "nil"})
 
 func _Bool(b bool) object.Bool {
 	return object.Bool{Value: b}
@@ -58,6 +58,6 @@ func _Map() object.Map {
 	return object.Map{Value: make(map[object.Key]object.Object, 0)}
 }
 
-func _Error(e string) object.Error {
-	return object.Error{Message: e}
+func _Error(isFatal bool, number int64, message string) object.Error {
+	return object.Error{}.Init(isFatal, uint32(0), object.Integer{Value: number}, object.String{Value: message})
 }

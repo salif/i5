@@ -2,26 +2,28 @@
 package file
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
 	"github.com/i5/i5/src/constants"
-
-	"github.com/i5/i5/src/io/console"
 )
 
-func GetFilesToRun(dir string) []string {
+func GetFilesToRun(dir string) ([]string, error) {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
-		console.ThrowError(1, console.Format(constants.FILE_CANNOT_READ_DIR, dir))
+		return nil, err
 	}
 	filesToRun := []string{}
 	for _, f := range files {
 		if !f.IsDir() {
 			if filepath.Ext(f.Name()) == constants.I5_FILE_EXT {
-				filesToRun = append(filesToRun, f.Name())
+				if err != nil {
+					return nil, err
+				}
+				filesToRun = append(filesToRun, fmt.Sprintf("%v/%v", dir, f.Name()))
 			}
 		}
 	}
-	return filesToRun
+	return filesToRun, nil
 }

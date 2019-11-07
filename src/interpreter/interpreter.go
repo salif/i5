@@ -2,72 +2,133 @@
 package interpreter
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/io/console"
-	"github.com/i5/i5/src/io/file"
+	"github.com/i5/i5/src/file"
 	"github.com/i5/i5/src/lexer"
 	"github.com/i5/i5/src/object"
 	"github.com/i5/i5/src/parser"
 )
 
-func RunDirectory(directoryName string) {
-	absoluteDirectoryName, _ := filepath.Abs(directoryName)
-	modFile := console.Format("%s/%s", absoluteDirectoryName, constants.I5_MOD_FILE_NAME)
-	if file.Exists(modFile) {
-		RunModule(modFile, absoluteDirectoryName)
-	} else {
-		RunPackage(absoluteDirectoryName)
-	}
+func RunEval(content string, args []string) error {
+	return runFile("evaluated code", []byte(content))
 }
 
-func RunPackage(absoluteDirectoryName string) {
-	env := object.InitEnv()
-	EvalPackage(absoluteDirectoryName, env)
-	EvalMainFunction(env)
-}
-
-func RunModule(moduleFileName, module string) {
-	f := file.Read(moduleFileName)
-	moduleInfoArray := lexer.ParseModuleFile(f)
-	if len(moduleInfoArray) < 2 {
-		console.ThrowError(1, constants.IR_INVALID_MOD_FILE)
-	}
-}
-
-func RunFile(code []byte) {
-	program := parser.Run(lexer.Run(code))
-	env := object.InitEnv()
-	EvalFile(program, env)
-	EvalMainFunction(env)
-}
-
-func EvalPackage(absoluteDirectoryName string, env *object.Env) {
-	filesToRun := file.GetFilesToRun(absoluteDirectoryName)
-	for _, fileToRun := range filesToRun {
-		fileToRunPath := console.Format("%v/%v", absoluteDirectoryName, fileToRun)
-		EvalFile(parser.Run(lexer.Run(file.Read(fileToRunPath))), env)
-	}
-}
-
-func EvalFile(program ast.Node, env *object.Env) {
-	err := Eval(program, env)
-	if err.Type() == object.ERROR {
-		console.ThrowError(1, err.StringValue())
-		return
-	}
-}
-
-func EvalMainFunction(env *object.Env) {
-	if mainFunction, ok := env.Get(constants.MAIN_FUNCTION_NAME); ok {
-		result := callFunction(mainFunction, []object.Object{}, 0)
-		if result.Type() == object.ERROR {
-			console.ThrowError(1, result.StringValue())
-			return
+func Run(fileOrDirectoryName string, args []string) error {
+	var result int = file.Info(fileOrDirectoryName)
+	switch result {
+	case 1:
+		return Errf(fmt.Errorf(constants.FILE_NOT_FOUND, fileOrDirectoryName))
+	case 2:
+		return runDirectory(fileOrDirectoryName)
+	case 3:
+		codeBytes, err := file.Read(fileOrDirectoryName)
+		if err != nil {
+			return Errf(err)
 		}
-	} else {
-		console.ThrowError(1, constants.IR_MAIN_FN_NOT_FOUND)
+		return runFile(fileOrDirectoryName, codeBytes)
+	default:
+		return nil
 	}
+}
+
+func runDirectory(directoryName string) error {
+	absoluteDirectoryName, err := filepath.Abs(directoryName)
+	if err != nil {
+		return Errf(err)
+	}
+	modFile := fmt.Sprintf("%s/%s", absoluteDirectoryName, constants.I5_MOD_FILE_NAME)
+	if file.Exists(modFile) {
+		return runModule(modFile, absoluteDirectoryName)
+	} else {
+		return runPackage(absoluteDirectoryName)
+	}
+}
+
+func runModule(moduleFileName, module string) error {
+	f, err := file.Read(moduleFileName)
+	if err != nil {
+		return Errf(err)
+	}
+	moduleInfoArray := lexer.ParseModuleFile(moduleFileName, f)
+	if len(moduleInfoArray) < 2 {
+		return Errf(fmt.Errorf(constants.IR_INVALID_MOD_FILE))
+	}
+	return Errf(fmt.Errorf(constants.IR_NOT_IMPLEMENTED, "modules"))
+}
+
+// TODO remove dublication
+func runPackage(absoluteDirectoryName string) error {
+	var env *object.Env = object.InitEnv()
+	filesToRun, err := file.GetFilesToRun(absoluteDirectoryName)
+	if err != nil {
+		return Errf(err)
+	}
+	programs, err := parsePrograms(filesToRun)
+	if err != nil {
+		return err
+	}
+	var evaluatedPrograms object.Error = evalProgramNodes(programs, env)
+	if evaluatedPrograms.GetIsFatal() {
+		// TODO edit fileName
+		return evaluatedPrograms.NativeError(absoluteDirectoryName)
+	}
+	var evaluatedMainFunction object.Object = evalMainFunction(env)
+	var errorType int = ErrorType(evaluatedMainFunction)
+	if errorType == 2 || errorType == 3 {
+		return evaluatedMainFunction.(object.Error).NativeError(absoluteDirectoryName)
+	} else {
+		return nil
+	}
+
+}
+
+func runFile(fileName string, code []byte) error {
+	var env *object.Env = object.InitEnv()
+	program, err := parseProgram(fileName, code)
+	if err != nil {
+		return err
+	}
+	var evaluatedProgram object.Error = evalProgramNode(program, env)
+	if evaluatedProgram.GetIsFatal() {
+		return evaluatedProgram.NativeError(fileName)
+	}
+	var evaluatedMainFunction object.Object = evalMainFunction(env)
+	var errorType int = ErrorType(evaluatedMainFunction)
+	if errorType == 2 || errorType == 3 {
+		return evaluatedMainFunction.(object.Error).NativeError(fileName)
+	} else {
+		return nil
+	}
+}
+
+func parsePrograms(fileNames []string) ([]ast.Node, error) {
+	var programs []ast.Node = []ast.Node{}
+	for _, fileName := range fileNames {
+		codeBytes, err := file.Read(fileName)
+		if err != nil {
+			return nil, Errf(err)
+		}
+		program, err := parseProgram(fileName, codeBytes)
+		if err != nil {
+			return nil, err
+		}
+		programs = append(programs, program)
+	}
+	return programs, nil
+}
+
+func parseProgram(fileName string, code []byte) (ast.Node, error) {
+	tokens, err := lexer.Run(fileName, code)
+	if err != nil {
+		return nil, err
+	}
+	program, err2 := parser.Run(fileName, tokens)
+	if err2 != nil {
+		return nil, err2
+	}
+	return program, nil
 }

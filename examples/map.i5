@@ -1,9 +1,9 @@
 #!/usr/bin/env i5
 
-fn main() {
+main = () => {
 	map = $map.new()
 	map.name = "Name"
 	map.age = 0
 	$print(map)
-	# output: "{"name": "Name", "age": 0}"
+	# output: '{"name": "Name", "age": 0}'
 }

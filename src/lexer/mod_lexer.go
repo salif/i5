@@ -1,17 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package lexer
 
-import (
-	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/io/console"
-)
-
-func ParseModuleFile(f []byte) []string {
+func ParseModuleFile(fileName string, f []byte) []string {
 	result := []string{}
 	var scanner Scanner
-	scanner.Init(f, func(length int, position int, line int) {
-		console.ThrowSyntaxError(1, constants.LEXER_OUT_OF_RANGE, line, "")
-	})
+	scanner.Init(f)
 
 	for scanner.HasNext() {
 
