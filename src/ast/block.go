@@ -23,6 +23,11 @@ func (this Block) Debug() string {
 	return result.String()
 }
 
+func (this Block) Init(line uint32) Block {
+	this.line = line
+	return this
+}
+
 func (this Block) GetLine() uint32 {
 	return this.line
 }
@@ -31,17 +36,12 @@ func (this Block) GetBody() []Node {
 	return this.body
 }
 
-func (this Block) Init(line uint32) Block {
-	this.line = line
-	return this
-}
-
 func (this Block) Set(line uint32, body []Node) Block {
 	this.line = line
 	this.body = body
 	return this
 }
 
-func (this *Block) Append(node Node) {
-	this.body = append(this.body, node)
+func (this *Block) SetBody(body []Node) {
+	this.body = body
 }

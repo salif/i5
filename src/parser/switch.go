@@ -6,7 +6,6 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-// TODO
 func (p *Parser) parseSwitch() (ast.Node, error) {
 	node := ast.Switch{}.Init(p.peek.Line, p.peek.Type)
 	p.next()
@@ -28,14 +27,66 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 
 	cases := []ast.Case{}
 	for p.peek.Type != types.RBRACE {
-		_case, err := p.parseCase()
+		casesToAppend := []ast.Case{}
+
+		_case := ast.Case{}.Init(p.peek.Line)
+		err := p.require(p.peek.Type, types.CASE)
 		if err != nil {
 			return nil, err
 		}
-		cases = append(cases, _case)
+		p.next() // 'case'
+
+		e, err := p.parseExpression(LOWEST)
+		if err != nil {
+			return nil, err
+		}
+		_case.SetCase(e)
+
+		casesToAppend = append(casesToAppend, _case)
+
+		for p.peek.Type == types.COMMA {
+			p.next() // ','
+
+			err := p.require(p.peek.Type, types.EOL)
+			if err != nil {
+				return nil, err
+			}
+			p.next() // 'EOL'
+
+			_case = ast.Case{}.Init(p.peek.Line)
+			err = p.require(p.peek.Type, types.CASE)
+			if err != nil {
+				return nil, err
+			}
+			p.next() // 'case'
+			e, err = p.parseExpression(LOWEST)
+			if err != nil {
+				return nil, err
+			}
+
+			_case.SetCase(e)
+			casesToAppend = append(casesToAppend, _case)
+		}
+
+		e, err = p.parseBlock()
+		if err != nil {
+			return nil, err
+		}
+		block := e.(ast.Block)
+
+		for _, c := range casesToAppend {
+			c.SetBody(block)
+			cases = append(cases, c)
+		}
+
+		err = p.require(p.peek.Type, types.EOL)
+		if err != nil {
+			return nil, err
+		}
+		p.next()
+
 	}
 	node.SetCases(cases)
-	node.SetElse(ast.Block{}.Init(p.peek.Line))
 
 	err = p.require(p.peek.Type, types.RBRACE)
 	if err != nil {
@@ -45,58 +96,6 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 	err = p.require(p.peek.Type, types.EOL)
 	if err != nil {
 		return nil, err
-	}
-	p.next()
-
-	return node, nil
-}
-
-func (p *Parser) parseCase() (ast.Case, error) {
-	node := ast.Case{}.Init(p.peek.Line)
-
-	err := p.require(p.peek.Type, types.CASE)
-	if err != nil {
-		return ast.Case{}, err
-	}
-	p.next() // 'case'
-
-	e, err := p.parseExpression(LOWEST)
-	if err != nil {
-		return ast.Case{}, err
-	}
-	node.Append(e)
-
-	for p.peek.Type == types.COMMA {
-		p.next() // ','
-
-		err := p.require(p.peek.Type, types.EOL)
-		if err != nil {
-			return ast.Case{}, err
-		}
-		p.next() // 'EOL'
-
-		err = p.require(p.peek.Type, types.CASE)
-		if err != nil {
-			return ast.Case{}, err
-		}
-		p.next() // 'case'
-		e, err = p.parseExpression(LOWEST)
-		if err != nil {
-			return ast.Case{}, err
-		}
-		node.Append(e)
-	}
-
-	e, err = p.parseBlock()
-	if err != nil {
-		return ast.Case{}, err
-	}
-	block := e.(ast.Block)
-	node.SetBody(block)
-
-	err = p.require(p.peek.Type, types.EOL)
-	if err != nil {
-		return ast.Case{}, err
 	}
 	p.next()
 

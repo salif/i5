@@ -24,6 +24,12 @@ func (this Program) Debug() string {
 	return result.String()
 }
 
+func (this Program) Init(line uint32, body []Assign) Program {
+	this.line = line
+	this.body = body
+	return this
+}
+
 func (this Program) GetLine() uint32 {
 	return this.line
 }
@@ -32,12 +38,6 @@ func (this Program) GetBody() []Assign {
 	return this.body
 }
 
-func (this Program) Init(line uint32, body []Assign) Program {
-	this.line = line
+func (this *Program) SetBody(body []Assign) {
 	this.body = body
-	return this
-}
-
-func (this *Program) Append(node Assign) {
-	this.body = append(this.body, node)
 }

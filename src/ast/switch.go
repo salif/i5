@@ -2,7 +2,6 @@
 package ast
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/i5/i5/src/types"
@@ -13,7 +12,6 @@ type Switch struct {
 	token     string
 	condition Node
 	cases     []Case
-	_else     Block
 }
 
 func (this Switch) GetType() string {
@@ -31,11 +29,6 @@ func (this Switch) Debug() string {
 		n = append(n, i.Debug())
 	}
 	result.WriteString(strings.Join(n, ";"))
-	if this._else.body != nil {
-		result.WriteString(types.ELSE)
-		result.WriteString(" ")
-		result.WriteString(this._else.Debug())
-	}
 	return result.String()
 }
 
@@ -49,6 +42,14 @@ func (this Switch) Init(line uint32, token string) Switch {
 	return this
 }
 
+func (this Switch) GetCondition() Node {
+	return this.condition
+}
+
+func (this Switch) GetCases() []Case {
+	return this.cases
+}
+
 func (this *Switch) SetCondition(condition Node) {
 	this.condition = condition
 }
@@ -57,24 +58,18 @@ func (this *Switch) SetCases(cases []Case) {
 	this.cases = cases
 }
 
-func (this *Switch) SetElse(_else Block) {
-	this._else = _else
-}
-
 type Case struct {
 	line  uint32
-	cases []Node
+	_case Node
 	body  Block
 }
 
 func (this Case) Debug() string {
 	var result strings.Builder
-	for _, i := range this.cases {
-		result.WriteString(types.CASE)
-		result.WriteString(" ")
-		result.WriteString(i.Debug())
-		fmt.Print(";")
-	}
+	result.WriteString(types.CASE)
+	result.WriteString(" ")
+	result.WriteString(this._case.Debug())
+	result.WriteString(" ")
 	result.WriteString(this.body.Debug())
 	return result.String()
 }
@@ -88,8 +83,16 @@ func (this Case) Init(line uint32) Case {
 	return this
 }
 
-func (this *Case) Append(_case Node) {
-	this.cases = append(this.cases, _case)
+func (this Case) GetCase() Node {
+	return this._case
+}
+
+func (this Case) GetBody() Node {
+	return this.body
+}
+
+func (this *Case) SetCase(_case Node) {
+	this._case = _case
 }
 
 func (this *Case) SetBody(body Block) {

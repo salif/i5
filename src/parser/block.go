@@ -22,6 +22,7 @@ func (p *Parser) parseBlock() (ast.Node, error) {
 
 	p.next() // 'EOL'
 
+	stmts := []ast.Node{}
 	for p.peek.Type != types.RBRACE {
 		if p.peek.Type == types.EOL {
 			p.next() // skip empty line
@@ -31,8 +32,9 @@ func (p *Parser) parseBlock() (ast.Node, error) {
 		if err != nil {
 			return nil, err
 		}
-		node.Append(stmt)
+		stmts = append(stmts, stmt)
 	}
+	node.SetBody(stmts)
 
 	err = p.require(p.peek.Type, types.RBRACE)
 	if err != nil {
