@@ -1,9 +1,8 @@
 #!/usr/bin/env i5
 
-log = $print
-user_types = $array.new("admin", "moderator")
-
 main = () => {
+	log = $print
+
 	log("begin") # output: "begin"
 
 	hi_array = $array.new()
@@ -31,7 +30,7 @@ main = () => {
 }
 
 say_hi_to_user = (user_type user_name) => {
-	if $array.contains(user_types, user_type) {
+	if !(user_type == "admin" or user_type == "moderator") {
 		return $error.new("Invalid user type!")
 	}
 	return "Hi ":user_type:" ":user_name:"!"

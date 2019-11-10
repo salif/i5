@@ -1,26 +1,30 @@
 #!/usr/bin/env i5
 
 main = () => {
-	object = new_object()
-	object.set_name("My Name")
+	object = Object.new("", 0)
+	object.set_name("Name")
 	object.set_age(1)
 	$print("name: " : object.get_name())
-	# output: "name: My Name"
+	# output: "name: Name"
 	$print("age: " : object.get_age())
 	# output: "age: 1"
 }
 
-newObject = () => {
+Object = (name age) => {
 	this = $map.new()
-	this.name = ""
-	this.age = 0
+
+	this.name = name
+	this.age = age
+
 	this.get_name = () => this.name
 	this.get_age = () => this.age
+
 	this.set_name = (name) => {
 		this.name = name
 	}
 	this.set_age = (age) => {
 		this.age = age
 	}
+
 	return this
 }
