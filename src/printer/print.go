@@ -11,7 +11,7 @@ import (
 	"github.com/i5/i5/src/parser"
 )
 
-func Print(name string, tokens bool, code bool, ast bool) error {
+func Print(name string, printOption string) error {
 	var result int = file.Info(name)
 	switch result {
 	case 1:
@@ -25,13 +25,15 @@ func Print(name string, tokens bool, code bool, ast bool) error {
 		if err != nil {
 			return err
 		}
-		if code {
+
+		switch printOption {
+		case "code":
 			PrintCode(t)
-		}
-		if tokens {
+
+		case "tokens":
 			PrintTokens(t)
-		}
-		if ast {
+
+		case "ast":
 			a, err := parser.Run(name, t)
 			if err != nil {
 				return err

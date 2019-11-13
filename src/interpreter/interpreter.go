@@ -13,17 +13,17 @@ import (
 	"github.com/i5/i5/src/parser"
 )
 
-func RunEval(content string, args []string) error {
-	return runFile("evaluated code", []byte(content))
-}
-
 func Run(fileOrDirectoryName string, args []string) error {
+	fileOrDirectoryName, err := filepath.Abs(fileOrDirectoryName)
+	if err != nil {
+		return Errf(err)
+	}
 	var result int = file.Info(fileOrDirectoryName)
 	switch result {
 	case 1:
 		return Errf(fmt.Errorf(constants.FILE_NOT_FOUND, fileOrDirectoryName))
 	case 2:
-		return runDirectory(fileOrDirectoryName)
+		return runModule(fileOrDirectoryName)
 	case 3:
 		codeBytes, err := file.Read(fileOrDirectoryName)
 		if err != nil {
@@ -35,33 +35,12 @@ func Run(fileOrDirectoryName string, args []string) error {
 	}
 }
 
-func runDirectory(directoryName string) error {
-	absoluteDirectoryName, err := filepath.Abs(directoryName)
-	if err != nil {
-		return Errf(err)
-	}
-	modFile := fmt.Sprintf("%s/%s", absoluteDirectoryName, constants.I5_MOD_FILE_NAME)
-	if file.Exists(modFile) {
-		return runModule(modFile, absoluteDirectoryName)
-	} else {
-		return runPackage(absoluteDirectoryName)
-	}
-}
-
-func runModule(moduleFileName, module string) error {
-	f, err := file.Read(moduleFileName)
-	if err != nil {
-		return Errf(err)
-	}
-	moduleInfoArray := lexer.ParseModuleFile(moduleFileName, f)
-	if len(moduleInfoArray) < 2 {
-		return Errf(fmt.Errorf(constants.IR_INVALID_MOD_FILE))
-	}
-	return Errf(fmt.Errorf(constants.IR_NOT_IMPLEMENTED, "modules"))
+func RunEval(content string, args []string) error {
+	return runFile("evaluated code", []byte(content))
 }
 
 // TODO remove dublication
-func runPackage(absoluteDirectoryName string) error {
+func runModule(absoluteDirectoryName string) error {
 	var env *object.Env = object.InitEnv()
 	filesToRun, err := file.GetFilesToRun(absoluteDirectoryName)
 	if err != nil {

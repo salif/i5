@@ -1,6 +1,0 @@
-hello = $import("hello_world")
-
-main = () => {
-	hello()
-	# output: "Hello, World!"
-}

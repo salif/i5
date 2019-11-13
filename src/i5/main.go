@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/i5/i5/src/printer"
-
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/i5/args_parser"
 	"github.com/i5/i5/src/i5/colors"
 	"github.com/i5/i5/src/interpreter"
+	"github.com/i5/i5/src/printer"
 )
 
 // Parse CLI arguments
@@ -19,72 +18,68 @@ func ParseArguments() {
 
 	argumentsParser.Init("i5 [options] [file] [arguments]", "Options")
 	argumentsParser.Bool("help", "print help")
-	argumentsParser.Bool("code", "print code")
-	argumentsParser.Bool("tokens", "print tokens")
-	argumentsParser.Bool("ast", "print abstract syntax tree")
-	argumentsParser.String("output", "set output format", "format")
+	argumentsParser.String("print", "string: 'tokens', 'code' or 'ast'", "string")
+	argumentsParser.String("output", "string: 'no-color', 'html' or 'default'", "string")
 	argumentsParser.String("eval", "evaluate code", "code")
-	argumentsParser.Bool("init", "initialize new module")
 	argumentsParser.Bool("version", "print current version")
 
-	err := argumentsParser.Parse()
+	var err error = argumentsParser.Parse()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v%v\n", colors.Red("error: "), err.Error())
-		return
+		os.Exit(1)
 	}
 
 	if argumentsParser.IsEmpty() || argumentsParser.IsTrue("help") {
 		fmt.Println(argumentsParser.GetHelp())
-		return
-	}
-
-	if argumentsParser.IsTrue("init") {
-		InitModule()
-		return
+		os.Exit(1)
 	}
 
 	if argumentsParser.IsTrue("version") {
-		PrintVersion()
+		printVersion()
 		return
 	}
 
 	if len(argumentsParser.Get("output")) > 0 {
 		format := argumentsParser.Get("output")
-		err := colors.SetColorFormat(format)
+		var err error = colors.SetColorFormat(format)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v%v\n", colors.Red("error: "), err.Error())
-			return
+			os.Exit(1)
 		}
 	}
 
-	notOptions := argumentsParser.GetNotOptions()
+	var notOptions []string = argumentsParser.GetNotOptions()
+
+	Eval := argumentsParser.Get("eval")
+	if len(Eval) > 0 {
+		var err error = interpreter.RunEval(Eval, notOptions)
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+	}
+
 	if len(notOptions) > 0 {
-		t1 := argumentsParser.IsTrue("tokens")
-		t2 := argumentsParser.IsTrue("code")
-		t3 := argumentsParser.IsTrue("ast")
-		if t1 || t2 || t3 {
-			err := printer.Print(notOptions[0], t1, t2, t3)
+		var toRun string = notOptions[0]
+		var printOption string = argumentsParser.Get("print")
+		if len(printOption) > 0 {
+			var err error = printer.Print(toRun, printOption)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%v", err.Error())
+				os.Exit(1)
 			}
 			return
 		}
-		cEval := argumentsParser.Get("eval")
-		if len(cEval) > 0 {
-			err := interpreter.RunEval(cEval, notOptions)
-			if err != nil {
-				fmt.Fprint(os.Stderr, err.Error())
-			}
-		} else {
-			err := interpreter.Run(notOptions[0], notOptions)
-			if err != nil {
-				fmt.Fprint(os.Stderr, err.Error())
-			}
+
+		var err error = interpreter.Run(toRun, notOptions)
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(1)
 		}
 	}
 }
 
 // Print current version
-func PrintVersion() {
+func printVersion() {
 	fmt.Printf("v%v\n", constants.MINOR_VERSION)
 }
