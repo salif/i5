@@ -6,20 +6,21 @@ import (
 )
 
 func _array() object.Object {
-	v := _Map()
-	v.Set(_String("new"), _Builtin(object.ARRAY, 0, _array_new))
-	v.Set(_String("add"), _Builtin(object.ARRAY, 2, _array_add))
-	// v.Set(_String("remove"), _Builtin(object.ARRAY, 2, _array_remove))
-	// v.Set(_String("get"), _Builtin(object.OBJECT, 2, _array_get))
-	// v.Set(_String("set"), _Builtin(object.ARRAY, 3, _array_set))
-	// v.Set(_String("join"), _Builtin(object.STRING, 2, _array_join))
+	v := object.ClassObject{}.Init()
+	v.Set("new", object.BuiltinFunction{MinParams: 0, Function: _array_new})
+	v.Set("add", object.BuiltinFunction{MinParams: 2, Function: _array_add})
+	// TODO add "remove", 2, _array_remove
+	// TODO add "get", 2, _array_get
+	// TODO add "set", 3, _array_set
+	// TODO add "join", 2, _array_join
 	return v
 }
 
 func _array_new(args ...object.Object) object.Object {
 	if len(args) > 0 {
+		// TODO
 	}
-	return _Array()
+	return object.Array{}.Init()
 }
 
 func _array_add(args ...object.Object) object.Object {

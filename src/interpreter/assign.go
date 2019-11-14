@@ -28,18 +28,13 @@ func evalAssign(node ast.Assign, env *object.Env) object.Object {
 			return leftIndex
 		}
 
-		if leftIndex.Type() == object.MAP {
+		if leftIndex.Type() == object.CLASSOBJECT {
 			switch rightIndex := left.GetRight().(type) {
 
 			case ast.Identifier:
-				_map := leftIndex.(object.Map)
-				_map.Set(object.String{Value: rightIndex.GetValue()}, evaluatedRight)
-				return _map
-
-			case ast.Integer:
-				_map := leftIndex.(object.Map)
-				_map.Set(object.Integer{Value: rightIndex.GetValue()}, evaluatedRight)
-				return _map
+				_class := leftIndex.(object.ClassObject)
+				_class.Set(rightIndex.GetValue(), evaluatedRight)
+				return _class
 
 			default:
 				return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, leftIndex.Type(), left.GetOperator(), rightIndex.GetType())

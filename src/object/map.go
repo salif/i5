@@ -38,12 +38,17 @@ func (this Map) StringValue() string {
 	return out.String()
 }
 
+func (this Map) Init() Map {
+	this.Value = make(map[Key]Object, 0)
+	return this
+}
+
 func (this *Map) Get(key Object) Object {
 	rkey := key.(Mappable)
 	if value, ok := this.Value[rkey.GenKey()]; ok {
 		return value
 	} else {
-		return Error{}.Init(false, 0, Integer{Value: constants.ERROR_NIL}, String{Value: "nil"})
+		return Error{IsFatal: false, Line: 0, Number: Integer{Value: constants.ERROR_NIL}, Message: String{Value: "nil"}}
 	}
 }
 

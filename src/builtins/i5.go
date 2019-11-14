@@ -7,8 +7,8 @@ import (
 )
 
 func _i5() object.Object {
-	v := _Map()
-	v.Set(_String("author"), _String("Salif Mehmed"))
-	v.Set(_String("version"), _String(constants.MINOR_VERSION))
+	v := object.ClassObject{}.Init()
+	v.Set("author", object.String{Value: "Salif Mehmed"})
+	v.Set("version", object.String{Value: constants.MINOR_VERSION})
 	return v
 }

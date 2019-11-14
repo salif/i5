@@ -10,7 +10,7 @@ import (
 func evalProgramNodes(programs []ast.Node, env *object.Env) object.Error {
 	for _, program := range programs {
 		var result object.Error = evalProgramNode(program, env)
-		if result.GetIsFatal() {
+		if result.IsFatal {
 			return result
 		}
 	}
@@ -19,7 +19,7 @@ func evalProgramNodes(programs []ast.Node, env *object.Env) object.Error {
 
 func evalProgramNode(program ast.Node, env *object.Env) object.Error {
 	var result object.Object = Eval(program, env)
-	if err, ok := result.(object.Error); ok && err.GetIsFatal() {
+	if err, ok := result.(object.Error); ok && err.IsFatal {
 		return err
 	} else {
 		return Nil(program.GetLine())

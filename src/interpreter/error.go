@@ -24,7 +24,7 @@ func Nil(line uint32) object.Error {
 
 func newError(isFatal bool, line uint32, number int64, text string, format ...interface{}) object.Error {
 	var message object.String = object.String{Value: fmt.Sprintf(text, format...)}
-	return object.Error{}.Init(isFatal, line, object.Integer{Value: int64(number)}, message)
+	return object.Error{IsFatal: isFatal, Line: line, Number: object.Integer{Value: number}, Message: message}
 }
 
 // if err is:
@@ -34,9 +34,9 @@ func newError(isFatal bool, line uint32, number int64, text string, format ...in
 // other error -> return 3;
 func ErrorType(err object.Object) int {
 	if err, ok := err.(object.Error); ok {
-		if err.GetIsFatal() {
+		if err.IsFatal {
 			return 2
-		} else if err.GetNumber().Value == constants.ERROR_NIL {
+		} else if err.Number.Value == constants.ERROR_NIL {
 			return 1
 		} else {
 			return 3

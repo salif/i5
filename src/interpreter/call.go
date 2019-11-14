@@ -35,7 +35,7 @@ func callFunction(fn object.Object, args []object.Object, line uint32) object.Ob
 			return result
 		}
 
-	case object.Builtin:
+	case object.BuiltinFunction:
 		if len(args) < fn.MinParams {
 			return newError(true, line, constants.ERROR_RANGE, constants.IR_NOT_ENOUGH_ARGS)
 		}

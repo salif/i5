@@ -12,15 +12,11 @@ func evalIndex(node ast.Index, env *object.Env) object.Object {
 	if ErrorType(left) == FATAL {
 		return left
 	}
-	if left.Type() == object.MAP {
+	if left.Type() == object.CLASSOBJECT {
 		switch rnode := node.GetRight().(type) {
 		case ast.Identifier:
-			_map := left.(object.Map)
-			obj := _map.Get(object.String{Value: rnode.GetValue()})
-			return obj
-		case ast.Integer:
-			_map := left.(object.Map)
-			obj := _map.Get(object.Integer{Value: rnode.GetValue()})
+			_class := left.(object.ClassObject)
+			obj := _class.Get(object.String{Value: rnode.GetValue()})
 			return obj
 
 		default:

@@ -1,7 +1,7 @@
 #!/usr/bin/env i5
 
 main = () => {
-	object = Object.new("", 0)
+	object = Object("", 0)
 	object.set_name("Name")
 	object.set_age(1)
 	$print("name: " : object.get_name())
@@ -11,7 +11,7 @@ main = () => {
 }
 
 Object = (name age) => {
-	this = $map.new()
+	this = $class.new()
 
 	this.name = name
 	this.age = age

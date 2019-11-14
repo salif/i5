@@ -30,6 +30,11 @@ func (this Array) StringValue() string {
 	return out.String()
 }
 
+func (this Array) Init() Array {
+	this.Value = make([]Object, 0)
+	return this
+}
+
 func (this *Array) Push(obj Object) []Object {
 	return append(this.Value, obj)
 }

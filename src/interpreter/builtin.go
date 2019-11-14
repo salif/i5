@@ -10,6 +10,11 @@ import (
 
 func evalBuiltin(node ast.Builtin, env *object.Env) object.Object {
 	if builtin, ok := builtins.Get(node.GetValue(), env); ok {
+		if ErrorType(builtin) > 0 {
+			builtin := builtin.(object.Error)
+			builtin.Line = node.GetLine()
+			return builtin
+		}
 		return builtin
 	} else {
 		return newError(true, node.GetLine(), constants.ERROR_REFERENCE, "buitin not found: "+node.GetValue())

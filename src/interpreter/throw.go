@@ -14,7 +14,7 @@ func evalThrow(node ast.Throw, env *object.Env) object.Object {
 	}
 	if evaluatedRight.Type() == object.ERROR {
 		var err object.Error = evaluatedRight.(object.Error)
-		err.SetIsFatal(true)
+		err.IsFatal = true
 		return err
 	} else {
 		return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_NOT_THROWABLE, evaluatedRight.Type())

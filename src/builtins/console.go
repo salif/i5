@@ -11,10 +11,10 @@ import (
 )
 
 func _console() object.Object {
-	v := _Map()
-	v.Set(_String("print"), _Builtin(object.ERROR, 1, _console_print))
-	v.Set(_String("println"), _Builtin(object.ERROR, 0, _console_println))
-	v.Set(_String("readln"), _Builtin(object.STRING, 0, _console_readln))
+	v := object.ClassObject{}.Init()
+	v.Set("print", object.BuiltinFunction{MinParams: 1, Function: _console_print})
+	v.Set("println", object.BuiltinFunction{MinParams: 0, Function: _console_println})
+	v.Set("readln", object.BuiltinFunction{MinParams: 0, Function: _console_readln})
 	return v
 }
 
@@ -43,8 +43,8 @@ func _console_readln(args ...object.Object) object.Object {
 		return _Error(true, constants.ERROR_INTERTAL, err.Error())
 	}
 	if input == "\n" {
-		return _String(input)
+		return object.String{Value: input}
 	} else {
-		return _String(input[:len(input)-1])
+		return object.String{Value: input[:len(input)-1]}
 	}
 }

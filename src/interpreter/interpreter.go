@@ -51,7 +51,7 @@ func runModule(absoluteDirectoryName string) error {
 		return err
 	}
 	var evaluatedPrograms object.Error = evalProgramNodes(programs, env)
-	if evaluatedPrograms.GetIsFatal() {
+	if evaluatedPrograms.IsFatal {
 		// TODO edit fileName
 		return evaluatedPrograms.NativeError(absoluteDirectoryName)
 	}
@@ -72,7 +72,7 @@ func runFile(fileName string, code []byte) error {
 		return err
 	}
 	var evaluatedProgram object.Error = evalProgramNode(program, env)
-	if evaluatedProgram.GetIsFatal() {
+	if evaluatedProgram.IsFatal {
 		return evaluatedProgram.NativeError(fileName)
 	}
 	var evaluatedMainFunction object.Object = evalMainFunction(env)

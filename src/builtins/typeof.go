@@ -8,6 +8,5 @@ import (
 )
 
 func _typeof(obj ...object.Object) object.Object {
-	elem := obj[0]
-	return _String(fmt.Sprintf("%v", elem.Type()))
+	return object.String{Value: fmt.Sprintf("%v", obj[0].Type())}
 }

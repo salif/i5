@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package object
 
-type Builtin struct {
-	RealType  TYPE
+type BuiltinFunction struct {
 	Function  func(args ...Object) Object
 	MinParams int
-	Value     Object
 }
 
-func (this Builtin) Type() TYPE {
+func (this BuiltinFunction) Type() TYPE {
 	return BUILTIN
 }
 
-func (this Builtin) StringValue() string {
+func (this BuiltinFunction) StringValue() string {
 	return "[type: builtin]"
 }

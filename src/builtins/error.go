@@ -6,13 +6,19 @@ import (
 )
 
 func _error() object.Object {
-	v := _Map()
-	v.Set(_String("new"), _Builtin(object.MAP, 1, _error_new))
+	v := object.ClassObject{}.Init()
+	v.Set("new", object.BuiltinFunction{MinParams: 0, Function: _error_new})
 	return v
 }
 
+// TODO
 func _error_new(obj ...object.Object) object.Object {
-	v := _Map()
-	v.Set(_String("message"), obj[0])
+	v := object.Error{IsFatal: false}
+	if len(obj) > 0 {
+		v.Message = obj[0].(object.String)
+	}
+	if len(obj) > 1 {
+		v.Number = obj[1].(object.Integer)
+	}
 	return v
 }

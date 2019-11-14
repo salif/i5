@@ -18,7 +18,7 @@ func evalLoop(node ast.Loop, env *object.Env) object.Object {
 			var forReturn object.Return = evaluatedLoopStatement.(object.Return)
 			if forReturn.Value.Type() == object.ERROR {
 				var errForReturn object.Error = forReturn.Value.(object.Error)
-				if errForReturn.GetNumber().Value == constants.ERROR_BREAK {
+				if errForReturn.Number.Value == constants.ERROR_BREAK {
 					break
 				}
 			}
