@@ -1,8 +1,10 @@
 #!/usr/bin/env i5
 
-add = (a b) => a + b
+fn add(a b) {
+	return a + b
+}
 
-main = () => {
+fn main() {
 	$print(add(5, 3))
-	# output: 8
+	# output: "8"
 }

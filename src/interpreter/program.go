@@ -7,10 +7,10 @@ import (
 )
 
 func evalProgram(node ast.Program, env *object.Env) object.Object {
-	for _, assign := range node.GetBody() {
-		var evaluatedAssign object.Object = Eval(assign, env)
-		if ErrorType(evaluatedAssign) == FATAL {
-			return evaluatedAssign
+	for _, fn := range node.GetBody() {
+		var result object.Object = Eval(fn, env)
+		if ErrorType(result) == FATAL {
+			return result
 		}
 	}
 	return Nil(node.GetLine())

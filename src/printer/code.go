@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/i5/i5/src/i5/colors"
-	"github.com/i5/i5/src/lexer"
 	"github.com/i5/i5/src/types"
 )
 
@@ -19,9 +18,8 @@ func PrintCode(tokens types.TokenList) {
 	for i := 0; i < tokens.Size(); i++ {
 		var token types.Token = tokens.Get(i)
 
-		if _, isKeyword := lexer.IsKeyword(token.Value); isKeyword {
-			output.WriteString(colors.Red(token.Value) + " ")
-		} else if token.Type == types.IDENT {
+		// TODO
+		if token.Type == types.IDENT {
 			output.WriteString(colors.Green(token.Value))
 			if tokens.Get(i+1).Type == types.IDENT {
 				output.WriteString(" ")

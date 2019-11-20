@@ -1,7 +1,7 @@
-write = $import("./console").write
-calculator = $import("author/package_name")
+fn main() {
+	write = $import("./console").write
+	calculator = $import("author/package_name")
 
-main = () => {
 	result = calculator.sum(1, 2)
 	write(result)
 	# output: "3"

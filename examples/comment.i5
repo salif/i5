@@ -1,6 +1,6 @@
 #!/usr/bin/env i5
 
-main = () => {
+fn main() {
 	# comment
 
 	`

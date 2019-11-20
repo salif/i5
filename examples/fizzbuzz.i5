@@ -1,10 +1,10 @@
 #!/usr/bin/env i5
 
-main = () => {
+fn main() {
 	fizzbuzz()
 }
 
-fizzbuzz = () => {
+fn fizzbuzz() {
 	i = 0
 	loop {
 		if i > 100 {

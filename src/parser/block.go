@@ -6,8 +6,13 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseBlock() (ast.Node, error) {
+func (p *Parser) parseBlock() (ast.Block, error) {
 	node := ast.Block{}.Init(p.peek.Line)
+
+	err := p.require(p.peek.Type, types.LBRACE)
+	if err != nil {
+		return node, err
+	}
 	p.next() // '{'
 
 	if p.peek.Type == types.RBRACE {
@@ -15,9 +20,9 @@ func (p *Parser) parseBlock() (ast.Node, error) {
 		return node, nil
 	}
 
-	err := p.require(p.peek.Type, types.EOL)
+	err = p.require(p.peek.Type, types.EOL)
 	if err != nil {
-		return nil, err
+		return node, err
 	}
 
 	p.next() // 'EOL'
@@ -30,7 +35,7 @@ func (p *Parser) parseBlock() (ast.Node, error) {
 		}
 		stmt, err := p.parseStatement()
 		if err != nil {
-			return nil, err
+			return node, err
 		}
 		stmts = append(stmts, stmt)
 	}
@@ -38,7 +43,7 @@ func (p *Parser) parseBlock() (ast.Node, error) {
 
 	err = p.require(p.peek.Type, types.RBRACE)
 	if err != nil {
-		return nil, err
+		return node, err
 	}
 	p.next() // '}'
 	return node, nil

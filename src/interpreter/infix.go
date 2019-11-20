@@ -9,6 +9,9 @@ import (
 )
 
 func evalInfixNode(node ast.Infix, env *object.Env) object.Object {
+	if node.GetOperator() == types.QM {
+		return evalIsError(node, env)
+	}
 	var evaluatedLeft object.Object = Eval(node.GetLeft(), env)
 	if ErrorType(evaluatedLeft) == FATAL {
 		return evaluatedLeft
@@ -200,5 +203,25 @@ func evalBooleanInfix(operator string, left, right object.Object, line uint32) o
 		return nativeToBool(leftBoolean || rightBoolean)
 	default:
 		return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+	}
+}
+
+func evalIsError(node ast.Infix, env *object.Env) object.Object {
+	var evaluatedRight object.Object = Eval(node.GetRight(), env)
+	e := ErrorType(evaluatedRight)
+	if e == FATAL {
+		return evaluatedRight
+	}
+	if e == 0 {
+		return FALSE
+	} else {
+		left := node.GetLeft()
+		if left.GetType() == types.IDENT {
+			ident := left.(ast.Identifier)
+			env.Set(ident.GetValue(), evaluatedRight)
+			return TRUE
+		} else {
+			return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_CANNOT_ASSIGN, left.GetType())
+		}
 	}
 }

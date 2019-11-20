@@ -1,9 +1,9 @@
 #!/usr/bin/env i5
 
-main = () => {
+fn main() {
 	array = $array.new()
 	array = $array.add(array, 1)
 	array = $array.add(array, 2)
-	$print(array)
+	$print($array.toString(array))
 	# output: "[1, 2]"
 }

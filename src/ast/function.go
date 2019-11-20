@@ -8,8 +8,9 @@ import (
 type Function struct {
 	line   uint32
 	token  string
-	params Identifiers
-	body   Node
+	name   Identifier
+	params []Identifier
+	body   Block
 }
 
 func (this Function) GetType() string {
@@ -18,13 +19,17 @@ func (this Function) GetType() string {
 
 func (this Function) Debug() string {
 	var result strings.Builder
-	result.WriteString("((")
-	result.WriteString(this.params.Debug())
-	result.WriteString(") ")
 	result.WriteString(this.token)
 	result.WriteString(" ")
+	result.WriteString(this.name.Debug())
+	result.WriteString("(")
+	var n []string = make([]string, 0)
+	for _, param := range this.params {
+		n = append(n, param.Debug())
+	}
+	result.WriteString(strings.Join(n, " "))
+	result.WriteString(") ")
 	result.WriteString(this.body.Debug())
-	result.WriteString(")")
 	return result.String()
 }
 
@@ -35,21 +40,30 @@ func (this Function) GetLine() uint32 {
 func (this Function) Init(line uint32, token string) Function {
 	this.line = line
 	this.token = token
+	this.params = make([]Identifier, 0)
 	return this
 }
 
-func (this Function) GetParams() Identifiers {
+func (this Function) GetName() Identifier {
+	return this.name
+}
+
+func (this *Function) SetName(name Identifier) {
+	this.name = name
+}
+
+func (this Function) GetParams() []Identifier {
 	return this.params
 }
 
-func (this *Function) SetParams(params Identifiers) {
+func (this *Function) SetParams(params []Identifier) {
 	this.params = params
 }
 
-func (this Function) GetBody() Node {
+func (this Function) GetBody() Block {
 	return this.body
 }
 
-func (this *Function) SetBody(body Node) {
+func (this *Function) SetBody(body Block) {
 	this.body = body
 }

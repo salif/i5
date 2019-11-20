@@ -12,7 +12,11 @@ func (this ClassObject) Type() TYPE {
 }
 
 func (this ClassObject) StringValue() string {
-	return fmt.Sprint(this.Value.StringValue())
+	return fmt.Sprintf("[type: %v]", this.Type())
+}
+
+func (this ClassObject) ToString() String {
+	return String{Value: fmt.Sprint(this.Value.ToString())}
 }
 
 func (this ClassObject) Init() ClassObject {

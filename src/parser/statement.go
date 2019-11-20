@@ -9,6 +9,8 @@ import (
 // All statements ends with EOL
 func (p *Parser) parseStatement() (ast.Node, error) {
 	switch p.peek.Type {
+	case types.FN:
+		return p.parseFunction()
 	case types.IF:
 		return p.parseIf()
 	case types.SWITCH:

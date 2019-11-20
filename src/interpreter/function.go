@@ -7,5 +7,7 @@ import (
 )
 
 func evalFunction(node ast.Function, env *object.Env) object.Object {
-	return object.Function{Params: node.GetParams(), Body: node.GetBody(), Env: env}
+	var function object.Function = object.Function{Params: node.GetParams(), Body: node.GetBody(), Env: env}
+	env.Set(node.GetName().GetValue(), function)
+	return function
 }

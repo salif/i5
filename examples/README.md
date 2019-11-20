@@ -3,7 +3,7 @@
 ## Hello World
 
 ```
-main = () => {
+fn main() {
 	$print("Hello, World!")
 }
 ```

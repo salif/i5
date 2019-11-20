@@ -12,12 +12,7 @@ func (p *Parser) parseGroup() (ast.Node, error) {
 		return nil, err
 	}
 	p.next() // '('
-	var node ast.Node
-	if p.peek.Type == types.RPAREN {
-		p.next()
-		return ast.Identifiers{}.Init(p.peek.Line), nil
-	}
-	node, err = p.parseExpression(LOWEST)
+	node, err := p.parseExpression(LOWEST)
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ import (
 
 type Program struct {
 	line uint32
-	body []Assign
+	body []Function
 }
 
 func (this Program) GetType() string {
@@ -24,9 +24,9 @@ func (this Program) Debug() string {
 	return result.String()
 }
 
-func (this Program) Init(line uint32, body []Assign) Program {
+func (this Program) Init(line uint32) Program {
 	this.line = line
-	this.body = body
+	this.body = make([]Function, 0)
 	return this
 }
 
@@ -34,10 +34,10 @@ func (this Program) GetLine() uint32 {
 	return this.line
 }
 
-func (this Program) GetBody() []Assign {
+func (this Program) GetBody() []Function {
 	return this.body
 }
 
-func (this *Program) SetBody(body []Assign) {
+func (this *Program) SetBody(body []Function) {
 	this.body = body
 }

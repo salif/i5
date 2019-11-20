@@ -1,6 +1,6 @@
 #!/usr/bin/env i5
 
-main = () => {
+fn main() {
 	object = Object("", 0)
 	object.set_name("Name")
 	object.set_age(1)
@@ -10,19 +10,19 @@ main = () => {
 	# output: "age: 1"
 }
 
-Object = (name age) => {
+fn Object(name age) {
 	this = $class.new()
 
 	this.name = name
 	this.age = age
 
-	this.get_name = () => this.name
-	this.get_age = () => this.age
+	this.get_name = lambda: () => this.name
+	this.get_age = lambda: () => this.age
 
-	this.set_name = (name) => {
+	this.set_name = lambda: (name) => {
 		this.name = name
 	}
-	this.set_age = (age) => {
+	this.set_age = lambda: (age) => {
 		this.age = age
 	}
 

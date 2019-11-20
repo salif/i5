@@ -15,7 +15,7 @@ func evalIf(node ast.If, env *object.Env) object.Object {
 	}
 
 	if evaluatedCondition.Type() != object.BOOL {
-		return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_NON_BOOL, evaluatedCondition.Type(), "if")
+		return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_IS_NOT_A_BOOL, evaluatedCondition.Type())
 	}
 	if isTrue(evaluatedCondition) {
 		return Eval(node.GetConsequence(), env)

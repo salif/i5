@@ -19,9 +19,9 @@ func (this Error) Type() TYPE {
 }
 
 func (this Error) StringValue() string {
-	return fmt.Sprintf("%s", this.Message.StringValue())
+	return fmt.Sprintf("[type: %v]", this.Type())
 }
 
 func (this Error) NativeError(fileName string) error {
-	return fmt.Errorf("%s%s\n%s%s:%v\n", colors.Red("error: "), this.StringValue(), colors.Red("in: "), fileName, this.Line)
+	return fmt.Errorf("%s%s\n%s%s:%v\n", colors.Red("error: "), this.Message.StringValue(), colors.Red("in: "), fileName, this.Line)
 }

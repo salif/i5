@@ -8,21 +8,21 @@ import (
 )
 
 func (p *Parser) parseProgram() (ast.Node, error) {
-	node := ast.Program{}.Init(p.peek.Line, []ast.Assign{})
+	node := ast.Program{}.Init(p.peek.Line)
 
-	body := []ast.Assign{}
+	body := make([]ast.Function, 0)
 	for p.peek.Type != types.EOF {
 		if p.peek.Type == types.EOL {
 			p.next()
 			continue
 		}
-		e, err := p.parseExpression(LOWEST)
+		e, err := p.parseStatement()
 		if err != nil {
 			return nil, err
-		} else if e, ok := e.(ast.Assign); ok {
+		} else if e, ok := e.(ast.Function); ok {
 			body = append(body, e)
 		} else {
-			return nil, p.Throw(e.GetLine(), constants.PARSER_EXPECTED, "declaration")
+			return nil, p.Throw(e.GetLine(), constants.PARSER_EXPECTED, "function")
 		}
 	}
 	node.SetBody(body)

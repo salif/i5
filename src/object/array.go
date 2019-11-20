@@ -3,6 +3,7 @@ package object
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 )
 
@@ -15,6 +16,10 @@ func (this Array) Type() TYPE {
 }
 
 func (this Array) StringValue() string {
+	return fmt.Sprintf("[type: %v]", this.Type())
+}
+
+func (this Array) ToString() String {
 	var out bytes.Buffer
 	out.WriteString("[")
 	result := []string{}
@@ -27,7 +32,7 @@ func (this Array) StringValue() string {
 	}
 	out.WriteString(strings.Join(result, ", "))
 	out.WriteString("]")
-	return out.String()
+	return String{Value: out.String()}
 }
 
 func (this Array) Init() Array {

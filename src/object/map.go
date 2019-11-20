@@ -18,6 +18,9 @@ func (this Map) Type() TYPE {
 }
 
 func (this Map) StringValue() string {
+	return fmt.Sprintf("[type: %v]", this.Type())
+}
+func (this Map) ToString() String {
 	var out bytes.Buffer
 	out.WriteString("{")
 	result := []string{}
@@ -35,7 +38,7 @@ func (this Map) StringValue() string {
 	}
 	out.WriteString(strings.Join(result, ", "))
 	out.WriteString("}")
-	return out.String()
+	return String{Value: out.String()}
 }
 
 func (this Map) Init() Map {
@@ -48,7 +51,7 @@ func (this *Map) Get(key Object) Object {
 	if value, ok := this.Value[rkey.GenKey()]; ok {
 		return value
 	} else {
-		return Error{IsFatal: false, Line: 0, Number: Integer{Value: constants.ERROR_NIL}, Message: String{Value: "nil"}}
+		return Error{IsFatal: false, Line: 0, Number: Integer{Value: constants.ERROR_NIL}, Message: String{Value: constants.IR_NIL}}
 	}
 }
 

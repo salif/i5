@@ -68,6 +68,12 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 			casesToAppend = append(casesToAppend, _case)
 		}
 
+		err = p.require(p.peek.Type, types.EQGT)
+		if err != nil {
+			return nil, err
+		}
+		p.next()
+
 		e, err = p.parseBlock()
 		if err != nil {
 			return nil, err

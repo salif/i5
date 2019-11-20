@@ -21,10 +21,11 @@ var builtins = map[string]object.Object{
 	"true":    object.Bool{Value: true},
 	"false":   object.Bool{Value: false},
 	"array":   _array(),
+	"class":   _class(),
+	"console": _console(),
 	"error":   _error(),
 	"i5":      _i5(),
 	"map":     _map(),
-	"console": _console(),
 	"print":   object.BuiltinFunction{Function: _console_println, MinParams: 0},
 	"typeof":  object.BuiltinFunction{Function: _typeof, MinParams: 1},
 }

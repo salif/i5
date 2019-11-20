@@ -30,7 +30,7 @@ func evalMainFunction(env *object.Env) object.Object {
 	if mainFunction, ok := env.Get(constants.MAIN_FUNCTION_NAME); ok {
 		return callFunction(mainFunction, []object.Object{}, 0)
 	} else {
-		return newError(false, 0, constants.ERROR_REFERENCE, constants.IR_MAIN_FN_NOT_FOUND)
+		return newError(true, 0, constants.ERROR_NIL, constants.IR_MAIN_FN_NOT_FOUND)
 	}
 }
 
@@ -48,6 +48,8 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		return evalCall(node, env)
 	case ast.Function:
 		return evalFunction(node, env)
+	case ast.Lambda:
+		return evalLambda(node, env)
 	case ast.Identifier:
 		return evalIdentifier(node, env)
 	case ast.Builtin:

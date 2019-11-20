@@ -7,7 +7,7 @@ import (
 )
 
 func (p *Parser) parseList(end string) ([]ast.Node, error) {
-	var list []ast.Node
+	var list []ast.Node = []ast.Node{}
 
 	if p.peek.Type == end {
 		return list, nil

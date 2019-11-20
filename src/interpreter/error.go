@@ -19,7 +19,7 @@ func Errf(err error) error {
 }
 
 func Nil(line uint32) object.Error {
-	return newError(false, line, constants.ERROR_NIL, "nil")
+	return newError(false, line, constants.ERROR_NIL, constants.IR_NIL)
 }
 
 func newError(isFatal bool, line uint32, number int64, text string, format ...interface{}) object.Error {

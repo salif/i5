@@ -6,15 +6,15 @@ import (
 	"github.com/i5/i5/src/types"
 )
 
-func (p *Parser) parseFunction() (ast.Node, error) {
-	node := ast.Function{}.Init(p.peek.Line, p.peek.Type)
-	p.next() // 'fn'
+func (p *Parser) parseLambda() (ast.Node, error) {
+	node := ast.Lambda{}.Init(p.peek.Line, p.peek.Type)
+	p.next() // 'lambda'
 
-	fnName, err := p.parseIdentifier()
+	err := p.require(p.peek.Type, types.COLON)
 	if err != nil {
 		return nil, err
 	}
-	node.SetName(fnName.(ast.Identifier))
+	p.next()
 
 	err = p.require(p.peek.Type, types.LPAREN)
 	if err != nil {
@@ -38,17 +38,25 @@ func (p *Parser) parseFunction() (ast.Node, error) {
 	}
 	p.next()
 
-	body, err := p.parseBlock()
-	if err != nil {
-		return nil, err
-	}
-	node.SetBody(body)
-
-	err = p.require(p.peek.Type, types.EOL)
+	err = p.require(p.peek.Type, types.EQGT)
 	if err != nil {
 		return nil, err
 	}
 	p.next()
+
+	if p.peek.Type == types.LBRACE {
+		body, err := p.parseBlock()
+		if err != nil {
+			return nil, err
+		}
+		node.SetBody(body)
+	} else {
+		body, err := p.parseExpression(LOWEST)
+		if err != nil {
+			return nil, err
+		}
+		node.SetBody(body)
+	}
 
 	return node, nil
 }

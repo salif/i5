@@ -23,7 +23,7 @@ func evalCall(node ast.Call, env *object.Env) object.Object {
 func callFunction(fn object.Object, args []object.Object, line uint32) object.Object {
 	switch fn := fn.(type) {
 	case object.Function:
-		if len(args) < len(fn.Params.GetBody()) {
+		if len(args) < len(fn.Params) {
 			return newError(true, line, constants.ERROR_RANGE, constants.IR_NOT_ENOUGH_ARGS)
 		}
 		env := extendFunctionEnv(fn, args)
@@ -45,13 +45,13 @@ func callFunction(fn object.Object, args []object.Object, line uint32) object.Ob
 			return Nil(line)
 		}
 	default:
-		return newError(true, line, constants.ERROR_TYPE, constants.IR_INVALID_CALL, fn.Type())
+		return newError(true, line, constants.ERROR_TYPE, constants.IR_IS_NOT_A_FUNCTION, fn.Type())
 	}
 }
 
 func extendFunctionEnv(fn object.Function, args []object.Object) *object.Env {
 	var env *object.Env = fn.Env.Clone()
-	for paramIdx, param := range fn.Params.GetBody() {
+	for paramIdx, param := range fn.Params {
 		env.Set(param.GetValue(), args[paramIdx])
 	}
 	return env

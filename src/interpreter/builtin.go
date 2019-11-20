@@ -17,6 +17,6 @@ func evalBuiltin(node ast.Builtin, env *object.Env) object.Object {
 		}
 		return builtin
 	} else {
-		return newError(true, node.GetLine(), constants.ERROR_REFERENCE, "buitin not found: "+node.GetValue())
+		return newError(true, node.GetLine(), constants.ERROR_NIL, "buitin not found: "+node.GetValue())
 	}
 }

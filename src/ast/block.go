@@ -15,16 +15,18 @@ func (this Block) GetType() string {
 func (this Block) Debug() string {
 	var result strings.Builder
 	result.WriteString("{")
-	for _, s := range this.body {
-		result.WriteString(s.Debug())
-		result.WriteString("; ")
+	var n []string = make([]string, 0)
+	for _, node := range this.body {
+		n = append(n, node.Debug())
 	}
+	result.WriteString(strings.Join(n, "; "))
 	result.WriteString("}")
 	return result.String()
 }
 
 func (this Block) Init(line uint32) Block {
 	this.line = line
+	this.body = make([]Node, 0)
 	return this
 }
 

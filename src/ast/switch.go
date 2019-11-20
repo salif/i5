@@ -23,12 +23,13 @@ func (this Switch) Debug() string {
 	result.WriteString(this.token)
 	result.WriteString(" ")
 	result.WriteString(this.condition.Debug())
-	result.WriteString(" {")
+	result.WriteString("{")
 	var n []string
 	for _, i := range this.cases {
 		n = append(n, i.Debug())
 	}
-	result.WriteString(strings.Join(n, ";"))
+	result.WriteString(strings.Join(n, "; "))
+	result.WriteString("}")
 	return result.String()
 }
 
@@ -69,7 +70,7 @@ func (this Case) Debug() string {
 	result.WriteString(types.CASE)
 	result.WriteString(" ")
 	result.WriteString(this._case.Debug())
-	result.WriteString(" ")
+	result.WriteString(" => ")
 	result.WriteString(this.body.Debug())
 	return result.String()
 }

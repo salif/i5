@@ -1,0 +1,7 @@
+#!/usr/bin/env i5
+
+fn main() {
+	function = lambda: (a b) => a + b
+	$print(function(1, 2))
+	# output: "3"
+}

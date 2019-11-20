@@ -13,7 +13,6 @@ import (
 const (
 	_ int = iota
 	LOWEST
-	FN       // =>
 	ASSIGN   // = := += -= *= /= %=
 	IF       // ?? ::
 	OR       // or
@@ -34,7 +33,6 @@ const (
 )
 
 var precedences = map[string]int{
-	types.EQGT:       FN,
 	types.EQ:         ASSIGN,
 	types.COLONEQ:    ASSIGN,
 	types.PLUSEQ:     ASSIGN,
@@ -100,12 +98,12 @@ func (p *Parser) Init(fileName string, tokens types.TokenList) {
 	p.prefixFunctions[types.FLOAT] = p.parseFloat
 	p.prefixFunctions[types.STRING] = p.parseString
 	p.prefixFunctions[types.BUILTIN] = p.parseBuiltin
+	p.prefixFunctions[types.LAMBDA] = p.parseLambda
 	p.prefixFunctions[types.LPAREN] = p.parseGroup
 	p.prefixFunctions[types.NOT] = p.parsePrefix
 	p.prefixFunctions[types.BNOT] = p.parsePrefix
 	p.prefixFunctions[types.MINUS] = p.parsePrefix
 
-	p.infixFunctions[types.EQGT] = p.parseFunction
 	p.infixFunctions[types.EQ] = p.parseAssign
 	p.infixFunctions[types.COLONEQ] = p.parseAssign
 	p.infixFunctions[types.PLUSEQ] = p.parseAssign

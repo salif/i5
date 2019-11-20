@@ -1,6 +1,6 @@
 #!/usr/bin/env i5
 
-main = () => {
+fn main() {
 	log = $print
 
 	log("begin") # output: "begin"
@@ -17,19 +17,19 @@ main = () => {
 
 	hi_john = say_hi_to_user("invalid", "John")
 	if err ? hi_john {
-		$printf('there was a problem: "%s"', err.message)
+		$print('there was a problem: ', $error.toString(err))
 	} else {
 		log(hi_john)
 		hi_array = $array.add(hi_array, hi_john)
 	}
-	# output: 'there was a problem: "Invalid user type!"'
+	# output: "there was a problem: Invalid user type!"
 
-	log(hi_array) # output: '["Hi moderator Lorem!", "Hi admin Ipsum!"]'
+	log($array.toString(hi_array)) # output: '["Hi moderator Lorem!", "Hi admin Ipsum!"]'
 
 	log("end") # output: "end"
 }
 
-say_hi_to_user = (user_type user_name) => {
+fn say_hi_to_user(user_type user_name) {
 	if !(user_type == "admin" or user_type == "moderator") {
 		return $error.new("Invalid user type!")
 	}

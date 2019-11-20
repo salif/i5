@@ -1,15 +1,15 @@
 #!/usr/bin/env i5
 
-main = () => {
+fn main() {
 	result = divide(2, 0)
 	if err ? result {
-		throw $error.new("error: " : err.message)
+		throw err
 	}
 	$print(result)
 	# output: "error: can not divide by zero!"
 }
 
-divide = (a b) => {
+fn divide(a b) {
 	if b == 0 {
 		return $error.new("can not divide by zero!")
 	}

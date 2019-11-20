@@ -13,15 +13,6 @@ func (p *Parser) parseIdentifier() (ast.Node, error) {
 	}
 	node := ast.Identifier{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
-	if p.peek.Type == types.IDENT {
-		result := ast.Identifiers{}.Init(node.GetLine())
-		result.Append(node)
-		for p.peek.Type == types.IDENT {
-			result.Append(ast.Identifier{}.Init(p.peek.Line, p.peek.Value))
-			p.next()
-		}
-		return result, nil
-	} else {
-		return node, nil
-	}
+	return node, nil
+
 }

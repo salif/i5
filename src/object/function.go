@@ -2,11 +2,13 @@
 package object
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/ast"
 )
 
 type Function struct {
-	Params ast.Identifiers
+	Params []ast.Identifier
 	Body   ast.Node
 	Env    *Env
 }
@@ -16,5 +18,5 @@ func (this Function) Type() TYPE {
 }
 
 func (this Function) StringValue() string {
-	return "[type: function]"
+	return fmt.Sprintf("[type: %v]", this.Type())
 }

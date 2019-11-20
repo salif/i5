@@ -1,9 +1,9 @@
 #!/usr/bin/env i5
 
-main = () => {
+fn main() {
 	map = $map.new()
 	$map.set(map, "name", "Name")
 	$map.set(map, "age", 0)
-	$print(map)
+	$print($map.toString(map))
 	# output: '{"name": "Name", "age": 0}'
 }

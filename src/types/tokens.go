@@ -2,18 +2,21 @@
 package types
 
 const (
+	EOL string = "EOL"
+	EOF string = "EOF"
+
 	// types
 	INT     string = "integer"
 	FLOAT   string = "float"
 	STRING  string = "string"
 	BUILTIN string = "builtin"
 	IDENT   string = "identifier"
-	EOL     string = "new line"
-	EOF     string = "end of file"
 
 	// keywords
 	ANDAND string = "and"
 	OROR   string = "or"
+	FN     string = "fn"
+	LAMBDA string = "lambda"
 	IF     string = "if"
 	ELIF   string = "elif"
 	ELSE   string = "else"

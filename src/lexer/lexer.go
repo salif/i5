@@ -161,11 +161,7 @@ func Run(fileName string, code []byte) (types.TokenList, error) {
 				value += string(scanner.Peek())
 			}
 
-			if kToken, isKeyword := IsKeyword(value); isKeyword {
-				tokens.Add(kToken, value, scanner.Line())
-			} else {
-				tokens.Add(types.IDENT, value, scanner.Line())
-			}
+			tokens.Add(getIdentType(value), value, scanner.Line())
 			continue
 		}
 

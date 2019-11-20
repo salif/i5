@@ -34,30 +34,34 @@ const (
 	QM       byte = 63
 )
 
-func IsKeyword(char string) (string, bool) {
-	switch char {
+func getIdentType(value string) string {
+	switch value {
 	case types.ANDAND:
-		return types.ANDAND, true
+		return types.ANDAND
 	case types.OROR:
-		return types.OROR, true
+		return types.OROR
+	case types.FN:
+		return types.FN
+	case types.LAMBDA:
+		return types.LAMBDA
 	case types.IF:
-		return types.IF, true
+		return types.IF
 	case types.ELIF:
-		return types.ELIF, true
+		return types.ELIF
 	case types.ELSE:
-		return types.ELSE, true
+		return types.ELSE
 	case types.SWITCH:
-		return types.SWITCH, true
+		return types.SWITCH
 	case types.CASE:
-		return types.CASE, true
+		return types.CASE
 	case types.LOOP:
-		return types.LOOP, true
+		return types.LOOP
 	case types.RETURN:
-		return types.RETURN, true
+		return types.RETURN
 	case types.THROW:
-		return types.THROW, true
+		return types.THROW
 	default:
-		return "", false
+		return types.IDENT
 	}
 }
 
