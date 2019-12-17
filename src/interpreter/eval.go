@@ -2,66 +2,61 @@
 package interpreter
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
 )
 
-func evalProgramNodes(programs []ast.Node, env *object.Env) object.Error {
-	for _, program := range programs {
-		var result object.Error = evalProgramNode(program, env)
-		if result.IsFatal {
-			return result
-		}
-	}
-	return Nil(0)
-}
-
-func evalProgramNode(program ast.Node, env *object.Env) object.Error {
-	var result object.Object = Eval(program, env)
-	if err, ok := result.(object.Error); ok && err.IsFatal {
-		return err
-	} else {
-		return Nil(program.GetLine())
-	}
-}
-
-func evalMainFunction(env *object.Env) object.Object {
+func evalMainFunction(env *object.Env) (object.Object, error) {
 	if mainFunction, ok := env.Get(constants.MAIN_FUNCTION_NAME); ok {
 		return callFunction(mainFunction, []object.Object{}, 0)
 	} else {
-		return newError(true, 0, constants.ERROR_NIL, constants.IR_MAIN_FN_NOT_FOUND)
+		return Null, constants.Error{Line: 0, Type: constants.ERROR_FATAL, Message: constants.IR_MAIN_FN_NOT_FOUND}
 	}
 }
 
-func Eval(node ast.Node, env *object.Env) object.Object {
+func Eval(node ast.Node, env *object.Env) (object.Object, error) {
 	switch node := node.(type) {
+
+	// statements
 	case ast.Program:
-		return evalProgram(node, env)
+		return Null, evalProgram(node, env)
 	case ast.Block:
-		return evalBlock(node, env)
-	case ast.Return:
-		return evalReturn(node, env)
-	case ast.Assign:
-		return evalAssign(node, env)
-	case ast.Call:
-		return evalCall(node, env)
+		return Null, evalBlock(node, env)
 	case ast.Function:
-		return evalFunction(node, env)
-	case ast.Lambda:
-		return evalLambda(node, env)
+		return Null, evalFunction(node, env)
+	case ast.Return:
+		return Null, evalReturn(node, env)
+	case ast.If:
+		return Null, evalIf(node, env)
+	case ast.Switch:
+		return Null, evalSwitch(node, env)
+	case ast.Loop:
+		return Null, evalLoop(node, env)
+	case ast.Break:
+		return Null, evalBreak(node, env)
+	case ast.Throw:
+		return Null, evalThrow(node, env)
+
+	// expressions
+	case ast.Integer:
+		return object.Integer{Value: node.GetValue()}, nil
+	case ast.Float:
+		return object.Float{Value: node.GetValue()}, nil
+	case ast.String:
+		return object.String{Value: node.GetValue()}, nil
 	case ast.Identifier:
 		return evalIdentifier(node, env)
 	case ast.Builtin:
 		return evalBuiltin(node, env)
-	case ast.Integer:
-		return evalInteger(node, env)
-	case ast.Float:
-		return evalFloat(node, env)
-	case ast.String:
-		return evalString(node, env)
-	case ast.Throw:
-		return evalThrow(node, env)
+	case ast.Assign:
+		return evalAssign(node, env)
+	case ast.Call:
+		return evalCall(node, env)
+	case ast.FunctionExpr:
+		return object.Function{Params: node.GetParams(), Body: node.GetBody(), Env: env}, nil
 	case ast.Prefix:
 		return evalPrefixNode(node, env)
 	case ast.Infix:
@@ -70,13 +65,8 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		return evalPostfixNode(node, env)
 	case ast.Index:
 		return evalIndex(node, env)
-	case ast.If:
-		return evalIf(node, env)
-	case ast.Switch:
-		return evalSwitch(node, env)
-	case ast.Loop:
-		return evalLoop(node, env)
+
 	default:
-		return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_INVALID_EVAL, node.GetType())
+		return Null, constants.Error{Line: node.GetLine(), Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_EVAL, node.GetType())}
 	}
 }

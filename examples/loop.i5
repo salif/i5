@@ -4,7 +4,7 @@ fn main() {
 	i = 0
 	loop {
 		if i > 9 {
-			return $break
+			break
 		}
 		$print(i)
 		i += 1

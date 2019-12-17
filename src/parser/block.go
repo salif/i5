@@ -3,24 +3,24 @@ package parser
 
 import (
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 func (p *Parser) parseBlock() (ast.Block, error) {
 	node := ast.Block{}.Init(p.peek.Line)
 
-	err := p.require(p.peek.Type, types.LBRACE)
+	err := p.require(p.peek.Type, constants.TOKEN_LBRACE)
 	if err != nil {
 		return node, err
 	}
 	p.next() // '{'
 
-	if p.peek.Type == types.RBRACE {
+	if p.peek.Type == constants.TOKEN_RBRACE {
 		p.next()
 		return node, nil
 	}
 
-	err = p.require(p.peek.Type, types.EOL)
+	err = p.require(p.peek.Type, constants.TOKEN_EOL)
 	if err != nil {
 		return node, err
 	}
@@ -28,8 +28,8 @@ func (p *Parser) parseBlock() (ast.Block, error) {
 	p.next() // 'EOL'
 
 	stmts := []ast.Node{}
-	for p.peek.Type != types.RBRACE {
-		if p.peek.Type == types.EOL {
+	for p.peek.Type != constants.TOKEN_RBRACE {
+		if p.peek.Type == constants.TOKEN_EOL {
 			p.next() // skip empty line
 			continue
 		}
@@ -41,7 +41,7 @@ func (p *Parser) parseBlock() (ast.Block, error) {
 	}
 	node.SetBody(stmts)
 
-	err = p.require(p.peek.Type, types.RBRACE)
+	err = p.require(p.peek.Type, constants.TOKEN_RBRACE)
 	if err != nil {
 		return node, err
 	}

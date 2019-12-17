@@ -2,21 +2,19 @@
 package interpreter
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/builtins"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
 )
 
-func evalBuiltin(node ast.Builtin, env *object.Env) object.Object {
-	if builtin, ok := builtins.Get(node.GetValue(), env); ok {
-		if ErrorType(builtin) > 0 {
-			builtin := builtin.(object.Error)
-			builtin.Line = node.GetLine()
-			return builtin
-		}
-		return builtin
+func evalBuiltin(node ast.Builtin, env *object.Env) (object.Object, error) {
+	ev, ok := builtins.Get(node.GetValue(), env)
+	if ok {
+		return ev, nil
 	} else {
-		return newError(true, node.GetLine(), constants.ERROR_NIL, "buitin not found: "+node.GetValue())
+		return nil, constants.Error{Line: node.GetLine(), Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_BUILTIN_NOT_FOUND, node.GetValue())}
 	}
 }

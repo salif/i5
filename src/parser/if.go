@@ -4,7 +4,6 @@ package parser
 import (
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/types"
 )
 
 func (p *Parser) parseIf() (ast.Node, error) {
@@ -28,13 +27,13 @@ func (p *Parser) parseIf() (ast.Node, error) {
 		return nil, p.Throw(e.GetLine(), constants.PARSER_EXPECTED, "block statement")
 	}
 
-	if p.peek.Type == types.ELIF {
+	if p.peek.Type == constants.TOKEN_ELIF {
 		e, err := p.parseIf()
 		if err != nil {
 			return nil, err
 		}
 		node.SetAlternative(ast.Block{}.Set(p.peek.Line, []ast.Node{e}))
-	} else if p.peek.Type == types.ELSE {
+	} else if p.peek.Type == constants.TOKEN_ELSE {
 		p.next() // 'else'
 		e, err = p.parseBlock()
 		if err != nil {
@@ -60,7 +59,7 @@ func (p *Parser) parseTernary(left ast.Node) (ast.Node, error) {
 	}
 	node.SetConsequence(e)
 
-	if p.peek.Type == types.COLONCOLON {
+	if p.peek.Type == constants.TOKEN_COLONCOLON {
 		p.next()
 		e, err = p.parseExpression(LOWEST)
 		if err != nil {

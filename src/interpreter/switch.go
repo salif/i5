@@ -3,25 +3,22 @@ package interpreter
 
 import (
 	"github.com/i5/i5/src/ast"
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
-	"github.com/i5/i5/src/types"
 )
 
-func evalSwitch(node ast.Switch, env *object.Env) object.Object {
-	var evaluatedCondition object.Object = Eval(node.GetCondition(), env)
-	if ErrorType(evaluatedCondition) == FATAL {
-		return evaluatedCondition
-	}
-
+func evalSwitch(node ast.Switch, env *object.Env) error {
 	for _, c := range node.GetCases() {
-		result := Eval(ast.Infix{}.Set(c.GetLine(), c.GetCase(), types.EQEQ, node.GetCondition()), env)
-		if ErrorType(result) == FATAL {
-			return result
+		ev, err := Eval(ast.Infix{}.Set(c.GetLine(), c.GetCase(), constants.TOKEN_EQEQ, node.GetCondition()), env)
+		if err != nil {
+			return err
 		}
-		if isTrue(result) {
-			return Eval(c.GetBody(), env)
+		if isTrue(ev) {
+			_, errr := Eval(c.GetBody(), env)
+			if errr != nil {
+				return errr
+			}
 		}
 	}
-
-	return Nil(node.GetLine())
+	return nil
 }

@@ -5,18 +5,18 @@ import (
 	"strings"
 )
 
-type Lambda struct {
+type FunctionExpr struct {
 	line   uint32
 	token  string
 	params []Identifier
 	body   Node
 }
 
-func (this Lambda) GetType() string {
-	return LAMBDA
+func (this FunctionExpr) GetType() string {
+	return FUNCTIONEXPR
 }
 
-func (this Lambda) Debug() string {
+func (this FunctionExpr) Debug() string {
 	var result strings.Builder
 	result.WriteString(this.token)
 	result.WriteString(": (")
@@ -30,29 +30,29 @@ func (this Lambda) Debug() string {
 	return result.String()
 }
 
-func (this Lambda) GetLine() uint32 {
+func (this FunctionExpr) GetLine() uint32 {
 	return this.line
 }
 
-func (this Lambda) Init(line uint32, token string) Lambda {
+func (this FunctionExpr) Init(line uint32, token string) FunctionExpr {
 	this.line = line
 	this.token = token
 	this.params = make([]Identifier, 0)
 	return this
 }
 
-func (this Lambda) GetParams() []Identifier {
+func (this FunctionExpr) GetParams() []Identifier {
 	return this.params
 }
 
-func (this *Lambda) SetParams(params []Identifier) {
+func (this *FunctionExpr) SetParams(params []Identifier) {
 	this.params = params
 }
 
-func (this Lambda) GetBody() Node {
+func (this FunctionExpr) GetBody() Node {
 	return this.body
 }
 
-func (this *Lambda) SetBody(body Node) {
+func (this *FunctionExpr) SetBody(body Node) {
 	this.body = body
 }

@@ -3,7 +3,7 @@ package object
 
 import (
 	"bytes"
-	"fmt"
+	"github.com/i5/i5/src/constants"
 	"strings"
 )
 
@@ -11,20 +11,16 @@ type Array struct {
 	Value []Object
 }
 
-func (this Array) Type() TYPE {
-	return ARRAY
+func (this Array) Type() string {
+	return constants.TYPE_ARRAY
 }
 
 func (this Array) StringValue() string {
-	return fmt.Sprintf("[type: %v]", this.Type())
-}
-
-func (this Array) ToString() String {
 	var out bytes.Buffer
 	out.WriteString("[")
 	result := []string{}
 	for _, v := range this.Value {
-		if v.Type() == STRING {
+		if v.Type() == constants.TYPE_STRING {
 			result = append(result, "\""+v.StringValue()+"\"")
 		} else {
 			result = append(result, v.StringValue())
@@ -32,12 +28,7 @@ func (this Array) ToString() String {
 	}
 	out.WriteString(strings.Join(result, ", "))
 	out.WriteString("]")
-	return String{Value: out.String()}
-}
-
-func (this Array) Init() Array {
-	this.Value = make([]Object, 0)
-	return this
+	return out.String()
 }
 
 func (this *Array) Push(obj Object) []Object {

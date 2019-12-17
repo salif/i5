@@ -6,11 +6,10 @@ import (
 
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/types"
 )
 
 func (p *Parser) parseFloat() (ast.Node, error) {
-	err := p.require(p.peek.Type, types.FLOAT)
+	err := p.require(p.peek.Type, constants.TOKEN_FLOAT)
 	if err != nil {
 		return nil, err
 	}

@@ -2,21 +2,21 @@
 package interpreter
 
 import (
+	"fmt"
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
 )
 
-func evalThrow(node ast.Throw, env *object.Env) object.Object {
-	var evaluatedRight object.Object = Eval(node.GetBody(), env)
-	if ErrorType(evaluatedRight) == FATAL {
-		return evaluatedRight
-	}
-	if evaluatedRight.Type() == object.ERROR {
-		var err object.Error = evaluatedRight.(object.Error)
-		err.IsFatal = true
+func evalThrow(node ast.Throw, env *object.Env) error {
+	evRight, err := Eval(node.GetBody(), env)
+	if err != nil {
 		return err
+	}
+	if evRight.Type() == constants.TYPE_STRING {
+		exc := evRight.(object.String)
+		return constants.Error{Line: node.GetLine(), Type: constants.ERROR_FATAL, Message: exc.StringValue()}
 	} else {
-		return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_IS_NOT_AN_ERROR, evaluatedRight.Type())
+		return constants.Error{Line: node.GetLine(), Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_IS_NOT_A_STRING, evRight.Type())}
 	}
 }

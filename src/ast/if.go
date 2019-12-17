@@ -4,7 +4,7 @@ package ast
 import (
 	"strings"
 
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 type If struct {
@@ -28,7 +28,7 @@ func (this If) Debug() string {
 	result.WriteString(this.consequence.Debug())
 	if this.HaveAlternative() {
 		result.WriteString(" ")
-		result.WriteString(types.ELSE)
+		result.WriteString(constants.TOKEN_ELSE)
 		result.WriteString(" ")
 		result.WriteString(this.alternative.Debug())
 	}

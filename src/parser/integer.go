@@ -6,11 +6,10 @@ import (
 
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/types"
 )
 
 func (p *Parser) parseInteger() (ast.Node, error) {
-	err := p.require(p.peek.Type, types.INT)
+	err := p.require(p.peek.Type, constants.TOKEN_INTEGER)
 	if err != nil {
 		return nil, err
 	}

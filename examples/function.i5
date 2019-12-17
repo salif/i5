@@ -5,33 +5,33 @@ fn main() {
 
 	log("begin") # output: "begin"
 
-	hi_array = $array.new()
+	array = $array()
 
-	hi_lorem = say_hi_to_user("moderator", "Lorem")
-	log(hi_lorem) # output: "Hi moderator Lorem!"
-	hi_array = $array.add(hi_array, hi_lorem)
+	hiLorem = sayHi("moderator", "Lorem")
+	log(hiLorem) # output: "Hi moderator Lorem!"
+	array = $array_push(array, hiLorem)
 
-	hi_ipsum = say_hi_to_user("admin", "Ipsum")
-	log(hi_ipsum) # output: "Hi admin Ipsum!"
-	hi_array = $array.add(hi_array, hi_ipsum)
+	hiIpsum = sayHi("admin", "Ipsum")
+	log(hiIpsum) # output: "Hi admin Ipsum!"
+	array = $array_push(array, hiIpsum)
 
-	hi_john = say_hi_to_user("invalid", "John")
-	if err ? hi_john {
-		$print('there was a problem: ', $error.toString(err))
+	hiJohn = sayHi("invalid", "John")
+	if err ? hiJohn {
+		$print('there was a problem: ', err)
 	} else {
-		log(hi_john)
-		hi_array = $array.add(hi_array, hi_john)
+		log(hiJohn)
+		array = $array_push(array, hiJohn)
 	}
 	# output: "there was a problem: Invalid user type!"
 
-	log($array.toString(hi_array)) # output: '["Hi moderator Lorem!", "Hi admin Ipsum!"]'
+	log(array) # output: '["Hi moderator Lorem!", "Hi admin Ipsum!"]'
 
 	log("end") # output: "end"
 }
 
-fn say_hi_to_user(user_type user_name) {
+fn sayHi(user_type user_name) {
 	if !(user_type == "admin" or user_type == "moderator") {
-		return $error.new("Invalid user type!")
+		return $exception("Invalid user type!")
 	}
 	return "Hi ":user_type:" ":user_name:"!"
 }

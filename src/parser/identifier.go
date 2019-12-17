@@ -3,11 +3,11 @@ package parser
 
 import (
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 func (p *Parser) parseIdentifier() (ast.Node, error) {
-	err := p.require(p.peek.Type, types.IDENT)
+	err := p.require(p.peek.Type, constants.TOKEN_IDENTIFIER)
 	if err != nil {
 		return nil, err
 	}

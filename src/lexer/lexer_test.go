@@ -40,8 +40,8 @@ func TestRun(t *testing.T) {
 		if err != nil {
 			t.Errorf("error: %v\n", err.Error())
 		}
-		if result.Size() != tt.W {
-			t.Errorf(constants.TEST_GOT_WANT, result.Size(), tt.W)
+		if len(result) != tt.W {
+			t.Errorf(constants.TEST_GOT_WANT, len(result), tt.W)
 		}
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/i5/colors"
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/lexer"
 )
 
 const (
@@ -33,51 +33,36 @@ const (
 )
 
 var precedences = map[string]int{
-	types.EQ:         ASSIGN,
-	types.COLONEQ:    ASSIGN,
-	types.PLUSEQ:     ASSIGN,
-	types.MINUSEQ:    ASSIGN,
-	types.MULTIPLYEQ: ASSIGN,
-	types.DIVIDEEQ:   ASSIGN,
-	types.MODULOEQ:   ASSIGN,
-	types.QMQM:       IF,
-	types.OROR:       OR,
-	types.ANDAND:     AND,
-	types.EQEQ:       EQ,
-	types.NOTEQ:      EQ,
-	types.LT:         EQ,
-	types.GT:         EQ,
-	types.LTEQ:       EQ,
-	types.GTEQ:       EQ,
-	types.COLON:      CONCAT,
-	types.QM:         QM,
-	types.OR:         BTWOR,
-	types.XOR:        BTWXOR,
-	types.AND:        BTWAND,
-	types.LTLT:       BTWSHIFT,
-	types.GTGT:       BTWSHIFT,
-	types.PLUS:       SUM,
-	types.MINUS:      SUM,
-	types.MULTIPLY:   PRODUCT,
-	types.DIVIDE:     PRODUCT,
-	types.MODULO:     PRODUCT,
-	types.LPAREN:     CALL,
-	types.DOT:        DOT,
-}
-
-func Run(fileName string, tokens types.TokenList) (ast.Node, error) {
-	var parser Parser
-	parser.Init(fileName, tokens)
-	return parser.parseProgram()
-}
-
-type Parser struct {
-	tokenlist       types.TokenList
-	position        int
-	peek            types.Token
-	currentFile     string
-	prefixFunctions map[string]prefixFunction
-	infixFunctions  map[string]infixFunction
+	constants.TOKEN_EQ:         ASSIGN,
+	constants.TOKEN_COLONEQ:    ASSIGN,
+	constants.TOKEN_PLUSEQ:     ASSIGN,
+	constants.TOKEN_MINUSEQ:    ASSIGN,
+	constants.TOKEN_MULTIPLYEQ: ASSIGN,
+	constants.TOKEN_DIVIDEEQ:   ASSIGN,
+	constants.TOKEN_MODULOEQ:   ASSIGN,
+	constants.TOKEN_QMQM:       IF,
+	constants.TOKEN_OROR:       OR,
+	constants.TOKEN_ANDAND:     AND,
+	constants.TOKEN_EQEQ:       EQ,
+	constants.TOKEN_NOTEQ:      EQ,
+	constants.TOKEN_LT:         EQ,
+	constants.TOKEN_GT:         EQ,
+	constants.TOKEN_LTEQ:       EQ,
+	constants.TOKEN_GTEQ:       EQ,
+	constants.TOKEN_COLON:      CONCAT,
+	constants.TOKEN_QM:         QM,
+	constants.TOKEN_OR:         BTWOR,
+	constants.TOKEN_XOR:        BTWXOR,
+	constants.TOKEN_AND:        BTWAND,
+	constants.TOKEN_LTLT:       BTWSHIFT,
+	constants.TOKEN_GTGT:       BTWSHIFT,
+	constants.TOKEN_PLUS:       SUM,
+	constants.TOKEN_MINUS:      SUM,
+	constants.TOKEN_MULTIPLY:   PRODUCT,
+	constants.TOKEN_DIVIDE:     PRODUCT,
+	constants.TOKEN_MODULO:     PRODUCT,
+	constants.TOKEN_LPAREN:     CALL,
+	constants.TOKEN_DOT:        DOT,
 }
 
 type (
@@ -85,61 +70,96 @@ type (
 	infixFunction  func(ast.Node) (ast.Node, error)
 )
 
-func (p *Parser) Init(fileName string, tokens types.TokenList) {
-	p.tokenlist = tokens
+type Parser struct {
+	code            []byte
+	tokens          []constants.Token
+	position        int
+	peek            constants.Token
+	currentFile     string
+	prefixFunctions map[string]prefixFunction
+	infixFunctions  map[string]infixFunction
+}
+
+func ParseProgram(fileName string, code []byte) (ast.Node, error) {
+	var p Parser
+	p.Init(fileName, code)
+	tokens, err := lexer.Run(p.currentFile, p.code)
+	if err != nil {
+		return nil, err
+	}
+	p.tokens = tokens
+	p.next()
+	return p.parseProgram()
+}
+
+func Parse(fileName string, code []byte) (ast.Node, error) {
+	var p Parser
+	p.Init(fileName, code)
+	tokens, err := lexer.Run(p.currentFile, p.code)
+	if err != nil {
+		return nil, err
+	}
+	p.tokens = tokens
+	p.next()
+	return p.parseStatement()
+}
+
+func (p *Parser) Init(fileName string, code []byte) {
+	p.code = code
+	p.tokens = make([]constants.Token, 0)
 	p.position = 0
-	p.peek = types.Token{}
+	p.peek = constants.Token{}
 	p.currentFile = fileName
 	p.prefixFunctions = make(map[string]prefixFunction)
 	p.infixFunctions = make(map[string]infixFunction)
-
-	p.prefixFunctions[types.IDENT] = p.parseIdentifier
-	p.prefixFunctions[types.INT] = p.parseInteger
-	p.prefixFunctions[types.FLOAT] = p.parseFloat
-	p.prefixFunctions[types.STRING] = p.parseString
-	p.prefixFunctions[types.BUILTIN] = p.parseBuiltin
-	p.prefixFunctions[types.LAMBDA] = p.parseLambda
-	p.prefixFunctions[types.LPAREN] = p.parseGroup
-	p.prefixFunctions[types.NOT] = p.parsePrefix
-	p.prefixFunctions[types.BNOT] = p.parsePrefix
-	p.prefixFunctions[types.MINUS] = p.parsePrefix
-
-	p.infixFunctions[types.EQ] = p.parseAssign
-	p.infixFunctions[types.COLONEQ] = p.parseAssign
-	p.infixFunctions[types.PLUSEQ] = p.parseAssign
-	p.infixFunctions[types.MINUSEQ] = p.parseAssign
-	p.infixFunctions[types.MULTIPLYEQ] = p.parseAssign
-	p.infixFunctions[types.DIVIDEEQ] = p.parseAssign
-	p.infixFunctions[types.MODULOEQ] = p.parseAssign
-	p.infixFunctions[types.QMQM] = p.parseTernary
-	p.infixFunctions[types.OROR] = p.parseInfix
-	p.infixFunctions[types.ANDAND] = p.parseInfix
-	p.infixFunctions[types.EQEQ] = p.parseInfix
-	p.infixFunctions[types.NOTEQ] = p.parseInfix
-	p.infixFunctions[types.LT] = p.parseInfix
-	p.infixFunctions[types.GT] = p.parseInfix
-	p.infixFunctions[types.LTEQ] = p.parseInfix
-	p.infixFunctions[types.GTEQ] = p.parseInfix
-	p.infixFunctions[types.COLON] = p.parseInfix
-	p.infixFunctions[types.QM] = p.parseInfix
-	p.infixFunctions[types.OR] = p.parseInfix
-	p.infixFunctions[types.XOR] = p.parseInfix
-	p.infixFunctions[types.AND] = p.parseInfix
-	p.infixFunctions[types.LTLT] = p.parseInfix
-	p.infixFunctions[types.GTGT] = p.parseInfix
-	p.infixFunctions[types.PLUS] = p.parseInfix
-	p.infixFunctions[types.MINUS] = p.parseInfix
-	p.infixFunctions[types.MULTIPLY] = p.parseInfix
-	p.infixFunctions[types.DIVIDE] = p.parseInfix
-	p.infixFunctions[types.MODULO] = p.parseInfix
-	p.infixFunctions[types.LPAREN] = p.parseCall
-	p.infixFunctions[types.DOT] = p.parseIndex
-
-	p.next()
+	p.prefixFunctions[constants.TOKEN_IDENTIFIER] = p.parseIdentifier
+	p.prefixFunctions[constants.TOKEN_INTEGER] = p.parseInteger
+	p.prefixFunctions[constants.TOKEN_FLOAT] = p.parseFloat
+	p.prefixFunctions[constants.TOKEN_STRING] = p.parseString
+	p.prefixFunctions[constants.TOKEN_BUILTIN] = p.parseBuiltin
+	p.prefixFunctions[constants.TOKEN_FN] = p.parseFunctionExpr
+	p.prefixFunctions[constants.TOKEN_LPAREN] = p.parseGroup
+	p.prefixFunctions[constants.TOKEN_NOT] = p.parsePrefix
+	p.prefixFunctions[constants.TOKEN_BNOT] = p.parsePrefix
+	p.prefixFunctions[constants.TOKEN_MINUS] = p.parsePrefix
+	p.infixFunctions[constants.TOKEN_EQ] = p.parseAssign
+	p.infixFunctions[constants.TOKEN_COLONEQ] = p.parseAssign
+	p.infixFunctions[constants.TOKEN_PLUSEQ] = p.parseAssign
+	p.infixFunctions[constants.TOKEN_MINUSEQ] = p.parseAssign
+	p.infixFunctions[constants.TOKEN_MULTIPLYEQ] = p.parseAssign
+	p.infixFunctions[constants.TOKEN_DIVIDEEQ] = p.parseAssign
+	p.infixFunctions[constants.TOKEN_MODULOEQ] = p.parseAssign
+	p.infixFunctions[constants.TOKEN_QMQM] = p.parseTernary
+	p.infixFunctions[constants.TOKEN_OROR] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_ANDAND] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_EQEQ] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_NOTEQ] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_LT] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_GT] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_LTEQ] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_GTEQ] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_COLON] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_QM] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_OR] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_XOR] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_AND] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_LTLT] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_GTGT] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_PLUS] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_MINUS] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_MULTIPLY] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_DIVIDE] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_MODULO] = p.parseInfix
+	p.infixFunctions[constants.TOKEN_LPAREN] = p.parseCall
+	p.infixFunctions[constants.TOKEN_DOT] = p.parseIndex
 }
 
 func (p *Parser) next() {
-	p.peek = p.tokenlist.Get(p.position)
+	if p.position < len(p.tokens) {
+		p.peek = p.tokens[p.position]
+	} else {
+		p.peek = constants.Token{Type: constants.TOKEN_EOF, Value: constants.TOKEN_EOF, Line: 0}
+	}
 	p.position++
 }
 

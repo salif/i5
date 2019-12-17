@@ -2,50 +2,60 @@
 package interpreter
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
 )
 
-func evalCall(node ast.Call, env *object.Env) object.Object {
-	var evaluatedFunctionCaller object.Object = Eval(node.GetCaller(), env)
+func evalCall(node ast.Call, env *object.Env) (object.Object, error) {
+	evCaller, err := Eval(node.GetCaller(), env)
+	if err != nil {
+		return nil, err
+	}
+
 	var evaluatedArguments []object.Object = []object.Object{}
 	for _, e := range node.GetArguments() {
-		var evaluatedArgument object.Object = Eval(e, env)
-		if ErrorType(evaluatedArgument) == FATAL {
-			return evaluatedArgument
+		ev, err := Eval(e, env)
+		if err != nil {
+			return nil, err
 		}
-		evaluatedArguments = append(evaluatedArguments, evaluatedArgument)
+
+		evaluatedArguments = append(evaluatedArguments, ev)
 	}
-	return callFunction(evaluatedFunctionCaller, evaluatedArguments, node.GetLine())
+
+	return callFunction(evCaller, evaluatedArguments, node.GetLine())
 }
 
-func callFunction(fn object.Object, args []object.Object, line uint32) object.Object {
+func callFunction(fn object.Object, args []object.Object, line uint32) (object.Object, error) {
 	switch fn := fn.(type) {
 	case object.Function:
 		if len(args) < len(fn.Params) {
-			return newError(true, line, constants.ERROR_RANGE, constants.IR_NOT_ENOUGH_ARGS)
+			return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: constants.IR_NOT_ENOUGH_ARGS}
 		}
 		env := extendFunctionEnv(fn, args)
-		var result object.Object = Eval(fn.Body, env)
-		if result.Type() == object.RETURN {
-			var forReturn object.Return = result.(object.Return)
-			return forReturn.Value
-		} else {
-			return result
+		result, err := Eval(fn.Body, env)
+		if err != nil {
+			if er, ok := err.(constants.Error); ok {
+				if er.Type == constants.ERROR_RETURN {
+					return er.Value.(object.Object), nil
+				}
+			}
 		}
+		return result, err
 
 	case object.BuiltinFunction:
 		if len(args) < fn.MinParams {
-			return newError(true, line, constants.ERROR_RANGE, constants.IR_NOT_ENOUGH_ARGS)
+			return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: constants.IR_NOT_ENOUGH_ARGS}
 		}
 		if result := fn.Function(args...); result != nil {
-			return result
+			return result, nil
 		} else {
-			return Nil(line)
+			return Null, nil
 		}
 	default:
-		return newError(true, line, constants.ERROR_TYPE, constants.IR_IS_NOT_A_FUNCTION, fn.Type())
+		return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_IS_NOT_A_FUNCTION, fn.Type())}
 	}
 }
 

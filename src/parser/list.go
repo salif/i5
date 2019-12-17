@@ -3,7 +3,7 @@ package parser
 
 import (
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 func (p *Parser) parseList(end string) ([]ast.Node, error) {
@@ -19,9 +19,9 @@ func (p *Parser) parseList(end string) ([]ast.Node, error) {
 	}
 	list = append(list, e)
 
-	for p.peek.Type == types.COMMA {
+	for p.peek.Type == constants.TOKEN_COMMA {
 		p.next() // ','
-		if p.peek.Type == types.EOL {
+		if p.peek.Type == constants.TOKEN_EOL {
 			p.next() // 'EOL'
 		}
 		e, err := p.parseExpression(LOWEST)

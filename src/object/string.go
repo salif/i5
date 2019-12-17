@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package object
 
+import "github.com/i5/i5/src/constants"
+
 type String struct {
 	Value string
 }
 
-func (this String) Type() TYPE {
-	return STRING
+func (this String) Type() string {
+	return constants.TYPE_STRING
 }
 
 func (this String) StringValue() string {

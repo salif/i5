@@ -3,7 +3,7 @@ package parser
 
 import (
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 func (p *Parser) parseSwitch() (ast.Node, error) {
@@ -14,23 +14,23 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 		return nil, err
 	}
 	node.SetCondition(e)
-	err = p.require(p.peek.Type, types.LBRACE)
+	err = p.require(p.peek.Type, constants.TOKEN_LBRACE)
 	if err != nil {
 		return nil, err
 	}
 	p.next()
-	err = p.require(p.peek.Type, types.EOL)
+	err = p.require(p.peek.Type, constants.TOKEN_EOL)
 	if err != nil {
 		return nil, err
 	}
 	p.next()
 
 	cases := []ast.Case{}
-	for p.peek.Type != types.RBRACE {
+	for p.peek.Type != constants.TOKEN_RBRACE {
 		casesToAppend := []ast.Case{}
 
 		_case := ast.Case{}.Init(p.peek.Line)
-		err := p.require(p.peek.Type, types.CASE)
+		err := p.require(p.peek.Type, constants.TOKEN_CASE)
 		if err != nil {
 			return nil, err
 		}
@@ -44,17 +44,17 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 
 		casesToAppend = append(casesToAppend, _case)
 
-		for p.peek.Type == types.COMMA {
+		for p.peek.Type == constants.TOKEN_COMMA {
 			p.next() // ','
 
-			err := p.require(p.peek.Type, types.EOL)
+			err := p.require(p.peek.Type, constants.TOKEN_EOL)
 			if err != nil {
 				return nil, err
 			}
 			p.next() // 'EOL'
 
 			_case = ast.Case{}.Init(p.peek.Line)
-			err = p.require(p.peek.Type, types.CASE)
+			err = p.require(p.peek.Type, constants.TOKEN_CASE)
 			if err != nil {
 				return nil, err
 			}
@@ -68,7 +68,7 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 			casesToAppend = append(casesToAppend, _case)
 		}
 
-		err = p.require(p.peek.Type, types.EQGT)
+		err = p.require(p.peek.Type, constants.TOKEN_EQGT)
 		if err != nil {
 			return nil, err
 		}
@@ -85,7 +85,7 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 			cases = append(cases, c)
 		}
 
-		err = p.require(p.peek.Type, types.EOL)
+		err = p.require(p.peek.Type, constants.TOKEN_EOL)
 		if err != nil {
 			return nil, err
 		}
@@ -94,12 +94,12 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 	}
 	node.SetCases(cases)
 
-	err = p.require(p.peek.Type, types.RBRACE)
+	err = p.require(p.peek.Type, constants.TOKEN_RBRACE)
 	if err != nil {
 		return nil, err
 	}
 	p.next()
-	err = p.require(p.peek.Type, types.EOL)
+	err = p.require(p.peek.Type, constants.TOKEN_EOL)
 	if err != nil {
 		return nil, err
 	}

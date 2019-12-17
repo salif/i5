@@ -6,12 +6,12 @@ fn main() {
 		throw err
 	}
 	$print(result)
-	# output: "error: can not divide by zero!"
+	# output: "exception: can not divide by zero!"
 }
 
 fn divide(a b) {
 	if b == 0 {
-		return $error.new("can not divide by zero!")
+		return $exception("can not divide by zero!")
 	}
 	return a / b
 }

@@ -6,12 +6,12 @@ import (
 	"github.com/i5/i5/src/object"
 )
 
-func evalProgram(node ast.Program, env *object.Env) object.Object {
+func evalProgram(node ast.Program, env *object.Env) error {
 	for _, fn := range node.GetBody() {
-		var result object.Object = Eval(fn, env)
-		if ErrorType(result) == FATAL {
-			return result
+		_, err := Eval(fn, env)
+		if err != nil {
+			return err
 		}
 	}
-	return Nil(node.GetLine())
+	return nil
 }

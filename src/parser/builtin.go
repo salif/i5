@@ -3,11 +3,11 @@ package parser
 
 import (
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 func (p *Parser) parseBuiltin() (ast.Node, error) {
-	err := p.require(p.peek.Type, types.BUILTIN)
+	err := p.require(p.peek.Type, constants.TOKEN_BUILTIN)
 	if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,7 @@ package parser
 
 import (
 	"github.com/i5/i5/src/ast"
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 func (p *Parser) parseLoop() (ast.Node, error) {
@@ -14,7 +14,7 @@ func (p *Parser) parseLoop() (ast.Node, error) {
 		return nil, err
 	}
 	node.SetBody(e)
-	err = p.require(p.peek.Type, types.EOL)
+	err = p.require(p.peek.Type, constants.TOKEN_EOL)
 	if err != nil {
 		return nil, err
 	}

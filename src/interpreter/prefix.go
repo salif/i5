@@ -2,53 +2,54 @@
 package interpreter
 
 import (
+	"fmt"
+
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
-	"github.com/i5/i5/src/types"
 )
 
-func evalPrefixNode(node ast.Prefix, env *object.Env) object.Object {
-	var evaluatedRight object.Object = Eval(node.GetRight(), env)
-	if ErrorType(evaluatedRight) == FATAL {
-		return evaluatedRight
+func evalPrefixNode(node ast.Prefix, env *object.Env) (object.Object, error) {
+	evRight, err := Eval(node.GetRight(), env)
+	if err != nil {
+		return nil, err
 	}
-	return evalPrefix(node.GetOperator(), evaluatedRight, env, node.GetLine())
+	return evalPrefix(node.GetOperator(), evRight, env, node.GetLine())
 }
 
-func evalPrefix(operator string, right object.Object, env *object.Env, line uint32) object.Object {
+func evalPrefix(operator string, right object.Object, env *object.Env, line uint32) (object.Object, error) {
 	switch operator {
-	case types.NOT:
-		if right.Type() == object.BOOL {
+	case constants.TOKEN_NOT:
+		if right.Type() == constants.TYPE_BOOLEAN {
 			switch right {
 			case TRUE:
-				return FALSE
+				return FALSE, nil
 			case FALSE:
-				return TRUE
+				return TRUE, nil
 			default:
-				return FALSE
+				return FALSE, nil
 			}
 		} else {
-			return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_PREFIX, operator, right.Type())
+			return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_PREFIX, operator, right.Type())}
 		}
-	case types.BNOT:
-		if right.Type() == object.INTEGER {
+	case constants.TOKEN_BNOT:
+		if right.Type() == constants.TYPE_INTEGER {
 			value := right.(object.Integer).Value
-			return object.Integer{Value: ^value}
+			return object.Integer{Value: ^value}, nil
 		} else {
-			return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_PREFIX, operator, right.Type())
+			return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_PREFIX, operator, right.Type())}
 		}
-	case types.MINUS:
-		if right.Type() == object.INTEGER {
+	case constants.TOKEN_MINUS:
+		if right.Type() == constants.TYPE_INTEGER {
 			value := right.(object.Integer).Value
-			return object.Integer{Value: -value}
-		} else if right.Type() == object.FLOAT {
+			return object.Integer{Value: -value}, nil
+		} else if right.Type() == constants.TYPE_FLOAT {
 			value := right.(object.Float).Value
-			return object.Float{Value: -value}
+			return object.Float{Value: -value}, nil
 		} else {
-			return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_PREFIX, operator, right.Type())
+			return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_PREFIX, operator, right.Type())}
 		}
 	default:
-		return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_PREFIX, operator, right.Type())
+		return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_PREFIX, operator, right.Type())}
 	}
 }

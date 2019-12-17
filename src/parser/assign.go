@@ -4,61 +4,61 @@ package parser
 import (
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/types"
 )
 
 func (p *Parser) parseAssign(left ast.Node) (ast.Node, error) {
-	node := ast.Assign{}.Init(p.peek.Line, types.EQ, left)
+	node := ast.Assign{}.Init(p.peek.Line, constants.TOKEN_EQ, left)
 	switch p.peek.Type {
-	case types.EQ:
+
+	case constants.TOKEN_EQ:
 		p.next()
 		e, err := p.parseExpression(LOWEST)
 		if err != nil {
 			return nil, err
 		}
 		node.SetRight(e)
-	case types.COLONEQ:
+	case constants.TOKEN_COLONEQ:
 		p.next()
 		e, err := p.parseExpression(LOWEST)
 		if err != nil {
 			return nil, err
 		}
-		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.COLON, e))
-	case types.PLUSEQ:
+		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, constants.TOKEN_COLON, e))
+	case constants.TOKEN_PLUSEQ:
 		p.next()
 		e, err := p.parseExpression(LOWEST)
 		if err != nil {
 			return nil, err
 		}
-		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.PLUS, e))
-	case types.MINUSEQ:
+		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, constants.TOKEN_PLUS, e))
+	case constants.TOKEN_MINUSEQ:
 		p.next()
 		e, err := p.parseExpression(LOWEST)
 		if err != nil {
 			return nil, err
 		}
-		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.MINUS, e))
-	case types.MULTIPLYEQ:
+		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, constants.TOKEN_MINUS, e))
+	case constants.TOKEN_MULTIPLYEQ:
 		p.next()
 		e, err := p.parseExpression(LOWEST)
 		if err != nil {
 			return nil, err
 		}
-		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.MULTIPLY, e))
-	case types.DIVIDEEQ:
+		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, constants.TOKEN_MULTIPLY, e))
+	case constants.TOKEN_DIVIDEEQ:
 		p.next()
 		e, err := p.parseExpression(LOWEST)
 		if err != nil {
 			return nil, err
 		}
-		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.DIVIDE, e))
-	case types.MODULOEQ:
+		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, constants.TOKEN_DIVIDE, e))
+	case constants.TOKEN_MODULOEQ:
 		p.next()
 		e, err := p.parseExpression(LOWEST)
 		if err != nil {
 			return nil, err
 		}
-		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, types.MODULO, e))
+		node.SetRight(ast.Infix{}.Set(p.peek.Line, left, constants.TOKEN_MODULO, e))
 	default:
 		return nil, p.Throw(p.peek.Line, constants.PARSER_UNEXPECTED, p.peek.Type)
 	}

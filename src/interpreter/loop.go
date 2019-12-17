@@ -7,25 +7,17 @@ import (
 	"github.com/i5/i5/src/object"
 )
 
-func evalLoop(node ast.Loop, env *object.Env) object.Object {
+func evalLoop(node ast.Loop, env *object.Env) error {
 	for {
-		var evaluatedLoopStatement = Eval(node.GetBody(), env)
-		var errorType int = ErrorType(evaluatedLoopStatement)
-		if errorType == FATAL {
-			return evaluatedLoopStatement
-		}
-		if evaluatedLoopStatement.Type() == object.RETURN {
-			var forReturn object.Return = evaluatedLoopStatement.(object.Return)
-			if forReturn.Value.Type() == object.ERROR {
-				var errForReturn object.Error = forReturn.Value.(object.Error)
-				if errForReturn.Number.Value == constants.ERROR_BREAK {
+		_, err := Eval(node.GetBody(), env)
+		if err != nil {
+			if er, ok := err.(constants.Error); ok {
+				if er.Type == constants.ERROR_BREAK {
 					break
 				}
 			}
-		}
-		if errorType != 1 {
-			return evaluatedLoopStatement
+			return err
 		}
 	}
-	return Nil(node.GetLine())
+	return nil
 }

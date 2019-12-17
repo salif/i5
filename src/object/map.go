@@ -13,24 +13,21 @@ type Map struct {
 	Value map[Key]Object
 }
 
-func (this Map) Type() TYPE {
-	return MAP
+func (this Map) Type() string {
+	return constants.TYPE_MAP
 }
 
 func (this Map) StringValue() string {
-	return fmt.Sprintf("[type: %v]", this.Type())
-}
-func (this Map) ToString() String {
 	var out bytes.Buffer
 	out.WriteString("{")
 	result := []string{}
 	for i, v := range this.Value {
 		left := i.GetValue().StringValue()
 		right := v
-		if i.GetValue().Type() == STRING {
+		if i.GetValue().Type() == constants.TYPE_STRING {
 			left = "\"" + left + "\""
 		}
-		if right.Type() == STRING {
+		if right.Type() == constants.TYPE_STRING {
 			result = append(result, fmt.Sprintf("%v: \"%v\"", left, right.StringValue()))
 		} else {
 			result = append(result, fmt.Sprintf("%v: %v", left, right.StringValue()))
@@ -38,12 +35,7 @@ func (this Map) ToString() String {
 	}
 	out.WriteString(strings.Join(result, ", "))
 	out.WriteString("}")
-	return String{Value: out.String()}
-}
-
-func (this Map) Init() Map {
-	this.Value = make(map[Key]Object, 0)
-	return this
+	return out.String()
 }
 
 func (this *Map) Get(key Object) Object {
@@ -51,7 +43,7 @@ func (this *Map) Get(key Object) Object {
 	if value, ok := this.Value[rkey.GenKey()]; ok {
 		return value
 	} else {
-		return Error{IsFatal: false, Line: 0, Number: Integer{Value: constants.ERROR_NIL}, Message: String{Value: constants.IR_NIL}}
+		return Exception{Name: String{Value: constants.EXCEPTION_NULL}, Message: String{Value: constants.EXCEPTION_NULL}}
 	}
 }
 

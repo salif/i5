@@ -1,8 +1,8 @@
-fn main() {
-	write = $import("./console").write
-	calculator = $import("author/package_name")
+import "./console" as console
+import "author/package_name" as calculator
 
+fn main() {
 	result = calculator.sum(1, 2)
-	write(result)
+	console.write(result)
 	# output: "3"
 }

@@ -2,226 +2,229 @@
 package interpreter
 
 import (
+	"fmt"
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
-	"github.com/i5/i5/src/types"
 )
 
-func evalInfixNode(node ast.Infix, env *object.Env) object.Object {
-	if node.GetOperator() == types.QM {
+func evalInfixNode(node ast.Infix, env *object.Env) (object.Object, error) {
+	if node.GetOperator() == constants.TOKEN_QM {
 		return evalIsError(node, env)
 	}
-	var evaluatedLeft object.Object = Eval(node.GetLeft(), env)
-	if ErrorType(evaluatedLeft) == FATAL {
-		return evaluatedLeft
+
+	evLeft, err := Eval(node.GetLeft(), env)
+	if err != nil {
+		return nil, err
 	}
-	var evaluatedRight object.Object = Eval(node.GetRight(), env)
-	if ErrorType(evaluatedRight) == FATAL {
-		return evaluatedRight
+
+	evRight, err := Eval(node.GetRight(), env)
+	if err != nil {
+		return nil, err
 	}
-	return evalInfix(node.GetOperator(), evaluatedLeft, evaluatedRight, env, node.GetLine())
+
+	return evalInfix(node.GetOperator(), evLeft, evRight, env, node.GetLine())
 }
 
-func evalInfix(operator string, left, right object.Object, env *object.Env, line uint32) object.Object {
-	if operator == types.COLON {
-		return object.String{Value: left.StringValue() + right.StringValue()}
-	} else if left.Type() == right.Type() && left.Type() == object.INTEGER {
+func evalInfix(operator string, left, right object.Object, env *object.Env, line uint32) (object.Object, error) {
+	if operator == constants.TOKEN_COLON {
+		return object.String{Value: left.StringValue() + right.StringValue()}, nil
+	} else if left.Type() == right.Type() && left.Type() == constants.TYPE_INTEGER {
 		return evalIntegerWithIntegerInfix(operator, left, right, line)
-	} else if left.Type() == right.Type() && left.Type() == object.FLOAT {
+	} else if left.Type() == right.Type() && left.Type() == constants.TYPE_FLOAT {
 		return evalFloatWithFloatInfix(operator, left, right, line)
-	} else if left.Type() == object.INTEGER && right.Type() == object.FLOAT {
+	} else if left.Type() == constants.TYPE_INTEGER && right.Type() == constants.TYPE_FLOAT {
 		return evalIntegerWithFloatInfix(operator, left, right, line)
-	} else if left.Type() == object.FLOAT && right.Type() == object.INTEGER {
+	} else if left.Type() == constants.TYPE_FLOAT && right.Type() == constants.TYPE_INTEGER {
 		return evalFloatWithIntegerInfix(operator, left, right, line)
-	} else if left.Type() == right.Type() && left.Type() == object.STRING {
+	} else if left.Type() == right.Type() && left.Type() == constants.TYPE_STRING {
 		return evalStringInfix(operator, left, right, line)
-	} else if left.Type() == right.Type() && left.Type() == object.BOOL {
+	} else if left.Type() == right.Type() && left.Type() == constants.TYPE_BOOLEAN {
 		return evalBooleanInfix(operator, left, right, line)
 	}
-	return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+	return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())}
 }
 
-func evalIntegerWithIntegerInfix(operator string, left, right object.Object, line uint32) object.Object {
+func evalIntegerWithIntegerInfix(operator string, left, right object.Object, line uint32) (object.Object, error) {
 	var leftInteger int64 = left.(object.Integer).Value
 	var rightInteger int64 = right.(object.Integer).Value
 
 	switch operator {
-	case types.PLUS:
-		return object.Integer{Value: leftInteger + rightInteger}
-	case types.MINUS:
-		return object.Integer{Value: leftInteger - rightInteger}
-	case types.MULTIPLY:
-		return object.Integer{Value: leftInteger * rightInteger}
-	case types.DIVIDE:
-		return object.Integer{Value: leftInteger / rightInteger}
-	case types.MODULO:
-		return object.Integer{Value: leftInteger % rightInteger}
-	case types.OR:
-		return object.Integer{Value: leftInteger | rightInteger}
-	case types.XOR:
-		return object.Integer{Value: leftInteger ^ rightInteger}
-	case types.AND:
-		return object.Integer{Value: leftInteger & rightInteger}
-	case types.LTLT:
-		return object.Integer{Value: leftInteger << uint64(rightInteger)}
-	case types.GTGT:
-		return object.Integer{Value: leftInteger >> uint64(rightInteger)}
-	case types.LT:
-		return nativeToBool(leftInteger < rightInteger)
-	case types.LTEQ:
-		return nativeToBool(leftInteger <= rightInteger)
-	case types.GT:
-		return nativeToBool(leftInteger > rightInteger)
-	case types.GTEQ:
-		return nativeToBool(leftInteger >= rightInteger)
-	case types.EQEQ:
-		return nativeToBool(leftInteger == rightInteger)
-	case types.NOTEQ:
-		return nativeToBool(leftInteger != rightInteger)
+	case constants.TOKEN_PLUS:
+		return object.Integer{Value: leftInteger + rightInteger}, nil
+	case constants.TOKEN_MINUS:
+		return object.Integer{Value: leftInteger - rightInteger}, nil
+	case constants.TOKEN_MULTIPLY:
+		return object.Integer{Value: leftInteger * rightInteger}, nil
+	case constants.TOKEN_DIVIDE:
+		return object.Integer{Value: leftInteger / rightInteger}, nil
+	case constants.TOKEN_MODULO:
+		return object.Integer{Value: leftInteger % rightInteger}, nil
+	case constants.TOKEN_OR:
+		return object.Integer{Value: leftInteger | rightInteger}, nil
+	case constants.TOKEN_XOR:
+		return object.Integer{Value: leftInteger ^ rightInteger}, nil
+	case constants.TOKEN_AND:
+		return object.Integer{Value: leftInteger & rightInteger}, nil
+	case constants.TOKEN_LTLT:
+		return object.Integer{Value: leftInteger << uint64(rightInteger)}, nil
+	case constants.TOKEN_GTGT:
+		return object.Integer{Value: leftInteger >> uint64(rightInteger)}, nil
+	case constants.TOKEN_LT:
+		return nativeToBool(leftInteger < rightInteger), nil
+	case constants.TOKEN_LTEQ:
+		return nativeToBool(leftInteger <= rightInteger), nil
+	case constants.TOKEN_GT:
+		return nativeToBool(leftInteger > rightInteger), nil
+	case constants.TOKEN_GTEQ:
+		return nativeToBool(leftInteger >= rightInteger), nil
+	case constants.TOKEN_EQEQ:
+		return nativeToBool(leftInteger == rightInteger), nil
+	case constants.TOKEN_NOTEQ:
+		return nativeToBool(leftInteger != rightInteger), nil
 	default:
-		return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())}
 	}
 }
 
-func evalFloatWithFloatInfix(operator string, left, right object.Object, line uint32) object.Object {
+func evalFloatWithFloatInfix(operator string, left, right object.Object, line uint32) (object.Object, error) {
 	var leftFloat float64 = left.(object.Float).Value
 	var rightFloat float64 = right.(object.Float).Value
 
 	switch operator {
-	case types.PLUS:
-		return object.Float{Value: leftFloat + rightFloat}
-	case types.MINUS:
-		return object.Float{Value: leftFloat - rightFloat}
-	case types.MULTIPLY:
-		return object.Float{Value: leftFloat * rightFloat}
-	case types.DIVIDE:
-		return object.Float{Value: leftFloat / rightFloat}
-	case types.LT:
-		return nativeToBool(leftFloat < rightFloat)
-	case types.LTEQ:
-		return nativeToBool(leftFloat <= rightFloat)
-	case types.GT:
-		return nativeToBool(leftFloat > rightFloat)
-	case types.GTEQ:
-		return nativeToBool(leftFloat >= rightFloat)
-	case types.EQEQ:
-		return nativeToBool(leftFloat == rightFloat)
-	case types.NOTEQ:
-		return nativeToBool(leftFloat != rightFloat)
+	case constants.TOKEN_PLUS:
+		return object.Float{Value: leftFloat + rightFloat}, nil
+	case constants.TOKEN_MINUS:
+		return object.Float{Value: leftFloat - rightFloat}, nil
+	case constants.TOKEN_MULTIPLY:
+		return object.Float{Value: leftFloat * rightFloat}, nil
+	case constants.TOKEN_DIVIDE:
+		return object.Float{Value: leftFloat / rightFloat}, nil
+	case constants.TOKEN_LT:
+		return nativeToBool(leftFloat < rightFloat), nil
+	case constants.TOKEN_LTEQ:
+		return nativeToBool(leftFloat <= rightFloat), nil
+	case constants.TOKEN_GT:
+		return nativeToBool(leftFloat > rightFloat), nil
+	case constants.TOKEN_GTEQ:
+		return nativeToBool(leftFloat >= rightFloat), nil
+	case constants.TOKEN_EQEQ:
+		return nativeToBool(leftFloat == rightFloat), nil
+	case constants.TOKEN_NOTEQ:
+		return nativeToBool(leftFloat != rightFloat), nil
 	default:
-		return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())}
 	}
 }
 
-func evalIntegerWithFloatInfix(operator string, left, right object.Object, line uint32) object.Object {
+func evalIntegerWithFloatInfix(operator string, left, right object.Object, line uint32) (object.Object, error) {
 	var leftInteger int64 = left.(object.Integer).Value
 	var rightFloat float64 = right.(object.Float).Value
 
 	switch operator {
-	case types.PLUS:
-		return object.Float{Value: float64(leftInteger) + rightFloat}
-	case types.MINUS:
-		return object.Float{Value: float64(leftInteger) - rightFloat}
-	case types.MULTIPLY:
-		return object.Float{Value: float64(leftInteger) * rightFloat}
-	case types.DIVIDE:
-		return object.Float{Value: float64(leftInteger) / rightFloat}
-	case types.LT:
-		return nativeToBool(float64(leftInteger) < rightFloat)
-	case types.LTEQ:
-		return nativeToBool(float64(leftInteger) <= rightFloat)
-	case types.GT:
-		return nativeToBool(float64(leftInteger) > rightFloat)
-	case types.GTEQ:
-		return nativeToBool(float64(leftInteger) >= rightFloat)
-	case types.EQEQ:
-		return nativeToBool(float64(leftInteger) == rightFloat)
-	case types.NOTEQ:
-		return nativeToBool(float64(leftInteger) != rightFloat)
+	case constants.TOKEN_PLUS:
+		return object.Float{Value: float64(leftInteger) + rightFloat}, nil
+	case constants.TOKEN_MINUS:
+		return object.Float{Value: float64(leftInteger) - rightFloat}, nil
+	case constants.TOKEN_MULTIPLY:
+		return object.Float{Value: float64(leftInteger) * rightFloat}, nil
+	case constants.TOKEN_DIVIDE:
+		return object.Float{Value: float64(leftInteger) / rightFloat}, nil
+	case constants.TOKEN_LT:
+		return nativeToBool(float64(leftInteger) < rightFloat), nil
+	case constants.TOKEN_LTEQ:
+		return nativeToBool(float64(leftInteger) <= rightFloat), nil
+	case constants.TOKEN_GT:
+		return nativeToBool(float64(leftInteger) > rightFloat), nil
+	case constants.TOKEN_GTEQ:
+		return nativeToBool(float64(leftInteger) >= rightFloat), nil
+	case constants.TOKEN_EQEQ:
+		return nativeToBool(float64(leftInteger) == rightFloat), nil
+	case constants.TOKEN_NOTEQ:
+		return nativeToBool(float64(leftInteger) != rightFloat), nil
 	default:
-		return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())}
 	}
 }
 
-func evalFloatWithIntegerInfix(operator string, left, right object.Object, line uint32) object.Object {
+func evalFloatWithIntegerInfix(operator string, left, right object.Object, line uint32) (object.Object, error) {
 	var leftFloat float64 = left.(object.Float).Value
 	var rightInteger int64 = right.(object.Integer).Value
 
 	switch operator {
-	case types.PLUS:
-		return object.Float{Value: leftFloat + float64(rightInteger)}
-	case types.MINUS:
-		return object.Float{Value: leftFloat - float64(rightInteger)}
-	case types.MULTIPLY:
-		return object.Float{Value: leftFloat * float64(rightInteger)}
-	case types.DIVIDE:
-		return object.Float{Value: leftFloat / float64(rightInteger)}
-	case types.LT:
-		return nativeToBool(leftFloat < float64(rightInteger))
-	case types.LTEQ:
-		return nativeToBool(leftFloat <= float64(rightInteger))
-	case types.GT:
-		return nativeToBool(leftFloat > float64(rightInteger))
-	case types.GTEQ:
-		return nativeToBool(leftFloat >= float64(rightInteger))
-	case types.EQEQ:
-		return nativeToBool(leftFloat == float64(rightInteger))
-	case types.NOTEQ:
-		return nativeToBool(leftFloat != float64(rightInteger))
+	case constants.TOKEN_PLUS:
+		return object.Float{Value: leftFloat + float64(rightInteger)}, nil
+	case constants.TOKEN_MINUS:
+		return object.Float{Value: leftFloat - float64(rightInteger)}, nil
+	case constants.TOKEN_MULTIPLY:
+		return object.Float{Value: leftFloat * float64(rightInteger)}, nil
+	case constants.TOKEN_DIVIDE:
+		return object.Float{Value: leftFloat / float64(rightInteger)}, nil
+	case constants.TOKEN_LT:
+		return nativeToBool(leftFloat < float64(rightInteger)), nil
+	case constants.TOKEN_LTEQ:
+		return nativeToBool(leftFloat <= float64(rightInteger)), nil
+	case constants.TOKEN_GT:
+		return nativeToBool(leftFloat > float64(rightInteger)), nil
+	case constants.TOKEN_GTEQ:
+		return nativeToBool(leftFloat >= float64(rightInteger)), nil
+	case constants.TOKEN_EQEQ:
+		return nativeToBool(leftFloat == float64(rightInteger)), nil
+	case constants.TOKEN_NOTEQ:
+		return nativeToBool(leftFloat != float64(rightInteger)), nil
 	default:
-		return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())}
 	}
 }
 
-func evalStringInfix(operator string, left, right object.Object, line uint32) object.Object {
+func evalStringInfix(operator string, left, right object.Object, line uint32) (object.Object, error) {
 	var leftString string = left.(object.String).Value
 	var rightString string = right.(object.String).Value
 
 	switch operator {
-	case types.EQEQ:
-		return nativeToBool(leftString == rightString)
-	case types.NOTEQ:
-		return nativeToBool(leftString != rightString)
+	case constants.TOKEN_EQEQ:
+		return nativeToBool(leftString == rightString), nil
+	case constants.TOKEN_NOTEQ:
+		return nativeToBool(leftString != rightString), nil
 	default:
-		return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())}
 	}
 }
 
-func evalBooleanInfix(operator string, left, right object.Object, line uint32) object.Object {
-	var leftBoolean bool = left.(object.Bool).Value
-	var rightBoolean bool = right.(object.Bool).Value
+func evalBooleanInfix(operator string, left, right object.Object, line uint32) (object.Object, error) {
+	var leftBoolean bool = left.(object.Boolean).Value
+	var rightBoolean bool = right.(object.Boolean).Value
 
 	switch operator {
-	case types.EQEQ:
-		return nativeToBool(leftBoolean == rightBoolean)
-	case types.NOTEQ:
-		return nativeToBool(leftBoolean != rightBoolean)
-	case types.ANDAND:
-		return nativeToBool(leftBoolean && rightBoolean)
-	case types.OROR:
-		return nativeToBool(leftBoolean || rightBoolean)
+	case constants.TOKEN_EQEQ:
+		return nativeToBool(leftBoolean == rightBoolean), nil
+	case constants.TOKEN_NOTEQ:
+		return nativeToBool(leftBoolean != rightBoolean), nil
+	case constants.TOKEN_ANDAND:
+		return nativeToBool(leftBoolean && rightBoolean), nil
+	case constants.TOKEN_OROR:
+		return nativeToBool(leftBoolean || rightBoolean), nil
 	default:
-		return newError(true, line, constants.ERROR_INTERTAL, constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())
+		return nil, constants.Error{Line: line, Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_INVALID_INFIX, left.Type(), operator, right.Type())}
 	}
 }
 
-func evalIsError(node ast.Infix, env *object.Env) object.Object {
-	var evaluatedRight object.Object = Eval(node.GetRight(), env)
-	e := ErrorType(evaluatedRight)
-	if e == FATAL {
-		return evaluatedRight
+func evalIsError(node ast.Infix, env *object.Env) (object.Object, error) {
+	evRight, err := Eval(node.GetRight(), env)
+	if err != nil {
+		return nil, err
 	}
-	if e == 0 {
-		return FALSE
+
+	if evRight.Type() != constants.TYPE_EXCEPTION {
+		return FALSE, nil
 	} else {
 		left := node.GetLeft()
-		if left.GetType() == types.IDENT {
+		if left.GetType() == constants.TOKEN_IDENTIFIER {
 			ident := left.(ast.Identifier)
-			env.Set(ident.GetValue(), evaluatedRight)
-			return TRUE
+			env.Set(ident.GetValue(), evRight)
+			return TRUE, nil
 		} else {
-			return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_CANNOT_ASSIGN, left.GetType())
+			return nil, constants.Error{Line: node.GetLine(), Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_CANNOT_ASSIGN, left.GetType())}
 		}
 	}
 }

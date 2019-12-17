@@ -4,7 +4,7 @@ package ast
 import (
 	"strings"
 
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 type Ternary struct {
@@ -28,7 +28,7 @@ func (this Ternary) Debug() string {
 	result.WriteString(this.consequence.Debug())
 	if this.HaveAlternative() {
 		result.WriteString(" ")
-		result.WriteString(types.QMQM)
+		result.WriteString(constants.TOKEN_QMQM)
 		result.WriteString(" ")
 		result.WriteString(this.alternative.Debug())
 	}

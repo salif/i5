@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package object
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/i5/i5/src/constants"
+)
 
 type Integer struct {
 	Value int64
 }
 
-func (this Integer) Type() TYPE {
-	return INTEGER
+func (this Integer) Type() string {
+	return constants.TYPE_INTEGER
 }
 
 func (this Integer) StringValue() string {

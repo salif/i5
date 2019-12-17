@@ -16,9 +16,11 @@
 package main
 
 import (
+	"os"
+
 	"github.com/i5/i5/src/i5"
 )
 
 func main() {
-	i5.ParseArguments()
+	os.Exit(i5.ParseArguments(os.Args))
 }

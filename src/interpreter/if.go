@@ -2,26 +2,34 @@
 package interpreter
 
 import (
+	"fmt"
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/object"
 )
 
-func evalIf(node ast.If, env *object.Env) object.Object {
-	var evaluatedCondition object.Object = Eval(node.GetCondition(), env)
+func evalIf(node ast.If, env *object.Env) error {
+	ev, err := Eval(node.GetCondition(), env)
 
-	if ErrorType(evaluatedCondition) == FATAL {
-		return evaluatedCondition
+	if err != nil {
+		return err
 	}
 
-	if evaluatedCondition.Type() != object.BOOL {
-		return newError(true, node.GetLine(), constants.ERROR_INTERTAL, constants.IR_IS_NOT_A_BOOL, evaluatedCondition.Type())
+	if ev.Type() != constants.TYPE_BOOLEAN {
+		return constants.Error{Line: node.GetLine(), Type: constants.ERROR_FATAL, Message: fmt.Sprintf(constants.IR_IS_NOT_A_BOOL, ev.Type())}
 	}
-	if isTrue(evaluatedCondition) {
-		return Eval(node.GetConsequence(), env)
+
+	if isTrue(ev) {
+		_, err := Eval(node.GetConsequence(), env)
+		if err != nil {
+			return err
+		}
 	} else if node.HaveAlternative() {
-		return Eval(node.GetAlternative(), env)
-	} else {
-		return Nil(node.GetLine())
+		_, err := Eval(node.GetAlternative(), env)
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }

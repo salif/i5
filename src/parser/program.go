@@ -4,15 +4,14 @@ package parser
 import (
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
-	"github.com/i5/i5/src/types"
 )
 
 func (p *Parser) parseProgram() (ast.Node, error) {
 	node := ast.Program{}.Init(p.peek.Line)
 
 	body := make([]ast.Function, 0)
-	for p.peek.Type != types.EOF {
-		if p.peek.Type == types.EOL {
+	for p.peek.Type != constants.TOKEN_EOF {
+		if p.peek.Type == constants.TOKEN_EOL {
 			p.next()
 			continue
 		}

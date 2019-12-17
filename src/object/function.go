@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/i5/i5/src/ast"
+	"github.com/i5/i5/src/constants"
 )
 
 type Function struct {
@@ -13,10 +14,10 @@ type Function struct {
 	Env    *Env
 }
 
-func (this Function) Type() TYPE {
-	return FUNCTION
+func (this Function) Type() string {
+	return constants.TYPE_FUNCTION
 }
 
 func (this Function) StringValue() string {
-	return fmt.Sprintf("[type: %v]", this.Type())
+	return fmt.Sprintf("[type: %v, params: %v]", this.Type(), len(this.Params))
 }

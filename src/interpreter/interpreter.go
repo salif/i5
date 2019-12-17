@@ -2,19 +2,33 @@
 package interpreter
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/i5/i5/src/ast"
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/file"
-	"github.com/i5/i5/src/lexer"
 	"github.com/i5/i5/src/object"
 	"github.com/i5/i5/src/parser"
 )
 
-func Run(fileOrDirectoryName string, args []string) error {
-	fileOrDirectoryName, err := filepath.Abs(fileOrDirectoryName)
+type Interpreter struct {
+	args []string
+	p    string
+}
+
+func New(args []string, p string) Interpreter {
+	this := Interpreter{}
+	this.args = args
+	this.p = p
+	return this
+}
+
+func (this Interpreter) Run() error {
+	fileOrDirectoryName, err := filepath.Abs(this.args[0])
 	if err != nil {
 		return Errf(err)
 	}
@@ -35,11 +49,43 @@ func Run(fileOrDirectoryName string, args []string) error {
 	}
 }
 
-func RunEval(content string, args []string) error {
+func (this Interpreter) RunEval(content string) error {
 	return runFile("evaluated code", []byte(content))
 }
 
-// TODO remove dublication
+func (this Interpreter) RunRepl() error {
+	fmt.Printf("i5 v%v\n", constants.PATCH_VERSION)
+	reader := bufio.NewReader(os.Stdin)
+	var env *object.Env = object.InitEnv()
+	var fileName string = "REPL"
+
+	for {
+		fmt.Print("> ")
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println()
+			return Errf(err)
+		}
+		if len(strings.TrimSpace(input)) == 0 {
+			continue
+		}
+		var code []byte = []byte(input)
+
+		program, err := parser.Parse(fileName, code)
+		if err != nil {
+			fmt.Print(err.Error())
+			continue
+		}
+
+		result, err := Eval(program, env)
+		if err == nil {
+			fmt.Println(result.StringValue())
+		} else {
+			fmt.Print(Errf(err))
+		}
+	}
+}
+
 func runModule(absoluteDirectoryName string) error {
 	var env *object.Env = object.InitEnv()
 	filesToRun, err := file.GetFilesToRun(absoluteDirectoryName)
@@ -50,15 +96,15 @@ func runModule(absoluteDirectoryName string) error {
 	if err != nil {
 		return err
 	}
-	var evaluatedPrograms object.Error = evalProgramNodes(programs, env)
-	if evaluatedPrograms.IsFatal {
-		// TODO edit fileName
-		return evaluatedPrograms.NativeError(absoluteDirectoryName)
+	for _, program := range programs {
+		_, err := Eval(program, env)
+		if err != nil {
+			return Errf(err)
+		}
 	}
-	var evaluatedMainFunction object.Object = evalMainFunction(env)
-	var errorType int = ErrorType(evaluatedMainFunction)
-	if errorType == 2 || errorType == 3 {
-		return evaluatedMainFunction.(object.Error).NativeError(absoluteDirectoryName)
+	_, err = evalMainFunction(env)
+	if err != nil {
+		return Errf(err)
 	} else {
 		return nil
 	}
@@ -71,14 +117,13 @@ func runFile(fileName string, code []byte) error {
 	if err != nil {
 		return err
 	}
-	var evaluatedProgram object.Error = evalProgramNode(program, env)
-	if evaluatedProgram.IsFatal {
-		return evaluatedProgram.NativeError(fileName)
+	_, err = Eval(program, env)
+	if err != nil {
+		return Errf(err)
 	}
-	var evaluatedMainFunction object.Object = evalMainFunction(env)
-	var errorType int = ErrorType(evaluatedMainFunction)
-	if errorType == 2 || errorType == 3 {
-		return evaluatedMainFunction.(object.Error).NativeError(fileName)
+	_, err = evalMainFunction(env)
+	if err != nil {
+		return Errf(err)
 	} else {
 		return nil
 	}
@@ -101,13 +146,9 @@ func parsePrograms(fileNames []string) ([]ast.Node, error) {
 }
 
 func parseProgram(fileName string, code []byte) (ast.Node, error) {
-	tokens, err := lexer.Run(fileName, code)
+	program, err := parser.ParseProgram(fileName, code)
 	if err != nil {
 		return nil, err
-	}
-	program, err2 := parser.Run(fileName, tokens)
-	if err2 != nil {
-		return nil, err2
 	}
 	return program, nil
 }

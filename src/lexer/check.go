@@ -4,64 +4,42 @@ package lexer
 import (
 	"fmt"
 
+	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/i5/colors"
-	"github.com/i5/i5/src/types"
-)
-
-const (
-	EQ       byte = 61
-	NOT      byte = 33
-	PLUS     byte = 43
-	MINUS    byte = 45
-	MULTIPLY byte = 42
-	DIVIDE   byte = 47
-	MODULO   byte = 37
-	AND      byte = 38
-	OR       byte = 124
-	XOR      byte = 94
-	BNOT     byte = 126
-	LT       byte = 60
-	GT       byte = 62
-	COLON    byte = 58
-	DOT      byte = 46
-	COMMA    byte = 44
-	LPAREN   byte = 40
-	RPAREN   byte = 41
-	LBRACE   byte = 123
-	RBRACE   byte = 125
-	LBRACKET byte = 91
-	RBRACKET byte = 93
-	QM       byte = 63
 )
 
 func getIdentType(value string) string {
 	switch value {
-	case types.ANDAND:
-		return types.ANDAND
-	case types.OROR:
-		return types.OROR
-	case types.FN:
-		return types.FN
-	case types.LAMBDA:
-		return types.LAMBDA
-	case types.IF:
-		return types.IF
-	case types.ELIF:
-		return types.ELIF
-	case types.ELSE:
-		return types.ELSE
-	case types.SWITCH:
-		return types.SWITCH
-	case types.CASE:
-		return types.CASE
-	case types.LOOP:
-		return types.LOOP
-	case types.RETURN:
-		return types.RETURN
-	case types.THROW:
-		return types.THROW
+	case constants.TOKEN_ANDAND:
+		return constants.TOKEN_ANDAND
+	case constants.TOKEN_OROR:
+		return constants.TOKEN_OROR
+	case constants.TOKEN_FN:
+		return constants.TOKEN_FN
+	case constants.TOKEN_RETURN:
+		return constants.TOKEN_RETURN
+	case constants.TOKEN_IF:
+		return constants.TOKEN_IF
+	case constants.TOKEN_ELIF:
+		return constants.TOKEN_ELIF
+	case constants.TOKEN_ELSE:
+		return constants.TOKEN_ELSE
+	case constants.TOKEN_SWITCH:
+		return constants.TOKEN_SWITCH
+	case constants.TOKEN_CASE:
+		return constants.TOKEN_CASE
+	case constants.TOKEN_LOOP:
+		return constants.TOKEN_LOOP
+	case constants.TOKEN_BREAK:
+		return constants.TOKEN_BREAK
+	case constants.TOKEN_THROW:
+		return constants.TOKEN_THROW
+	case constants.TOKEN_IMPORT:
+		return constants.TOKEN_IMPORT
+	case constants.TOKEN_AS:
+		return constants.TOKEN_AS
 	default:
-		return types.IDENT
+		return constants.TOKEN_IDENTIFIER
 	}
 }
 

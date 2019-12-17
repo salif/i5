@@ -4,7 +4,7 @@ package ast
 import (
 	"strings"
 
-	"github.com/i5/i5/src/types"
+	"github.com/i5/i5/src/constants"
 )
 
 type Switch struct {
@@ -67,7 +67,7 @@ type Case struct {
 
 func (this Case) Debug() string {
 	var result strings.Builder
-	result.WriteString(types.CASE)
+	result.WriteString(constants.TOKEN_CASE)
 	result.WriteString(" ")
 	result.WriteString(this._case.Debug())
 	result.WriteString(" => ")
