@@ -9,7 +9,7 @@ import (
 func (p *Parser) parseImport() (ast.Node, error) {
 	node := ast.Import{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // 'import'
-	e, err := p.parseExpression(LOWEST)
+	e, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 	if err != nil {
 		return nil, err
 	}

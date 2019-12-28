@@ -12,7 +12,7 @@ func (p *Parser) parseGroup() (ast.Node, error) {
 		return nil, err
 	}
 	p.next() // '('
-	node, err := p.parseExpression(LOWEST)
+	node, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 	if err != nil {
 		return nil, err
 	}

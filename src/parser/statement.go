@@ -26,7 +26,7 @@ func (p *Parser) parseStatement() (ast.Node, error) {
 	case constants.TOKEN_IMPORT:
 		return p.parseImport()
 	default:
-		node, err := p.parseExpression(LOWEST)
+		node, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 		if err != nil {
 			return nil, err
 		}

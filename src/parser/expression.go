@@ -9,7 +9,7 @@ import (
 func (p *Parser) parseExpression(precedence int) (ast.Node, error) {
 	prefix := p.prefixFunctions[p.peek.Type]
 	if prefix == nil {
-		return nil, p.Throw(p.peek.Line, constants.PARSER_UNEXPECTED, p.peek.Value)
+		return nil, p.Throw(p.peek.Line, constants.SYNTAX_UNEXPECTED, p.peek.Value)
 	}
 	leftExpression, err := prefix()
 	if err != nil {
@@ -19,7 +19,7 @@ func (p *Parser) parseExpression(precedence int) (ast.Node, error) {
 	for p.peek.Type != constants.TOKEN_EOL && precedence < p.precedence() {
 		infix := p.infixFunctions[p.peek.Type]
 		if infix == nil {
-			return nil, p.Throw(p.peek.Line, constants.PARSER_UNEXPECTED, p.peek.Value)
+			return nil, p.Throw(p.peek.Line, constants.SYNTAX_UNEXPECTED, p.peek.Value)
 		}
 		leftExpression, err = infix(leftExpression)
 		if err != nil {

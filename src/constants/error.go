@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package constants
 
+import "fmt"
+
 type Error struct {
 	Line    uint32
 	Message string
@@ -17,3 +19,12 @@ const (
 	ERROR_RETURN byte = 1
 	ERROR_BREAK  byte = 2
 )
+
+type SyntaxError struct {
+	Message string
+	In      string
+}
+
+func (this SyntaxError) Error() string {
+	return fmt.Sprintf(SYNTAX_ERROR, this.Message, this.In)
+}

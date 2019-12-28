@@ -9,7 +9,7 @@ import (
 func (p *Parser) parseReturn() (ast.Node, error) {
 	node := ast.Return{}.Init(p.peek.Line, p.peek.Type)
 	p.next() // 'return'
-	e, err := p.parseExpression(LOWEST)
+	e, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 	if err != nil {
 		return nil, err
 	}

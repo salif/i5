@@ -51,7 +51,7 @@ func (p *Parser) parseFunctionExpr() (ast.Node, error) {
 		}
 		node.SetBody(body)
 	} else {
-		body, err := p.parseExpression(LOWEST)
+		body, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 		if err != nil {
 			return nil, err
 		}

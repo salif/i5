@@ -11,7 +11,7 @@ func (p *Parser) parseIf() (ast.Node, error) {
 
 	p.next() // 'if' or 'elif'
 
-	e, err := p.parseExpression(LOWEST)
+	e, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (p *Parser) parseIf() (ast.Node, error) {
 	if e, ok := e.(ast.Block); ok {
 		node.SetConsequence(e)
 	} else {
-		return nil, p.Throw(e.GetLine(), constants.PARSER_EXPECTED, "block statement")
+		return nil, p.Throw(e.GetLine(), constants.SYNTAX_EXPECTED, "block statement")
 	}
 
 	if p.peek.Type == constants.TOKEN_ELIF {
@@ -42,7 +42,7 @@ func (p *Parser) parseIf() (ast.Node, error) {
 		if e, ok := e.(ast.Block); ok {
 			node.SetAlternative(e)
 		} else {
-			return nil, p.Throw(e.GetLine(), constants.PARSER_EXPECTED, "block statement")
+			return nil, p.Throw(e.GetLine(), constants.SYNTAX_EXPECTED, "block statement")
 		}
 	}
 
@@ -53,7 +53,7 @@ func (p *Parser) parseTernary(left ast.Node) (ast.Node, error) {
 	node := ast.Ternary{}.Init(p.peek.Line, p.peek.Type)
 	p.next()
 	node.SetCondition(left)
-	e, err := p.parseExpression(LOWEST)
+	e, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (p *Parser) parseTernary(left ast.Node) (ast.Node, error) {
 
 	if p.peek.Type == constants.TOKEN_COLONCOLON {
 		p.next()
-		e, err = p.parseExpression(LOWEST)
+		e, err = p.parseExpression(constants.PRECEDENCE_LOWEST)
 		if err != nil {
 			return nil, err
 		}

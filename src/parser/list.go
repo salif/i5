@@ -13,7 +13,7 @@ func (p *Parser) parseList(end string) ([]ast.Node, error) {
 		return list, nil
 	}
 
-	e, err := p.parseExpression(LOWEST)
+	e, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (p *Parser) parseList(end string) ([]ast.Node, error) {
 		if p.peek.Type == constants.TOKEN_EOL {
 			p.next() // 'EOL'
 		}
-		e, err := p.parseExpression(LOWEST)
+		e, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 		if err != nil {
 			return nil, err
 		}

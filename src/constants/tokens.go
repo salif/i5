@@ -8,7 +8,9 @@ type Token struct {
 }
 
 const (
+	// end of line
 	TOKEN_EOL string = "EOL"
+	// end of file
 	TOKEN_EOF string = "EOF"
 
 	// types
@@ -82,3 +84,20 @@ const (
 	TOKEN_LBRACE string = "{"
 	TOKEN_RBRACE string = "}"
 )
+
+var KEYWORDS = map[string]string{
+	TOKEN_ANDAND: TOKEN_ANDAND,
+	TOKEN_OROR:   TOKEN_OROR,
+	TOKEN_FN:     TOKEN_FN,
+	TOKEN_RETURN: TOKEN_RETURN,
+	TOKEN_IMPORT: TOKEN_IMPORT,
+	TOKEN_AS:     TOKEN_AS,
+	TOKEN_IF:     TOKEN_IF,
+	TOKEN_ELIF:   TOKEN_IF,
+	TOKEN_ELSE:   TOKEN_ELSE,
+	TOKEN_SWITCH: TOKEN_SWITCH,
+	TOKEN_CASE:   TOKEN_CASE,
+	TOKEN_LOOP:   TOKEN_LOOP,
+	TOKEN_BREAK:  TOKEN_BREAK,
+	TOKEN_THROW:  TOKEN_THROW,
+}

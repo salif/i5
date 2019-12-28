@@ -21,7 +21,7 @@ func (p *Parser) parseProgram() (ast.Node, error) {
 		} else if e, ok := e.(ast.Function); ok {
 			body = append(body, e)
 		} else {
-			return nil, p.Throw(e.GetLine(), constants.PARSER_EXPECTED, "function")
+			return nil, p.Throw(e.GetLine(), constants.SYNTAX_EXPECTED, "function")
 		}
 	}
 	node.SetBody(body)

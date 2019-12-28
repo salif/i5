@@ -71,7 +71,9 @@ func (this Interpreter) RunRepl() error {
 		}
 		var code []byte = []byte(input)
 
-		program, err := parser.Parse(fileName, code)
+		var _parser parser.Parser
+		_parser.Init(fileName, code)
+		program, err := _parser.Parse()
 		if err != nil {
 			fmt.Print(err.Error())
 			continue
@@ -146,7 +148,9 @@ func parsePrograms(fileNames []string) ([]ast.Node, error) {
 }
 
 func parseProgram(fileName string, code []byte) (ast.Node, error) {
-	program, err := parser.ParseProgram(fileName, code)
+	var _parser parser.Parser
+	_parser.Init(fileName, code)
+	program, err := _parser.ParseProgram()
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,6 @@ import (
 
 	"github.com/i5/i5/src/constants"
 	"github.com/i5/i5/src/i5/args_parser"
-	"github.com/i5/i5/src/i5/colors"
 	"github.com/i5/i5/src/interpreter"
 )
 
@@ -17,13 +16,12 @@ func ParseArguments(args []string) int {
 	argumentsParser.Init(args, "i5 [options] [file] [arguments]")
 	argumentsParser.Bool("help", "print help")
 	argumentsParser.String("print", "string: 'code' or 'ast'", "string")
-	argumentsParser.String("output", "string: 'no-color', 'html' or 'default'", "string")
 	argumentsParser.String("eval", "evaluate code", "code")
 	argumentsParser.Bool("version", "print current version")
 
 	var parseError error = argumentsParser.Parse()
 	if parseError != nil {
-		fmt.Fprintf(os.Stderr, "%v%v\n", colors.Red("error: "), parseError.Error())
+		fmt.Fprintf(os.Stderr, "%v%v\n", "error: ", parseError.Error())
 		return 1
 	}
 
@@ -35,15 +33,6 @@ func ParseArguments(args []string) int {
 	if argumentsParser.IsTrue("version") {
 		printVersion()
 		return 0
-	}
-
-	if len(argumentsParser.Get("output")) > 0 {
-		format := argumentsParser.Get("output")
-		var err error = colors.SetColorFormat(format)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v%v\n", colors.Red("error: "), err.Error())
-			return 1
-		}
 	}
 
 	var realArguments []string = argumentsParser.GetRealArguments()

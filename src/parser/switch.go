@@ -9,7 +9,7 @@ import (
 func (p *Parser) parseSwitch() (ast.Node, error) {
 	node := ast.Switch{}.Init(p.peek.Line, p.peek.Type)
 	p.next()
-	e, err := p.parseExpression(LOWEST)
+	e, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 		}
 		p.next() // 'case'
 
-		e, err := p.parseExpression(LOWEST)
+		e, err := p.parseExpression(constants.PRECEDENCE_LOWEST)
 		if err != nil {
 			return nil, err
 		}
@@ -59,7 +59,7 @@ func (p *Parser) parseSwitch() (ast.Node, error) {
 				return nil, err
 			}
 			p.next() // 'case'
-			e, err = p.parseExpression(LOWEST)
+			e, err = p.parseExpression(constants.PRECEDENCE_LOWEST)
 			if err != nil {
 				return nil, err
 			}

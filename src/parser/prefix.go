@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package parser
 
-import "github.com/i5/i5/src/ast"
+import (
+	"github.com/i5/i5/src/ast"
+	"github.com/i5/i5/src/constants"
+)
 
 func (p *Parser) parsePrefix() (ast.Node, error) {
 	node := ast.Prefix{}.Init(p.peek.Line, p.peek.Value)
 	p.next()
-	e, err := p.parseExpression(PREFIX)
+	e, err := p.parseExpression(constants.PRECEDENCE_PREFIX)
 	if err != nil {
 		return nil, err
 	}
