@@ -1,4 +1,8 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright 2020 Salif Mehmed
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 package constants
 
 // not included: 0-8, 11, 12, 14-31, 59, 64, 127
