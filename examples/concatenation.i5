@@ -1,8 +1,0 @@
-#!/usr/bin/env i5
-
-fn main() {
-	variable = 1
-	variable := 2
-	$print(0 : variable : "8" : -10)
-	# output: "0128-10"
-}

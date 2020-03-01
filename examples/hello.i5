@@ -1,6 +1,0 @@
-#!/usr/bin/env i5
-
-fn main() {
-	$print("Hello, World!")
-	# output: "Hello, World!"
-}

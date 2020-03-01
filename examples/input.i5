@@ -1,6 +1,0 @@
-#!/usr/bin/env i5
-
-fn main() {
-	input = $console_read_line("write input: ")
-	$print("input: " : input)
-}

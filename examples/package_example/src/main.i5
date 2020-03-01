@@ -1,8 +1,0 @@
-import "./console" as console
-import "author/package_name" as calculator
-
-fn main() {
-	result = calculator.sum(1, 2)
-	console.write(result)
-	# output: "3"
-}

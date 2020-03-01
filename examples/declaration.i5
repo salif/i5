@@ -1,7 +1,0 @@
-#!/usr/bin/env i5
-
-fn main() {
-	variable = 1
-	$print(variable)
-	# output: 1
-}

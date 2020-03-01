@@ -1,9 +1,0 @@
-#!/usr/bin/env i5
-
-fn main() {
-	# comment
-
-	`
-		comment
-	`
-}

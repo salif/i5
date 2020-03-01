@@ -1,9 +1,0 @@
-#!/usr/bin/env i5
-
-fn main() {
-	map = $map()
-	$map_set(map, "name", "Name")
-	$map_set(map, "age", 0)
-	$print(map)
-	# output: '{"name": "Name", "age": 0}'
-}
